@@ -1,0 +1,12 @@
+diff -up angelscript-2.22.0/angelscript/projects/gnuc/makefile.orig angelscript-2.22.0/angelscript/projects/gnuc/makefile
+--- angelscript-2.22.0/sdk/angelscript/projects/gnuc/makefile.orig	2011-12-23 18:10:38.000000000 +0100
++++ angelscript-2.22.0/sdk/angelscript/projects/gnuc/makefile	2011-12-23 18:10:46.000000000 +0100
+@@ -101,7 +101,7 @@ all: $(BIN)
+ $(BIN): $(OBJDIR) $(LIBDIR) $(OBJ)
+ ifdef SHARED
+ 	$(CXX) -shared -Wl,-soname,$(LIB) -o $(BIN) $(OBJ)
+-	( cd $(LIBDIR); ln -s $(LIB) $(DEVLIB) )
++	( cd $(LIBDIR); ln -sf $(LIB) $(DEVLIB) )
+ else
+ 	$(AR) r $(BIN) $(OBJ)
+ 	$(RANLIB) $(BIN)

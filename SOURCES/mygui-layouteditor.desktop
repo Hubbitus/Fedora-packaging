@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=MyGUI Layout Editor
+GenericName=MyGUI Layout Editor
+Comment=Design UIs usgin MyGUI library
+Exec=MyGUI-Tools LayoutEditor
+Icon=preferences-system-windows.png
+Terminal=false
+Type=Application
+Categories=Development;

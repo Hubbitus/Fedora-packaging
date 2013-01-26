@@ -1,0 +1,48 @@
+#!/bin/sh
+# Based on Ogre-Samples by Alexey Torkhov shipped with ogre-samples package.
+
+runSample()
+{
+  sample=$1
+  echo "Running $sample..."
+  $LIBDIR/MYGUI/Tools/$sample
+}
+
+set -e
+
+# find out LIBDIR
+if [ -f /usr/lib64/MYGUI/Tools/resources.xml ]; then
+  LIBDIR=/usr/lib64
+else
+  LIBDIR=/usr/lib
+fi
+
+mkdir -p $HOME/.mygui-tools
+cd $HOME/.mygui-tools
+
+for i in plugins.cfg resources.xml; do
+  cp -f $LIBDIR/MYGUI/Tools/$i .
+done
+
+set +e
+
+if [ "$1" = "-a" ]; then
+  for i in `(cd $LIBDIR/MYGUI/Tools/; find -type f -perm +111 | sort)`; do
+    runSample `echo $i | sed 's|./||'`
+  done
+elif [ $# -ge 1 ]; then
+  while [ $# -ge 1 ]; do
+    runSample $1
+    shift
+  done
+else
+  echo "Usage:" `basename $0` "(tool)"
+  echo
+  echo "tool - Runs specified tool from list"
+  echo
+  echo -n "Available tools:"
+  for i in `(cd $LIBDIR/MYGUI/Tools/; find -type f -perm +111 | sort)`; do
+    echo -n " $i" | sed 's|./||'
+  done
+  echo
+fi

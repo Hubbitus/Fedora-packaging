@@ -1,0 +1,12 @@
+diff -Nur MyGUI3.0.orig/CMake/Templates/MYGUI.pc.in MyGUI3.0/CMake/Templates/MYGUI.pc.in
+--- MyGUI3.0.orig/CMake/Templates/MYGUI.pc.in	2011-05-02 16:54:18.429693639 -0600
++++ MyGUI3.0/CMake/Templates/MYGUI.pc.in	2011-05-02 16:56:38.701732685 -0600
+@@ -7,6 +7,5 @@
+ Description: Fast, flexible and simple GUI
+ Version: @MYGUI_VERSION@
+ URL: http://www.my-gui.sourceforge.net
+-Libs: -L${libdir} -L${libdir}/MYGUI -lMyGUIEngine@MYGUI_LIB_SUFFIX@ -lMyGUI.Ogr
+-ePlatform @MYGUI_ADDITIONAL_LIBS@
+-Cflags: -I${includedir} -I${includedir}/MyGUI @MYGUI_CFLAGS@
++Libs: -L${libdir} -L${libdir}/MYGUI -lMyGUIEngine@MYGUI_LIB_SUFFIX@ -lMyGUI.OgrePlatform @MYGUI_ADDITIONAL_LIBS@
++Cflags: -I${includedir} -I${includedir}/MYGUI @MYGUI_CFLAGS@

@@ -1,0 +1,23 @@
+diff -Naur SocketW031026.orig/src/Makefile SocketW031026/src/Makefile
+--- SocketW031026.orig/src/Makefile	2003-10-26 17:18:16.000000000 +0100
++++ SocketW031026/src/Makefile	2012-02-26 21:45:09.000000000 +0100
+@@ -36,14 +36,14 @@
+ install:	shared
+ 	@mkdir -p $(PREFIX_H)
+ 	install -c -m 644 *.h $(PREFIX_H)
+-	@mkdir -p $(PREFIX)/lib
+-	install -c -m 644 libSocketW.a $(PREFIX)/lib
+-	install -c libSocketW.so.$(API_VER).$(SW_VER) $(PREFIX)/lib
+-	@cd $(PREFIX)/lib;\
++	@mkdir -p $(PREFIX_L)
++	install -c -m 644 libSocketW.a $(PREFIX_L)
++	install -c libSocketW.so.$(API_VER).$(SW_VER) $(PREFIX_L)
++	@cd $(PREFIX_L);\
+ 	ln -sf libSocketW.so.$(API_VER).$(SW_VER) libSocketW.so.$(API_VER);\
+ 	ln -sf libSocketW.so.$(API_VER) libSocketW.so
+ 	@echo "** Headerfiles installed in $(PREFIX_H)"
+-	@echo "** Library files installed in $(PREFIX)/lib"
++	@echo "** Library files installed in $(PREFIX_L)"
+ 
+ clean:
+ 	@rm -f *.o *.so *.so.* *.a *.dll *.def

@@ -1,0 +1,27 @@
+diff -up ogre-1.7.2/Tools/XMLConverter/CMakeLists.txt.sys-tinyxml ogre-1.7.2/Tools/XMLConverter/CMakeLists.txt
+--- ogre-1.7.2/Tools/XMLConverter/CMakeLists.txt.sys-tinyxml	2010-12-20 14:41:23.984800000 -0500
++++ ogre-1.7.2/Tools/XMLConverter/CMakeLists.txt	2010-12-20 14:43:05.264800002 -0500
+@@ -13,22 +13,16 @@ set(HEADER_FILES 
+   include/OgreXMLMeshSerializer.h
+   include/OgreXMLPrerequisites.h
+   include/OgreXMLSkeletonSerializer.h
+-  include/tinystr.h
+-  include/tinyxml.h
+ )
+ 
+ set(SOURCE_FILES 
+   src/main.cpp
+   src/OgreXMLMeshSerializer.cpp
+   src/OgreXMLSkeletonSerializer.cpp
+-  src/tinystr.cpp
+-  src/tinyxml.cpp
+-  src/tinyxmlerror.cpp
+-  src/tinyxmlparser.cpp
+ )
+ 
+ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+ add_definitions(-DTIXML_USE_STL)
+ add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
+-target_link_libraries(OgreXMLConverter ${OGRE_LIBRARIES})
++target_link_libraries(OgreXMLConverter ${OGRE_LIBRARIES} -ltinyxml)
+ ogre_config_tool(OgreXMLConverter)

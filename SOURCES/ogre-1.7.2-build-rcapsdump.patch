@@ -1,0 +1,20 @@
+--- Tools/CMakeLists.txt.orig	2010-11-03 13:24:48.000000000 -0500
++++ Tools/CMakeLists.txt	2011-01-02 13:14:03.000000000 -0600
+@@ -14,3 +14,5 @@
+   add_subdirectory(XMLConverter)
+   add_subdirectory(MeshUpgrader)
+ endif (NOT OGRE_BUILD_PLATFORM_IPHONE)
++
++add_subdirectory(rcapsdump)
+--- /dev/null	2010-12-22 19:33:04.813000034 -0600
++++ Tools/rcapsdump/CMakeLists.txt	2011-01-02 13:11:25.000000000 -0600
+@@ -0,0 +1,9 @@
++# Configure rcapsdump
++
++set(SOURCE_FILES 
++  src/main.cpp
++)
++
++add_executable(rcapsdump ${SOURCE_FILES})
++target_link_libraries(rcapsdump ${OGRE_LIBRARIES})
++ogre_config_tool(rcapsdump)

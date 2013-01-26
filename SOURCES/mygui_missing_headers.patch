@@ -1,0 +1,31 @@
+--- Platforms/Ogre/OgrePlatform/include/MyGUI_OgrePlatform.h.orig	2011-01-03 02:46:05.000000000 -0600
++++ Platforms/Ogre/OgrePlatform/include/MyGUI_OgrePlatform.h	2011-01-03 02:46:51.000000000 -0600
+@@ -14,7 +14,7 @@
+ #include "MyGUI_OgreRenderManager.h"
+ #include "MyGUI_OgreDataManager.h"
+ #include "MyGUI_OgreDiagnostic.h"
+-#include "MyGUI_OgreTexture.h"
++#include "MyGUI_LogManager.h"
+ 
+ namespace MyGUI
+ {
+--- Platforms/Ogre/OgrePlatform/include/MyGUI_OgreRenderManager.h.orig	2011-01-03 02:47:54.000000000 -0600
++++ Platforms/Ogre/OgrePlatform/include/MyGUI_OgreRenderManager.h	2011-01-03 02:48:20.000000000 -0600
+@@ -13,6 +13,7 @@
+ #include "MyGUI_RenderFormat.h"
+ #include "MyGUI_IVertexBuffer.h"
+ #include "MyGUI_RenderManager.h"
++#include "MyGUI_Types.h"
+ 
+ #include <Ogre.h>
+ 
+--- MyGUIEngine/include/MyGUI_IRenderTarget.h.orig	2011-01-03 02:48:43.000000000 -0600
++++ MyGUIEngine/include/MyGUI_IRenderTarget.h	2011-01-03 02:49:21.000000000 -0600
+@@ -23,6 +23,7 @@
+ #ifndef __MYGUI_I_RENDER_TARGET_H__
+ #define __MYGUI_I_RENDER_TARGET_H__
+ 
++#include <string>
+ #include "MyGUI_Prerequest.h"
+ #include "MyGUI_RenderTargetInfo.h"
+ 

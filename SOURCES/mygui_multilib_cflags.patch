@@ -1,0 +1,86 @@
+--- CMakeLists.txt.orig	2011-01-03 01:50:52.000000000 -0600
++++ CMakeLists.txt	2011-01-03 02:06:08.000000000 -0600
+@@ -85,8 +85,8 @@
+ set(MYGUI_LIBRARIES MyGUIEngine)
+ 
+ # Specify build paths
+-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${MYGUI_BINARY_DIR}/lib)
+-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${MYGUI_BINARY_DIR}/lib)
++set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${MYGUI_BINARY_DIR}/lib${LIB_SUFFIX})
++set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${MYGUI_BINARY_DIR}/lib${LIB_SUFFIX})
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${MYGUI_BINARY_DIR}/bin)
+ if (WIN32 OR APPLE)
+ 	if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+@@ -139,18 +139,18 @@
+ # Set compiler specific build flags
+ if (CMAKE_COMPILER_IS_GNUCXX)
+ 	add_definitions(-fdiagnostics-show-option)
+-	add_definitions(-msse)
++#	add_definitions(-msse)
+ 	if (MYGUI_RENDERSYSTEM EQUAL 2)
+ 		# to avoid warnings from OGRE sources
+-		add_definitions(-isystem ${OGRE_INCLUDE_DIR})
++#		add_definitions(-isystem ${OGRE_INCLUDE_DIR})
+ 	endif ()
+ 	# very interesting option, but way too many warnings
+ 	#add_definitions(-Weffc++)
+-	add_definitions(-Wno-deprecated -Wall -Wctor-dtor-privacy -Winit-self -Woverloaded-virtual -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter)
++#	add_definitions(-Wno-deprecated -Wall -Wctor-dtor-privacy -Winit-self -Woverloaded-virtual -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter)
+ 	#add_definitions(-pedantic)
+ 
+ 	# MyGUI_UString.h ignored from warnings because of this
+-	add_definitions(-Wshadow)
++#	add_definitions(-Wshadow)
+ endif ()
+ 
+ if (MSVC)
+--- CMake/ConfigureBuild.cmake.orig	2011-01-03 02:08:15.000000000 -0600
++++ CMake/ConfigureBuild.cmake	2011-01-03 02:06:36.000000000 -0600
+@@ -44,7 +44,7 @@
+   else ()
+     configure_file(${MYGUI_TEMPLATES_DIR}/MYGUI.pc.in ${MYGUI_BINARY_DIR}/pkgconfig/MYGUI${MYGUI_LIB_SUFFIX}.pc @ONLY)
+   endif ()
+-  install(FILES ${MYGUI_BINARY_DIR}/pkgconfig/MYGUI${MYGUI_LIB_SUFFIX}.pc DESTINATION lib/pkgconfig)
++  install(FILES ${MYGUI_BINARY_DIR}/pkgconfig/MYGUI${MYGUI_LIB_SUFFIX}.pc DESTINATION lib${LIB_SUFFIX}/pkgconfig)
+ 
+   # configure additional packages
+   
+--- CMake/Utils/MyGUIConfigTargets.cmake.orig	2011-01-03 02:08:44.000000000 -0600
++++ CMake/Utils/MyGUIConfigTargets.cmake	2011-01-03 02:12:12.000000000 -0600
+@@ -38,14 +38,14 @@
+ function(mygui_install_target TARGETNAME SUFFIX)
+ 	install(TARGETS ${TARGETNAME}
+ 		RUNTIME DESTINATION "bin${MYGUI_RELEASE_PATH}" CONFIGURATIONS Release None ""
+-		LIBRARY DESTINATION "lib${MYGUI_LIB_RELEASE_PATH}${SUFFIX}" CONFIGURATIONS Release None ""
+-		ARCHIVE DESTINATION "lib${MYGUI_LIB_RELEASE_PATH}${SUFFIX}" CONFIGURATIONS Release None ""
++		LIBRARY DESTINATION "lib${LIB_SUFFIX}${MYGUI_LIB_RELEASE_PATH}${SUFFIX}" CONFIGURATIONS Release None ""
++		ARCHIVE DESTINATION "lib${LIB_SUFFIX}${MYGUI_LIB_RELEASE_PATH}${SUFFIX}" CONFIGURATIONS Release None ""
+ 		FRAMEWORK DESTINATION "bin${MYGUI_RELEASE_PATH}" CONFIGURATIONS Release None ""
+ 	)
+ 	install(TARGETS ${TARGETNAME}
+ 		RUNTIME DESTINATION "bin${MYGUI_RELWDBG_PATH}" CONFIGURATIONS RelWithDebInfo
+-		LIBRARY DESTINATION "lib${MYGUI_LIB_RELWDBG_PATH}${SUFFIX}" CONFIGURATIONS RelWithDebInfo
+-		ARCHIVE DESTINATION "lib${MYGUI_LIB_RELWDBG_PATH}${SUFFIX}" CONFIGURATIONS RelWithDebInfo
++		LIBRARY DESTINATION "lib${LIB_SUFFIX}${MYGUI_LIB_RELWDBG_PATH}${SUFFIX}" CONFIGURATIONS RelWithDebInfo
++		ARCHIVE DESTINATION "lib${LIB_SUFFIX}${MYGUI_LIB_RELWDBG_PATH}${SUFFIX}" CONFIGURATIONS RelWithDebInfo
+ 		FRAMEWORK DESTINATION "bin${MYGUI_RELWDBG_PATH}" CONFIGURATIONS RelWithDebInfo
+ 	)
+ 	install(TARGETS ${TARGETNAME}
+--- CMake/Templates/MYGUI.pc.in.orig	2011-01-03 02:12:38.000000000 -0600
++++ CMake/Templates/MYGUI.pc.in	2011-01-03 02:15:43.000000000 -0600
+@@ -1,11 +1,12 @@
+ prefix=@MYGUI_PREFIX_PATH@
+ exec_prefix=${prefix}
+-libdir=${prefix}/lib
++libdir=${prefix}/lib@LIB_SUFFIX@
+ includedir=${prefix}/include
+ 
+ Name: MyGUI
+ Description: Fast, flexible and simple GUI
+ Version: @MYGUI_VERSION@
+ URL: http://www.my-gui.sourceforge.net
+-Libs: -L${libdir} -lMyGUIEngine@MYGUI_LIB_SUFFIX@ @MYGUI_ADDITIONAL_LIBS@
+-Cflags: -I${includedir} -I${includedir}/MYGUI @MYGUI_CFLAGS@
++Libs: -L${libdir} -L${libdir}/MYGUI -lMyGUIEngine@MYGUI_LIB_SUFFIX@ -lMyGUI.Ogr
++ePlatform @MYGUI_ADDITIONAL_LIBS@
++Cflags: -I${includedir} -I${includedir}/MyGUI @MYGUI_CFLAGS@
