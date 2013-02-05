@@ -1,0 +1,9 @@
+# Name: Hubbitus RPM Repository for Fedora $releasever
+# URL: http://hubbitus.info/rpm/
+
+[Hubbitus-F$releasever]
+name=Hubbitus F$releasever
+baseurl=
+	http://hubbitus.info/rpm/Fedora$releasever/
+enabled = 1
+gpgcheck = 0
