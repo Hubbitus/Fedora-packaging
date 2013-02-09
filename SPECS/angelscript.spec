@@ -1,15 +1,13 @@
 Name:           angelscript
-# RigsOfRods require 2.22.1 version, notmost fresh!
-# It also strongly required: http://redmine.rigsofrods.com/issues/1033
-# Also old fixed version: http://redmine.rigsofrods.com/issues/956
-Version:        2.22.1
+Version:        2.26.0
 Release:        1%{?dist}
-Summary:        AngelCode Scripting Library
+Summary:        Flexible cross-platform scripting library
 
 Group:          System Environment/Libraries
 License:        zlib
 URL:            http://www.angelcode.com/angelscript/
 Source0:        http://www.angelcode.com/angelscript/sdk/files/%{name}_%{version}.zip
+# Reported upstream http://www.gamedev.net/topic/638512-linker-problem/
 Patch0:         %{name}-2.22.1-link.patch
 
 %description
@@ -39,23 +37,23 @@ sed -i 's|$(LOCAL)/lib|$(LOCAL)/%{_lib}|g' sdk/%{name}/projects/gnuc/makefile
 
 %build
 pushd sdk/%{name}/projects/gnuc
-make %{?_smp_mflags} CXXFLAGS="$RPM_OPT_FLAGS -fPIC -fno-strict-aliasing" SHARED=1 VERSION=%{version}
+make %{?_smp_mflags} CXFLAGS="$RPM_OPT_FLAGS" SHARED=1 VERSION=%{version}
 popd
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
-mkdir -p $RPM_BUILD_ROOT%{_libdir}
-mkdir -p $RPM_BUILD_ROOT%{_includedir}
+mkdir -p %{buildroot}%{_libdir}
+mkdir -p %{buildroot}%{_includedir}
 
 pushd sdk/%{name}/projects/gnuc
-make install LOCAL=$RPM_BUILD_ROOT%{_prefix} SHARED=1 VERSION=%{version}
+make install LOCAL=%{buildroot}%{_prefix} SHARED=1 VERSION=%{version}
 popd
 
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 
 %post -p /sbin/ldconfig
@@ -77,6 +75,14 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat Feb 9 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.26.0-1
+- New version released.
+- It seams backward capability patch doews not needed anymore.
+
+* Sat Jan 26 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.25.2-1
+- Update to 2.25.2 version.
+- Apply (rebased) Patch1 to provide backward compatability with hope rigsofrods can work with it (https://bugzilla.redhat.com/show_bug.cgi?id=879931#c3) (thanks to Dan Horák).
+
 * Mon Nov 19 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 2.22.1-1
 - Import from http://fedora.danny.cz/danny/development/SRPMS/angelscript-2.24.1-1.fc18.src.rpm
 - Build 2.22.1 version due to the bug http://redmine.rigsofrods.com/issues/956

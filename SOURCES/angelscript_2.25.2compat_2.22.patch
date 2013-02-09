@@ -1,0 +1,111 @@
+diff -NurEbBH angelscript-2.25.2.orig/sdk/add_on/debugger/debugger.h angelscript-2.25.2/sdk/add_on/debugger/debugger.h
+--- angelscript-2.25.2.orig/sdk/add_on/debugger/debugger.h	2012-04-18 22:21:40.000000000 +0400
++++ angelscript-2.25.2/sdk/add_on/debugger/debugger.h	2013-01-27 01:10:56.065008743 +0400
+@@ -1,6 +1,10 @@
+ #ifndef DEBUGGER_H
+ #define DEBUGGER_H
+ 
++#include <stdio.h>
++#include <stdlib.h>
++
++
+ #ifndef ANGELSCRIPT_H 
+ // Avoid having to inform include path if header is already include before
+ #include <angelscript.h>
+@@ -9,6 +13,10 @@
+ #include <string>
+ #include <vector>
+ 
++#ifdef AS_USE_NAMESPACE
++using namespace AngelScript;
++#endif //AS_USE_NAMESPACE
++
+ BEGIN_AS_NAMESPACE
+ 
+ class CDebugger
+diff -NurEbBH angelscript-2.25.2.orig/sdk/add_on/scriptbuilder/scriptbuilder.cpp angelscript-2.25.2/sdk/add_on/scriptbuilder/scriptbuilder.cpp
+--- angelscript-2.25.2.orig/sdk/add_on/scriptbuilder/scriptbuilder.cpp	2012-11-09 20:47:34.000000000 +0400
++++ angelscript-2.25.2/sdk/add_on/scriptbuilder/scriptbuilder.cpp	2013-01-27 01:11:46.531858435 +0400
+@@ -124,6 +124,7 @@
+ 	return true;
+ }
+ 
++#if 0
+ int CScriptBuilder::LoadScriptSection(const char *filename)
+ {
+ 	// Open the script file
+@@ -172,6 +173,7 @@
+ 
+ 	return ProcessScriptSection(code.c_str(), filename);
+ }
++#endif //0
+ 
+ int CScriptBuilder::ProcessScriptSection(const char *script, const char *sectionname)
+ {
+diff -NurEbBH angelscript-2.25.2.orig/sdk/add_on/scriptbuilder/scriptbuilder.h angelscript-2.25.2/sdk/add_on/scriptbuilder/scriptbuilder.h
+--- angelscript-2.25.2.orig/sdk/add_on/scriptbuilder/scriptbuilder.h	2012-11-09 20:42:24.000000000 +0400
++++ angelscript-2.25.2/sdk/add_on/scriptbuilder/scriptbuilder.h	2013-01-27 01:12:03.011135897 +0400
+@@ -96,7 +96,7 @@
+ 	void ClearAll();
+ 	int  Build();
+ 	int  ProcessScriptSection(const char *script, const char *sectionname);
+-	int  LoadScriptSection(const char *filename);
++	virtual int  LoadScriptSection(const char *filename);
+ 	bool IncludeIfNotAlreadyIncluded(const char *filename);
+ 
+ 	int  SkipStatement(int pos);
+diff -NurEbBH angelscript-2.25.2.orig/sdk/add_on/scriptdictionary/scriptdictionary.h angelscript-2.25.2/sdk/add_on/scriptdictionary/scriptdictionary.h
+--- angelscript-2.25.2.orig/sdk/add_on/scriptdictionary/scriptdictionary.h	2012-04-22 18:00:38.000000000 +0400
++++ angelscript-2.25.2/sdk/add_on/scriptdictionary/scriptdictionary.h	2013-01-27 01:12:59.835092662 +0400
+@@ -78,7 +78,6 @@
+ 	void EnumReferences(asIScriptEngine *engine);
+ 	void ReleaseAllReferences(asIScriptEngine *engine);
+ 
+-protected:
+ 	// The structure for holding the values
+     struct valueStruct
+     {
+@@ -91,6 +90,9 @@
+         int   typeId;
+     };
+     
++	// HACK so we can interate over the items in C++
++    std::map<std::string, valueStruct> dict;
++protected:
+ 	// We don't want anyone to call the destructor directly, it should be called through the Release method
+ 	virtual ~CScriptDictionary();
+ 
+@@ -101,8 +103,6 @@
+     asIScriptEngine *engine;
+     mutable int refCount;
+ 
+-	// TODO: optimize: Use C++11 std::unordered_map instead
+-    std::map<std::string, valueStruct> dict;
+ };
+ 
+ // This function will determine the configuration of the engine
+diff -NurEbBH angelscript-2.25.2.orig/sdk/add_on/scriptmath/scriptmath.cpp angelscript-2.25.2/sdk/add_on/scriptmath/scriptmath.cpp
+--- angelscript-2.25.2.orig/sdk/add_on/scriptmath/scriptmath.cpp	2010-06-17 19:36:52.000000000 +0400
++++ angelscript-2.25.2/sdk/add_on/scriptmath/scriptmath.cpp	2013-01-27 01:14:23.127495144 +0400
+@@ -1,6 +1,7 @@
+ #include <assert.h>
+ #include <math.h>
+ #include <string.h>
++#include <stdlib.h>
+ #include "scriptmath.h"
+ 
+ #ifdef __BORLANDC__
+@@ -102,9 +103,13 @@
+ 	// Nearest integer, absolute value, and remainder functions
+ 	r = engine->RegisterGlobalFunction("float ceil(float)", asFUNCTIONPR(ceilf, (float), float), asCALL_CDECL); assert( r >= 0 );
+ 	r = engine->RegisterGlobalFunction("float abs(float)", asFUNCTIONPR(fabsf, (float), float), asCALL_CDECL); assert( r >= 0 );
++	r = engine->RegisterGlobalFunction("float fabs(float)", asFUNCTIONPR(fabsf, (float), float), asCALL_CDECL); assert( r >= 0 );
+ 	r = engine->RegisterGlobalFunction("float floor(float)", asFUNCTIONPR(floorf, (float), float), asCALL_CDECL); assert( r >= 0 );
+ 	r = engine->RegisterGlobalFunction("float fraction(float)", asFUNCTIONPR(fractionf, (float), float), asCALL_CDECL); assert( r >= 0 );
+ 
++	// our stuff
++	r = engine->RegisterGlobalFunction("int abs(int)", asFUNCTIONPR(abs, (int), int), asCALL_CDECL); assert( r >= 0 );
++
+ 	// Don't register modf because AngelScript already supports the % operator
+ #else
+ 	// double versions of the same
