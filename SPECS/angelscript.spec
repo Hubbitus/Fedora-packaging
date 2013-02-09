@@ -14,7 +14,7 @@ Patch0:         %{name}-2.22.1-link.patch
 The AngelScript library is a software library for easy integration of
 external scripting to applications, with built-in compiler and virtual
 machine. The scripting language is easily extendable to incorporate
-application specific datatypes and functions. It is designed with C++
+application specific data types and functions. It is designed with C++
 in mind, as such it shares many features with C++, for example syntax
 and data types.
 
