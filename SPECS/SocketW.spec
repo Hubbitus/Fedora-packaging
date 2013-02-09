@@ -1,9 +1,9 @@
 Name:           SocketW
 Version:        031026
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Streaming socket C++ library designed to be easy to use
 License:        LGPLv2+
-Group:          Development/Libraries
+Group:          System Environment/Libraries
 Source0:        http://www.digitalfanatics.org/cal/socketw/files/%{name}%{version}.tar.gz
 Patch0:         SocketW031026-path.patch
 # Reported upstream by mail. Did not found open bugtracker.
@@ -20,7 +20,7 @@ without needing to spend time learning low-level system functions or reading
 OpenSSL manuals.
 
 %package devel
-Summary:        It is a streaming socket C++ library designed to be easy to use
+Summary:        Files for compiling software that uses %{name}
 Group:          Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
@@ -62,6 +62,9 @@ mv README.new README
 %{_libdir}/libSocketW.so
 
 %changelog
+* Sat Feb 9 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 031026-3
+- Change group and small adjust -devel summary (thanks to Michael Schwendt).
+
 * Mon Nov 26 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 031026-2
 - Changes inspired by Volker Fröhlich review comments. Thanks.
 - For devel requirement add %%{?_isa}.
