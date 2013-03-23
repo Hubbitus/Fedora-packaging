@@ -1,12 +1,14 @@
 Name:           sparkleshare
 Version:        0.8.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Easy file sharing based on git repositories
 
 Group:          Applications/Productivity
 License:        GPLv3
 URL:            http://www.sparkleshare.org/
-Source0:        https://github.com/downloads/hbons/SparkleShare/%{name}-%{version}.tar.gz
+Source0:        https://github.com/downloads/hbons/SparkleShare/sparkleshare-%{version}.tar.gz
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  mono-devel
 BuildRequires:  ndesk-dbus-devel
@@ -18,12 +20,10 @@ BuildRequires:  gnome-doc-utils
 BuildRequires:  nant
 BuildRequires:  webkit-sharp-devel
 BuildRequires:  nautilus-python-devel
-BuildRequires:  gettext
 Requires:       git
 Requires:       yelp
 
 
-#https://fedoraproject.org/wiki/Packaging:Mono#Empty_debuginfo
 %global debug_package %{nil}
 
 
@@ -45,9 +45,14 @@ GMCS_FLAGS=-codepage:utf8 make
 
 
 %install
+rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %find_lang %{name}
+
+
+%clean
+rm -rf %{buildroot}
 
 
 %post
@@ -66,28 +71,25 @@ fi
 
 
 %files -f %{name}.lang
-%{_bindir}/%{name}
-%{_datadir}/nautilus-python/extensions/%{name}-nautilus3-extension*
-%defattr(0644,root,root,0755)
+%defattr(-,root,root,-)
+%{_bindir}/sparkleshare
 %{_libdir}/%{name}/
 %{_datadir}/%{name}/
 %{_datadir}/applications/%{name}.desktop
-%{_mandir}/man1/%{name}.1.gz
-%{_datadir}/icons/hicolor/16x16/apps/folder-%{name}.png
-%{_datadir}/icons/hicolor/22x22/apps/folder-%{name}.png
-%{_datadir}/icons/hicolor/24x24/apps/folder-%{name}.png
-%{_datadir}/icons/hicolor/256x256/apps/folder-%{name}.png
-%{_datadir}/icons/hicolor/32x32/apps/folder-%{name}.png
-%{_datadir}/icons/hicolor/48x48/apps/folder-%{name}.png
-%{_datadir}/icons/hicolor/24x24/status/process-syncing-%{name}-i*.png
+%{_mandir}/man1/sparkleshare.1.gz
+%{_datadir}/nautilus-python/extensions/sparkleshare-nautilus3-extension*
+%{_datadir}/icons/hicolor/16x16/apps/folder-sparkleshare.png
+%{_datadir}/icons/hicolor/22x22/apps/folder-sparkleshare.png
+%{_datadir}/icons/hicolor/24x24/apps/folder-sparkleshare.png
+%{_datadir}/icons/hicolor/256x256/apps/folder-sparkleshare.png
+%{_datadir}/icons/hicolor/32x32/apps/folder-sparkleshare.png
+%{_datadir}/icons/hicolor/48x48/apps/folder-sparkleshare.png
+%{_datadir}/icons/hicolor/24x24/status/process-syncing-sparkleshare-i*.png
 %doc AUTHORS LICENSE NEWS
 
 
 
 %changelog
-* Tue Feb 14 2012 Nikos Roussos <nikos@autoverse.net> 0.8.0-2
-- gettext added as buildrequirement, permissions error fixes
-
 * Tue Feb 01 2012 Nikos Roussos <nikos@autoverse.net> 0.8.0-1
 - Update to 0.8.0
 

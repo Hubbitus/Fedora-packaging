@@ -1,0 +1,108 @@
+%define contentdir /var/www
+%define suexec_caller apache
+
+Summary:		MPM Itk for Apache HTTP Server
+Name:		httpd-itk
+Version:		2.2.15
+Release:		1%{?dist}
+URL:			http://mpm-itk.sesse.net/
+# It does not contain main sources instead relies to package httpd-source in it
+Patch0:		http://mpm-itk.sesse.net/apache2.2-mpm-itk-20090414-00.patch
+License:		ASL 2.0
+Group:		System Environment/Daemons
+# It still needed as it targedted for EPEL5 too
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root
+Requires:		httpd >= 2.2
+BuildRequires:	httpd-devel, httpd-source
+
+BuildRequires:	autoconf, perl, pkgconfig, findutils, libselinux-devel
+BuildRequires:	apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
+Provides:		webserver
+
+%description
+The Apache HTTP Server is a powerful, efficient, and extensible
+web server.
+
+This build include additional MPM Itk (http://mpm-itk.sesse.net/) which allow
+safely run several VirtualHosts under own users id.
+
+%prep
+%setup -qcT
+# Manually cp from httpd-source package actual sources
+cp -ra %{_datadir}/httpd-source/* .
+
+%patch0 -p1 -b .itk
+
+# Delete caches and regenerate configure scripts (seen in ./buildconf)
+rm -rf aclocal.m4 generated_lists srclib/pcre/aclocal.m4 autom4te*.cache srclib/pcre/autom4te*.cache
+autoheader && autoconf || exit 1
+
+%build
+# Flags come from main httpd package spec. I leaf it as is.
+CFLAGS=$RPM_OPT_FLAGS
+SH_LDFLAGS="-Wl,-z,relro"
+export CFLAGS SH_LDFLAGS
+
+# Hard-code path to links to avoid unnecessary builddep
+export LYNX_PATH=/usr/bin/links
+
+function mpmbuild()
+{
+mpm=$1; shift
+mkdir $mpm; pushd $mpm
+../configure \
+	--prefix=%{_sysconfdir}/httpd \
+	--exec-prefix=%{_prefix} \
+	--bindir=%{_bindir} \
+	--sbindir=%{_sbindir} \
+	--mandir=%{_mandir} \
+	--libdir=%{_libdir} \
+	--sysconfdir=%{_sysconfdir}/httpd/conf \
+	--includedir=%{_includedir}/httpd \
+	--libexecdir=%{_libdir}/httpd/modules \
+	--datadir=%{contentdir} \
+	--with-installbuilddir=%{_libdir}/httpd/build \
+	--with-mpm=$mpm \
+	--with-apr=%{_prefix} --with-apr-util=%{_prefix} \
+	--enable-suexec --with-suexec \
+	--with-suexec-caller=%{suexec_caller} \
+	--with-suexec-docroot=%{contentdir} \
+	--with-suexec-logfile=%{_localstatedir}/log/httpd/suexec.log \
+	--with-suexec-bin=%{_sbindir}/suexec \
+	--with-suexec-uidmin=500 --with-suexec-gidmin=100 \
+	--enable-pie \
+	--with-pcre \
+	$*
+
+make %{?_smp_mflags}
+popd
+}
+
+# Only one build
+mpmbuild itk --enable-modules=none
+
+%install
+rm -rf $RPM_BUILD_ROOT
+
+echo "It is only additional MPM for Apachee web server.
+To enable it just set
+HTTPD=/usr/sbin/httpd.itk
+in /etc/sysconfig/httpd and restart daemon:
+service httpd restart
+
+For more information about Apache refer to man and manuals into main httpd package" > README
+
+install -Dm 755 itk/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.itk
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root,-)
+%doc README
+%{_sbindir}/httpd.itk
+
+%changelog
+* Sun May 16 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 2.2.15-1
+- Initial release of httpd-itk package as separate MPM only.
+	Based on my previous patch attempt of main httpd package (http://hubbitus.net.ru/rpm/Fedora9/httpd/httpd-2.2.9-1.fc9.Hu.0.src.rpm)

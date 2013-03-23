@@ -1,0 +1,66 @@
+--- httpd.spec.orig	2010-04-04 20:59:00.000000000 +0400
++++ httpd.spec.mpmbuild-function	2010-05-16 18:08:01.000000000 +0400
+@@ -7,7 +7,7 @@
+ Summary: Apache HTTP Server
+ Name: httpd
+ Version: 2.2.15
+-Release: 1%{?dist}
++Release: 2%{?dist}
+ URL: http://httpd.apache.org/
+ Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
+ Source1: index.html
+@@ -75,12 +75,26 @@
+ able to compile or develop additional modules for Apache, you need
+ to install this package.
+ 
++%package source
++Summary: httpd source code required to build foreign workers (httpd-itk, httpd-peruser)
++Group: Development/Libraries
++# EL-5 does not support noarch subpackages
++%if 0%{?fedora} > 9 || 0%{?rhel} > 5
++BuildArch: noarch
++%endif
++
++%description source
++httpd source code required to build foreign workers (httpd-itk, httpd-peruser)
++
+ %package manual
+ Group: Documentation
+ Summary: Documentation for the Apache HTTP server
+ Requires: httpd = %{version}-%{release}
+ Obsoletes: secureweb-manual, apache-manual
++# EL-5 does not support noarch subpackages
++%if 0%{?fedora} > 9 || 0%{?rhel} > 5
+ BuildArch: noarch
++%endif
+ 
+ %description manual
+ The httpd-manual package contains the complete manual and
+@@ -335,6 +349,12 @@
+ # Make suexec a+rw so it can be stripped.  %%files lists real permissions
+ chmod 755 $RPM_BUILD_ROOT%{_sbindir}/suexec
+ 
++# Make the source package
++mkdir -p $RPM_BUILD_ROOT%{_datadir}/httpd-source
++cp -ra * $RPM_BUILD_ROOT%{_datadir}/httpd-source
++# remove binaries from noarch package
++rm $RPM_BUILD_ROOT%{_datadir}/httpd-source/{prefork,worker}/httpd
++
+ %pre
+ # Add the "apache" user
+ /usr/sbin/useradd -c "Apache" -u 48 \
+@@ -484,7 +504,14 @@
+ %{_libdir}/httpd/build/*.mk
+ %{_libdir}/httpd/build/*.sh
+ 
++%files source
++%defattr(-,root,root,-)
++%{_datadir}/httpd-source
++
+ %changelog
++* Sun May 16 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 2.2.15-2
++- Add build subpackage -source
++
+ * Sun Apr 04 2010 Robert Scheck <robert@fedoraproject.org> - 2.2.15-1
+ - update to 2.2.15 (#572404, #579311)
+ 

@@ -6,3 +6,4 @@ SOURCES/*.tar.gz
 SOURCES/*.tar.xz
 SOURCES/*.tar.bz2
 SOURCES/*.zip
+SPECS/.svn

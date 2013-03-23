@@ -1,9 +1,9 @@
-#% global SVN	859
+%global SVN	859
 
 Summary:		GTK front-end for X Neural Switcher (xneur)
 Name:		gxneur
-Version:		0.15.0
-Release:		1%{?SVN:.svn%{SVN}}%{?dist}
+Version:		0.12.0
+Release:		2%{?SVN:.svn%{SVN}}%{?dist}
 
 Group:		User Interface/Desktops
 License:		GPLv2+
@@ -20,7 +20,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	desktop-file-utils, pcre-devel, libglade2-devel, enchant-devel
 BuildRequires:	gettext-devel, gtk2-devel, GConf2-devel
 BuildRequires:	xneur-devel = %{version}
-%if 0%{?SVN}
+%if 0%{SVN}
 BuildRequires:	libtool
 %endif
 
@@ -37,11 +37,9 @@ GTK интерфейс для Интеллектуального переклю�
 %prep
 %setup -q
 
-# Temporary hack. Problem mailed to upstream author
-sed -i 's/DEFAULT_CFLAGS="-Wall -Wextra -Werror -g0 -fPIC -std=gnu99"/DEFAULT_CFLAGS="-Wall -Wextra -g0 -fPIC -std=gnu99"/' configure
 
 %build
-%if 0%{?SVN}
+%if 0%{SVN}
 ./autogen.sh
 %endif
 
@@ -88,15 +86,6 @@ rm -rf %{buildroot}
 %{_mandir}/man1/%{name}.1*
 
 %changelog
-* Mon Dec 5 2011 Pavel Alexeev <Pahan@Hubbitus.info> - 0.15.0-1
-- Update to 0.15.0 version
-
-* Fri Jun 24 2011 Pavel Alexeev <Pahan@Hubbitus.info> - 0.13.0-1
-- Update to 0.13 version (request bz#708922).
-
-* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.12.0-3.svn859
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
-
 * Sat Feb 5 2011 Pavel Alexeev <Pahan@Hubbitus.info> - 0.12.0-2.svn859
 - Rebuild svn revision 859. See update info for xneur for more details.
 

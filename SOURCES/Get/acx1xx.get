@@ -1,0 +1,9 @@
+#!/bin/bash
+
+rm -rf acx-mac80211
+git clone --depth 1 git://acx100.git.sourceforge.net/gitroot/acx100/acx-mac80211 acx-mac80211
+GHASH=$( git --git-dir ./acx-mac80211/.git reflog | cut -d' ' -f1 )
+rm -rf acx-mac80211/.git
+TARF=acx-mac80211-$GHASH.tar.xz
+tar -cJf $TARF acx-mac80211
+echo "[$TARF] created"

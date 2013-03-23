@@ -1,0 +1,72 @@
+Summary:		MPM Itk for Apache HTTP Server
+Name:		httpd-itk
+Version:		2.2.15
+Release:		1%{?dist}
+URL:			http://mpm-itk.sesse.net/
+# It does not contain main sources instead relies to package httpd-source in it
+Patch0:		http://mpm-itk.sesse.net/apache2.2-mpm-itk-20090414-00.patch
+License:		ASL 2.0
+Group:		System Environment/Daemons
+# It still needed as it targedted for EPEL5 too
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root
+Requires:		httpd >= 2.2
+BuildRequires:	httpd-source
+
+%description
+The Apache HTTP Server is a powerful, efficient, and extensible
+web server.
+
+This build include additional MPM Itk (http://mpm-itk.sesse.net/) which allow
+safely run several VirtualHosts under own users id.
+
+%prep
+# Manually cp from httpd-source package actual sources
+cp %{_datadir}/httpd-source .
+%patch0 -p1 -b .itk
+
+%build
+# Flags come from main httpd package spec. I leaf it as is.
+CFLAGS=$RPM_OPT_FLAGS
+SH_LDFLAGS="-Wl,-z,relro"
+export CFLAGS SH_LDFLAGS
+
+# Hard-code path to links to avoid unnecessary builddep
+export LYNX_PATH=/usr/bin/links
+
+# Only one build
+./mpmbuild itk --enable-modules=none
+
+%install
+rm -rf $RPM_BUILD_ROOT
+
+echo "It is only additional MPM for Apachee web server.
+To enable it just set
+HTTPD=/usr/sbin/httpd.itk
+in /etc/sysconfig/httpd and restart daemon:
+service httpd restart
+
+For more information about Apache refer to man and manuals into main httpd package" > README
+
+install -m 755 itk/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.itk
+
+# Verify that the same modules were built into the httpd binaries
+./itk/httpd -l | grep -v itk > itk.mods
+	if ! diff -u prefork.mods itk.mods; then
+	: Different modules built into httpd binaries, will not proceed
+	exit 1
+	fi
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root-)
+
+%doc README
+
+%{_sbindir}/httpd.itk
+
+%changelog
+* Sun May 16 2010 Pavel Alexeev <Pahan@Hubbitus.info> - 2.2.15-1
+- Initial release of httpd-itk package as separate MPM only.
+	Based on my previous patch attempt of main httpd package (http://hubbitus.net.ru/rpm/Fedora9/httpd/httpd-2.2.9-1.fc9.Hu.0.src.rpm)

@@ -1,0 +1,268 @@
+Name:		mysql-gui-tools
+Version:		5.0r15
+Release:		1%{?dist}
+Summary:		GUI tools to manage mysql Databases
+
+Group:		Applications/Databases
+License:		GPLv2+
+URL:			http://www.mysql.com/products/tools/administrator/index.html
+#Tarballs not provided anymore. We got source from bazaar:
+# echo "lp:mysql-administrator lp:mysql-querybrowser lp:mysql-migrationtool lp:mysql-gui-common " | while read -d' ' part; do bzr branch -r tag:bundle-5.0-r15 $part; done
+# mdir=mysql-gui-tools-%{version} ; mkdir $mdir
+# mv mysql-administrator $mdir/administrator; mv mysql-gui-common $mdir/common; mv mysql-migrationtool $mdir/migration-tool; mv mysql-querybrowser $mdir/query-browser
+# tar -cjf $mdir.tar.bz2 $mdir
+Source0:		mysql-gui-tools-%{version}.tar.bz2
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Patch0:		mysql-gui-tools-5.0r14-DEBUG.patch
+Patch1:		mysql-gui-tools-5.0r14_schema_infinite_loop.patch
+Patch2:		mysql-gui-tools-5.0_p14-gcc-4.3.patch
+Patch3:		mysql-gui-tools-5.0_p14-libsigc++-2.2.patch
+Patch5:		mysql-gui-tools-5.0_p14-gtk_deprecated_typedefs.patch
+Patch6:		mysql-gui-tools-5.0r14-garbage.patch
+Patch7:		mysql-gui-tools-5.0r14-GNU-regex.patch
+Patch8:		mysql-gui-tools-5.0r15-configure.patch
+
+BuildRequires:	libglade2-devel, gtkmm24-devel >= 2.6 , pcre-devel, mysql-devel >= 4.0
+BuildRequires:	openssl-devel, gtkhtml3-devel, desktop-file-utils, gettext
+BuildRequires:	mesa-libGLU-devel, python-devel, autoconf, automake
+BuildRequires:	libtool, expat-devel, readline-devel
+BuildRequires:	libgnomeprint22-devel
+BuildRequires:	java-1.6.0-openjdk-devel glib2-devel
+
+Requires:		mysql-administrator, mysql-query-browser
+Requires:		glib2
+
+%description
+MySQL Administrator enables developers and DBAs to easily perform 
+all the command line operations visually including configuring servers,
+administering users, and dynamically monitoring database health. Other 
+common administrative tasks such as monitoring replication status, 
+backup and restore, and viewing logs can also be performed through the 
+MySQL Administrator graphical console.
+
+%package     -n mysql-administrator
+Summary:      GUI tools to manage mysql Databases
+Group:        Applications/Databases
+Requires:     mysql-gui-common = %{version}-%{release}
+
+%description -n mysql-administrator
+MySQL Administrator enables developers and DBAs to easily perform
+all the command line operations visually including configuring servers,
+administering users, and dynamically monitoring database health. Other
+common administrative tasks such as monitoring replication status,
+backup and restore, and viewing logs can also be performed through the
+MySQL Administrator graphical console.
+
+%package     -n mysql-query-browser
+Summary:       A graphical tool for handling MySQL queries 
+Group:          Applications/Databases
+Requires:     mysql-gui-common = %{version}-%{release}
+
+%description -n mysql-query-browser
+The MySQL Query Browser is a graphical tool provided by MySQL AB for creating,
+executing, and optimizing queries in a graphical environment. Where the MySQL
+Administrator is designed to administer a MySQL server, the MySQL Query
+Browser is designed to help you query and analyze data stored within your MySQL
+database.
+
+%package     -n mysql-gui-common
+Summary:        Common data shared among the MySQL GUI Suites
+Group:          System Environment/Libraries
+
+%description -n mysql-gui-common
+This package contains  glade files images and translations used by mysql tools
+at runtime
+
+
+%prep
+%setup -q
+%patch0 -p1 -b .shellbang
+%patch1 -p1 -b .loop
+%patch2 -p0 -b .gcc43
+%patch3 -p1 -b .sigc++
+#-Hu %patch5 -p1
+%patch6 -p1 -b .garbage
+#-Hu %patch7 -p1 -b .GNUregex
+%patch8 -p1 -b .configure
+
+%build
+pushd common
+
+%__chmod +x autogen.sh
+NOCONFIGURE=true ./autogen.sh
+%configure --enable-php-modules \
+        --enable-python-modules \
+        --enable-readline \
+%ifarch x86_64 ppc64 sparc64
+        --with-java-includes=/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.%{_arch}/include
+%else
+        --with-java-includes=/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0/include
+%endif
+make %{?_smp_mflags}
+popd
+
+pushd administrator
+# Directory layout changed, but mysql-buildscripts expects old one.
+ln -s common ../mysql-gui-common
+
+%__chmod +x autogen.sh
+NOCONFIGURE=true ./autogen.sh
+%configure
+make %{?_smp_mflags}
+popd
+
+pushd query-browser
+%__chmod +x autogen.sh
+NOCONFIGURE=true ./autogen.sh
+%configure --with-gtkhtml=libgtkhtml-3.14
+make %{?_smp_mflags}
+popd
+
+%install
+rm -rf $RPM_BUILD_ROOT
+pushd mysql-gui-common
+chmod 644 COPYING README
+make install DESTDIR=$RPM_BUILD_ROOT
+popd
+
+pushd administrator
+chmod 644 COPYING
+make install DESTDIR=$RPM_BUILD_ROOT
+popd
+
+pushd query-browser
+chmod 644 COPYING
+make install DESTDIR=$RPM_BUILD_ROOT
+popd
+
+# MySQL  use dos new line characters  that desktop file install doesnt like
+# MySQL  also use dos new line endings in there documantation files rpmlint didint like them
+sed -i 's/\r//' $RPM_BUILD_ROOT%{_datadir}/applications/MySQLAdministrator.desktop
+sed -i 's/\r//' $RPM_BUILD_ROOT%{_datadir}/applications/MySQLQueryBrowser.desktop
+sed -i 's/\r//' administrator/COPYING mysql-gui-common/COPYING mysql-gui-common/README 
+sed -i 's/\r//' query-browser/COPYING 
+
+desktop-file-install \
+  --dir $RPM_BUILD_ROOT%{_datadir}/applications \
+  --add-category System \
+  --add-category Application \
+  --add-category X-Fedora \
+  --delete-original \
+  $RPM_BUILD_ROOT%{_datadir}/applications/MySQLAdministrator.desktop
+
+desktop-file-install \
+  --dir $RPM_BUILD_ROOT%{_datadir}/applications \
+  --add-category Development \
+  --add-category Application \
+  --add-category X-Fedora \
+  --delete-original \
+  $RPM_BUILD_ROOT%{_datadir}/applications/MySQLQueryBrowser.desktop
+
+
+%find_lang mysql-administrator
+%find_lang mysql-query-browser
+
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root,-)
+%doc administrator/COPYING
+
+%files -n mysql-administrator -f mysql-administrator.lang
+%defattr(-,root,root,-)
+%doc administrator/COPYING 
+%{_bindir}/mabackup
+%{_bindir}/mysql-administrator
+%{_bindir}/mysql-administrator-bin
+%{_datadir}/applications/MySQLAdministrator.desktop
+%{_datadir}/mysql-gui/MySQLIcon_Admin_*.png
+%{_datadir}/mysql-gui/administrator
+
+%files -n mysql-gui-common
+%defattr(-,root,root,-)
+%doc common/COPYING mysql-gui-common/README
+%dir %{_datadir}/mysql-gui
+%{_datadir}/mysql-gui/common
+
+%files -n mysql-query-browser -f mysql-query-browser.lang
+%defattr(-,root,root,-)
+%doc query-browser/COPYING 
+%{_bindir}/mysql-query-browser*
+%{_datadir}/applications/MySQLQueryBrowser.desktop
+%{_datadir}/mysql-gui/query-browser
+%{_datadir}/mysql-gui/MySQLIcon_QueryBrowser_*.png
+
+
+%changelog
+* Sun Dec 14 2008 Pavel Alexeev <Pahan [ at ] Hubbitus [ DOT ] spb [ dOt.] su> - 5.0r14-1
+- Step to version 5.0r15
+- Upstream developer stop provide tarballs of sources (http://lists.mysql.com/gui-tools/2101)
+	so, change source to just file name. How it got also commented in place.
+- Deletu unesed patch4
+- Disable patch5 and patch7
+- Strange, but autogen.sh script comes without exec permissions. So, grant it anywhere before run.
+- Add patch8 mysql-gui-tools-5.0r15-configure.patch to fix search missing files: library/utilities/Makefile{,.am,.in}
+- Remove aoutdated options --with-bonobo
+- Add BR glib2-devel and R glib2
+
+* Sat Dec 13 2008 Pavel Alexeev <Pahan [ at ] Hubbitus [ DOT ] spb [ dOt.] su> - 5.0r14-1
+- Step to version 5.0r14
+- Adjust all directories to ney layout (without 'mysql-' prefix)
+- Add call to ./autogen.sh in each directory to genertae ./configure and other files.
+- Patch0 mysql-gui-tools-5.0r12-DEBUG.patch adopted to new version and renamed to mysql-gui-tools-5.0r14-DEBUG.patch
+- Patch1 mysql-query-browser-default_schema_infinite_loop.patch adopted and renamed to mysql-gui-tools-5.0r14_schema_infinite_loop.patch
+- Patch2 mysql-gui-tools-5.0_p12-gcc-4.3.patch adopted and renamed to mysql-gui-tools-5.0_p14-gcc-4.3.patch
+- Patch3 mysql-gui-tools-5.0_p12-libsigc++-2.2.patch -> mysql-gui-tools-5.0_p14-libsigc++-2.2.patch
+- Patch4 mysql-gui-tools-gtksourceview-cflags.patch -> mysql-gui-tools-5.0_p14-gtksourceview-cflags.patch
+- Patch5 gtk_deprecated_typedefs.patch -> mysql-gui-tools-5.0_p14-gtk_deprecated_typedefs.patch
+- Add patch6 (my) mysql-gui-tools-5.0r14-garbage.patch to fix errors like "error: stray '\357' in program"
+- Add patch7 (my) mysql-gui-tools-5.0r14-GNU-regex.patch to allow build with native regex library.
+- Remove '--vendor=fedora' from options of desktop-file-install
+	Accordingly:
+		%%{_datadir}/applications/fedora-MySQLAdministrator.desktop renamed to %%{_datadir}/applications/MySQLAdministrator.desktop
+		%%{_datadir}/applications/MySQLQueryBrowser.desktop renamed to %%{_datadir}/applications/MySQLQueryBrowser.desktop
+
+* Mon Sep 15 2008 Dennis Gilmore <dennis@ausil.us> - 5.0r12-9
+- apply patch from Pavel Alexeev for gtk 
+- bugzilla #433987
+
+* Tue Jul 08 2008 Dennis Gilmore <dennis@ausil.us> - 5.0r12-8
+- apply patch for gcc-4.3  from gentoo
+- use openjdk for building 
+
+* Mon Jul  7 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 5.0r12-7
+- fix conditional comparison
+
+* Mon Feb 18 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 5.0r12-6
+- Autorebuild for GCC 4.3
+
+* Thu Dec 06 2007 Release Engineering <rel-eng at fedoraproject dot org> - 5.0r12-5
+- Rebuild for deps
+
+* Tue Nov 27 2007 Dennis Gilmore <dennis@ausil.us> - 5.0r12-4
+- apply patch that fixes bug 266781
+
+* Tue Aug 28 2007 Dennis Gilmore <dennis@ausil.us> - 5.0r12-3
+- rebuild for ppc32 selinux issue.  clarify license GPLv2+
+
+* Sun Jun 17 2007 Dennis Gilmore <dennis@ausil.us> - 5.0r12-2
+- add changelog entry 
+
+* Sun Jun 17 2007 Dennis Gilmore <dennis@ausil.us> - 5.0r12-1
+- update to 5.0r12
+
+* Tue Apr 10 2007 Dennis Gilmore <dennis@ausil.us> - 5.0r11-3
+- drop BR on gtksourceview-devel and newt-devel
+
+* Sun Apr 08 2007 Dennis Gilmore <dennis@ausil.us> - 5.0r11-2
+- change where the r11 goes 
+- make a mysql-gui-tools package which requires everything
+- make mysql-administrator and mysql-query-browser require mysql-gui-common
+
+* Fri Mar 30 2007 Dennis Gilmore <dennis@ausil.us> - 5.0-1.r11
+- update to 5.0 release 11
+
+* Mon Mar 05 2007 Dennis Gilmore <dennis@ausil.us> - 5.0-1.r10
+- initial build
