@@ -1,7 +1,7 @@
 Name:           ogre-pagedgeometry
 Epoch:          1
 Version:        1.1.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Ogre addon for realtime rendering of dense forests
 Group:          Development/Libraries
 License:        zlib
@@ -64,6 +64,9 @@ done
 %build
 mkdir build
 cd build
+
+export CXXFLAGS="$RPM_OPT_FLAGS -lboost_system"
+
 %cmake -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING= -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING= .. 
 # Builds out of order with _smp_mflags
 make VERBOSE=1
@@ -132,6 +135,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sun Jan 27 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 1:1.1.0-8
+- Build against ogre 1.8.1 which is not in Fedora yet (https://bugzilla.redhat.com/show_bug.cgi?id=873353).
+- Add explicit linking to boost_system (https://svn.boost.org/trac/boost/ticket/7241)
+
 * Fri Jul 20 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:1.1.0-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 

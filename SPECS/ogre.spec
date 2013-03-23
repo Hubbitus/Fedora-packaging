@@ -1,6 +1,6 @@
 Name:           ogre
 Version:        1.8.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Object-Oriented Graphics Rendering Engine
 # MIT with exceptions - main library
 # CC-BY-SA - devel docs
@@ -23,7 +23,7 @@ Patch0:         ogre-1.7.2-rpath.patch
 #Patch1:         ogre-1.6.0-system-glew.patch
 # Upstream patch to GLEW applied to new version
 Patch1:         ogre-1.6.0rc1-glew.patch
-Patch2:         ogre-1.7.2-system-tinyxml.patch
+Patch2:         ogre-1.8.1-system-tinyxml.patch
 Patch3:         ogre-1.7.2-fix-ppc-build.patch
 Patch5:         ogre-1.7.2-build-rcapsdump.patch
 # Fixes bug 842041
@@ -88,7 +88,7 @@ using SampleBrowser.
 %setup -q -n ogre_src_v1-8-1
 %patch0 -p1 -z .rpath
 #?% patch1 -p0 -z .glew
-#?% patch2 -p1 -z .sys-tinyxml
+%patch2 -p1 -z .sys-tinyxml
 %patch3 -p1 -z .ppc
 #?% patch5 -p0 -z .build-rcapsdump
 #?% patch6 -p0 -z .fix-utilSSE
@@ -122,6 +122,8 @@ rm Tools/XMLConverter/include/tiny*
 %build
 mkdir build
 cd build
+export CFLAGS="$CFLAGS -L/usr/"
+export CXXFLAGS="$CXXFLAGS -L/usr/"
 %cmake .. -DOGRE_FULL_RPATH=0 -DCMAKE_SKIP_RPATH=1 -DOGRE_LIB_DIRECTORY=%{_lib}
 make %{?_smp_mflags}
 
@@ -156,13 +158,13 @@ install -p -m 755 bin/SampleBrowser $RPM_BUILD_ROOT%{_bindir}/SampleBrowser
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/OGRE/
 cp -a ../Samples/Media $RPM_BUILD_ROOT%{_datadir}/OGRE/media
 rm -f $RPM_BUILD_ROOT%{_datadir}/OGRE/media/CMakeLists.txt
-ln -s ../../../../fonts/dejavu/DejaVuSans-Bold.ttf \
+ln -sf ../../../../fonts/dejavu/DejaVuSans-Bold.ttf \
   $RPM_BUILD_ROOT%{_datadir}/OGRE/media/fonts/bluebold.ttf
-ln -s ../../../../fonts/dejavu/DejaVuSans.ttf \
+ln -sf ../../../../fonts/dejavu/DejaVuSans.ttf \
   $RPM_BUILD_ROOT%{_datadir}/OGRE/media/fonts/bluehigh.ttf
-ln -s ../../../../fonts/dejavu/DejaVuSansCondensed.ttf \
+ln -sf ../../../../fonts/dejavu/DejaVuSansCondensed.ttf \
   $RPM_BUILD_ROOT%{_datadir}/OGRE/media/fonts/bluecond.ttf
-ln -s ../../../../fonts/dejavu/DejaVuSans.ttf \
+ln -sf ../../../../fonts/dejavu/DejaVuSans.ttf \
   $RPM_BUILD_ROOT%{_datadir}/OGRE/media/fonts/solo5.ttf
 
 %post -p /sbin/ldconfig
@@ -175,7 +177,7 @@ ln -s ../../../../fonts/dejavu/DejaVuSans.ttf \
 %doc AUTHORS BUGS COPYING
 %doc Docs/ChangeLog.html Docs/License.html Docs/licenses Docs/ReadMe.html Docs/style.css Docs/ogre-logo*.gif
 %{_bindir}/Ogre*
-%{_bindir}/rcapsdump
+#? % {_bindir}/rcapsdump
 %{_libdir}/lib*Ogre*.so.*
 %{_libdir}/OGRE
 %{_datadir}/OGRE
@@ -207,6 +209,9 @@ ln -s ../../../../fonts/dejavu/DejaVuSans.ttf \
 
 
 %changelog
+* Sun Jan 27 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 1.8.1-2
+- Rebase patch2: ogre-1.7.2-system-tinyxml.patch to ogre-1.8.1-system-tinyxml.patch
+
 * Sun Nov 25 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 1.8.1-1
 - Try build 1.8.1 version
 
@@ -216,7 +221,7 @@ ln -s ../../../../fonts/dejavu/DejaVuSans.ttf \
 * Tue Feb 28 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.7.3-6
 - Rebuilt for c++ ABI breakage
 
-* Tue Jan 17 2012 Bruno Wolff III <bruno@wolff.to> - 1.7.3-5
+* Tue Jan 17 2012 Bruno1 Wolff III <bruno@wolff.to> - 1.7.3-5
 - Rebuild for ois 1.3
 
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.7.3-4

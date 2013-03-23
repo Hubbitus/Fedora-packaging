@@ -1,6 +1,6 @@
 Name:	rigsofrods
 Version:	0.4.0.4
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Vehicle simulator based on soft-body physics
 
 License:	GPLv3
@@ -11,21 +11,27 @@ Source0:	http://sourceforge.net/projects/rigsofrods/files/rigsofrods/0.4-dev/%{n
 # Not neccesary?
 # Source1:	http://sourceforge.net/projects/rigsofrods/files/rigsofrods/0.37/content-pack-0.37.zip
 
-BuildRequires:	wxGTK-devel, ois-devel, ogre-devel >= 1.8.1, ogre-pagedgeometry-devel, openal-devel, mygui-devel
+BuildRequires:	wxGTK-devel, ois-devel, ogre-devel >= 1.8.1, ogre-pagedgeometry-devel, openal-devel, mygui-devel >= 3.2.0
 BuildRequires:	cmake, dos2unix
 # Due to the bug http://redmine.rigsofrods.org/issues/1015 it strongly required
-BuildRequires:	caelum
+BuildRequires:	caelum-devel
 Patch0:	rigsofrods-0.39.4-dl.patch
 # Pathes of libraries. I think it Fedora-specific
 Patch1:	rigsofrods-0.4.0.4-paths-libs.patch
 
 # It also strongly required: http://redmine.rigsofrods.com/issues/1033
 # Also old fixed version: http://redmine.rigsofrods.com/issues/956
-BuildRequires:	angelscript-devel <= 2.22.1
+#BuildRequires:	angelscript-devel <= 2.22.1
+BuildRequires:	angelscript-devel
 Patch2:	rigsofrods-0.4.0.4-angelscript-required.patch
 
+# According to changelog make changes ( http://redmine.rigsofrods.com/issues/956 )
+Patch3:	rigsofrods-0.4.0.4-angelscript-gt-2.22.patch
+
 # http://redmine.rigsofrods.com/issues/964
-Patch3:	rigsofrods-0.4.0.4-gcc4.7.patch
+Patch4:	rigsofrods-0.4.0.4-gcc4.7.patch
+
+BuildRequires:	SocketW-devel
 
 %description
 Rigs of Rods is an open source vehicle simulator licensed under the GNU General
@@ -52,12 +58,16 @@ Features
 %patch0 -p0 -b .dl
 %patch1 -p1 -b .includes
 %patch2 -p1 -b .angelscript
-%patch3 -p1 -b .gcc4.7
+%patch3 -p1 -b .angelscriptOld
+%patch4 -p1 -b .gcc4.7
 
 # Convert lineendings
 dos2unix --keepdate readme.txt COPYING LICENSE.txt
 
 find . -type d -exec chmod 0755 {} \;
+
+# Additional flag: http://www.ogre3d.org/forums/viewtopic.php?f=2&t=71037
+export CXXFLAGS="$RPM_OPT_FLAGS -lboost_system"
 
 cmake \
 	-DROR_USE_MYGUI="TRUE" \
@@ -93,6 +103,13 @@ cp -pr bin/resources/* %{buildroot}%{_datarootdir}/%{name}/
 %{_datarootdir}/%{name}
 
 %changelog
+* Sun Jan 27 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.4.0.4-3
+- Try link with angelscript 2.25.2 with patch by Dan Horák (https://bugzilla.redhat.com/show_bug.cgi?id=879931#c3)
+- According to changelog make changes ( http://redmine.rigsofrods.com/issues/956 )
+	Add Patch3: rigsofrods-0.4.0.4-angelscript-gt-2.22.patch
+- BR caelum-devel instead of caelum.
+- Add explicit linking to boost_system (https://svn.boost.org/trac/boost/ticket/7241, https://github.com/hobbes1069/Field3D/commit/544cca15426dfaa55b4e43843ea0bbd5c9569178)
+
 * Sun Nov 25 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 0.4.0.4-2
 - Fix RoRconfig file.
 - Add resources.
@@ -104,3 +121,4 @@ cp -pr bin/resources/* %{buildroot}%{_datarootdir}/%{name}/
 
 * Sun Jun 24 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 0.39.4-1
 - Initial spec version.
+1
