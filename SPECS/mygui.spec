@@ -1,6 +1,6 @@
 Name:           mygui
 Version:        3.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Fast, simple and flexible GUI library for Ogre
 Group:          Development/Libraries
 # UnitTests include agg-2.4, which is under a BSD variant (not built or installed here)
@@ -122,6 +122,8 @@ EOT
 
 
 %build
+export CXXFLAGS="$RPM_OPT_FLAGS -lboost_system"
+
 # Plugins are windows only atm
 %cmake . \
    -DMYGUI_INSTALL_PDB:INTERNAL=FALSE -DCMAKE_BUILD_TYPE:STRING=Release \
@@ -263,6 +265,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sun Jan 27 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 3.2.0-2
+- Rebuild against ogre 1.8.1
+- Add explicit linking to boost_system (https://svn.boost.org/trac/boost/ticket/7241)
+
 * Sun Jun 24 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 3.2.0-1
 - Update to 3.2.0 version which needed to rigsofrods.
 - Fix build on gcc >= 4.7 (http://openmw.org/forum/viewtopic.php?f=6&t=685).
