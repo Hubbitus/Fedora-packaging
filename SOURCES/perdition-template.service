@@ -1,0 +1,12 @@
+[Unit]
+Description=POP, IMAP and managesieve proxy
+After=syslog.target network.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/perdition.pid
+EnvironmentFile=-/etc/sysconfig/perdition
+ExecStart=/usr/sbin/perdition.{name} $FLAGS ${NAME}_FLAGS
+
+[Install]
+WantedBy=multi-user.target
