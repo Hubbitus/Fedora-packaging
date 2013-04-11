@@ -3,7 +3,7 @@
 Summary:		Mail Retrieval Proxy
 Name:		perdition
 Version:		1.19
-Release:		rc5.0.1%{?dist}
+Release:		rc5.0.2%{?dist}
 License:		GPLv2+
 Group:		Applications/Internet
 URL:			http://horms.net/projects/perdition/
@@ -20,6 +20,8 @@ BuildRequires:	tetex-latex tetex-dvips libtiff unixODBC-devel tinycdb-devel
 BuildRequires:	libidn-devel libdb-devel
 Requires:		vanessa_logger >= 0.0.10 vanessa_adt >= 0.0.6 vanessa_socket >= 0.0.7
 Requires:		initscripts
+#???
+Patch0:		perdition-1.19-rc5-const-version.patch
 
 %description
 Perdition is a fully featured POP3 and IMAP4 proxy server. It is able to
@@ -38,7 +40,7 @@ applications.
 Summary:	Library to allow perdition to access Berkely DB based pop maps
 Group:	Applications/Internet
 License:	GPLv2+
-Requires:	%{name}-%{version}-%{release}
+Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description bdb
 Perdition allows for arbitrary user database access through shared
@@ -50,7 +52,7 @@ database to be sourced from a Berkely DB.
 Summary:	Library to allow perdition to access Constant DB based pop maps
 Group:	Applications/Internet
 License:	GPLv2+
-Requires:	%{name}-%{version}-%{release}
+Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description cdb
 Perdition allows for arbitrary user database access through shared
@@ -61,7 +63,7 @@ database to be sourced from a Constant DB.
 Summary:	Library to allow perdition to access LDAP based pop maps
 Group:	Applications/Internet
 License:	GPLv2+
-Requires:	%{name}-%{version}-%{release}
+Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description ldap
 Perdition allows for arbitrary user database access through shared
@@ -73,7 +75,7 @@ database to be sourced from LDAP.
 Summary:	Library to allow perdition to access MySQL based pop maps
 Group:	Applications/Internet
 License:	GPLv2+
-Requires:	%{name}-%{version}-%{release}
+Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description mysql
 Perdition allows for arbitrary user database access through shared
@@ -85,7 +87,7 @@ database stored in a MySQL database.
 Summary:	Library to allow perdition to access PostgreSQL based pop maps
 Group:	Applications/Internet
 License:	GPLv2+
-Requires:	%{name}-%{version}-%{release}
+Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description postgresql
 Perdition allows for arbitrary user database access through shared
@@ -97,7 +99,8 @@ database stored in a PostgreSQL database.
 Summary:	Library to allow perdition to access pop maps via ODBC
 Group:	Applications/Internet
 License:	GPLv2+
-Requires:	%{name}-%{version}-%{release} unixODBC
+Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires:	unixODBC
 
 %description odbc
 Perdition allows for arbitrary user database access through shared
@@ -116,6 +119,8 @@ which do not support the systemd unit file format.
 
 %prep
 %setup -q -n %{name}-%{vers}
+
+%patch0 -p1 -b .const
 
 %build
 
@@ -306,6 +311,10 @@ fi
 %{_mandir}/man8/%{name}db_odbc_makedb.*
 
 %changelog
+* Mon Mar 25 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 1.19-rc5.0.2
+- Add patch0 - perdition-1.19-rc5-const-version.patch to build against new Fedora version of gdbm.
+- Make add requirements arch-dependant by adding %%{?_isa} (thanks to Mario Blättermann).
+
 * Mon Jul 9 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 1.19-rc5.0.1
 - Update to version 1.19-rc5.
 - Adjust URLs.
