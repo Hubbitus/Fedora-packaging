@@ -1,0 +1,14 @@
+--- autogen.sh.orig	2013-04-16 13:30:03.000000000 +0400
++++ autogen.sh	2013-04-16 13:59:07.578712672 +0400
+@@ -88,7 +88,10 @@
+ 
+ 
+ echo -n "checking for automake >= $AUTOMAKE_REQUIRED_VERSION ... "
+-if (automake-1.11 --version) < /dev/null > /dev/null 2>&1; then
++if (automake-1.12 --version) < /dev/null > /dev/null 2>&1; then
++   AUTOMAKE=automake-1.12
++   ACLOCAL=aclocal-1.12
++elif (automake-1.11 --version) < /dev/null > /dev/null 2>&1; then
+    AUTOMAKE=automake-1.11
+    ACLOCAL=aclocal-1.11
+ elif (automake-1.10 --version) < /dev/null > /dev/null 2>&1; then
