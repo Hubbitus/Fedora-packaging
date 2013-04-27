@@ -34,7 +34,7 @@ Patch1:		gimp-gap-2.7-unbandle.patch
 
 %description
 The GIMP-GAP (GIMP Animation Package) is a collection of Plug-Ins to
-extend GIMP 2.6 with capabilities to edit and create animations as
+extend GIMP with capabilities to edit and create animations as
 sequences of single frames.
 
 %prep
