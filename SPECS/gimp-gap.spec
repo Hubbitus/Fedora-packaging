@@ -10,7 +10,7 @@ Version: 2.7.0
 
 Summary:		The GIMP Animation Package
 Name:		gimp-gap
-Release:		2%{?GITrev:.GIT%{GITrev}}
+Release:		3%{?GITrev:.GIT%{GITrev}}
 Group:		Applications/Multimedia
 License:		GPLv2+
 URL:			https://github.com/GNOME/gimp-gap
@@ -23,12 +23,12 @@ BuildRequires:	autoconf >= 2.54 automake >= 1.7 intltool >= 0.17
 # glib-gettextize >= 2.2.0
 BuildRequires:	glib2-devel >= 2.2.0
 BuildRequires:	gimp-devel >= 2.6.0 sed gimp-devel-tools >= 2.6.0
-BuildRequires:	bzip2-devel xvidcore-devel xvidcore
+BuildRequires:	bzip2-devel libjpeg-turbo-devel
 
 Requires:		gimp >= 2.6.0 xvidcore
 
-# Account new version 1.12
-Patch0:		autogen.sh-automake-1.12.patch
+# Account new version 1.12: https://bugzilla.gnome.org/show_bug.cgi?id=699207
+Patch0:		gimp-gap-2.7-autogen.sh-automake-1.12.patch
 # Unbundle libs. Fedora-specific patch, borrowed from SUSE.
 Patch1:		gimp-gap-2.7-unbandle.patch
 
@@ -40,7 +40,7 @@ sequences of single frames.
 %prep
 %setup -q -n %{name}
 
-%patch0 -p0 -b .automake-1.12
+%patch0 -p1 -b .automake-1.12
 %patch1 -p1 -b .unbundle
 
 # Bundled libs (list from SUSE)
@@ -66,9 +66,15 @@ make LIBS="$LIBS -lm"
 %{gimplibdir}/plug-ins/*
 %{_libdir}/gimp-gap-%gapmajorver.%gapminorver
 %{gimpdatadir}/scripts/*
-%{_datadir}/locale/*/*/*
 
 %changelog
+* Mon Apr 29 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-3.GITe75bd46
+- For changes thanks to Antonio Trande and their comments in Fedora review (bz#954108).
+- Remove BR xvidcore-devel xvidcore (its is not required and does not present in Fedora).
+- Remove %%{_datadir}/locale/*/*/*
+- Remade gimp-gap-2.7-autogen.sh-automake-1.12.patch to account automake-1.13 also.
+- Add BR libjpeg-turbo-devel
+
 * Sat Apr 20 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-2.GITe75bd46
 - Remove BuildRequires: ffmpeg-libs ffmpeg-devel
 - Borrow from SUSE Patch1: gimp-gap-2.7-unbandle.patch (rebased)
