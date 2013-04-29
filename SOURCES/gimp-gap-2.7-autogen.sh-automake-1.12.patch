@@ -1,0 +1,18 @@
+diff -NaurEbBH gimp-gap.orig/autogen.sh gimp-gap/autogen.sh
+--- gimp-gap.orig/autogen.sh	2013-04-16 13:30:03.000000000 +0400
++++ gimp-gap/autogen.sh	2013-04-29 12:55:26.319443362 +0400
+@@ -88,7 +88,13 @@
+ 
+ 
+ echo -n "checking for automake >= $AUTOMAKE_REQUIRED_VERSION ... "
+-if (automake-1.11 --version) < /dev/null > /dev/null 2>&1; then
++if (automake-1.13 --version) < /dev/null > /dev/null 2>&1; then
++   AUTOMAKE=automake-1.13
++   ACLOCAL=aclocal-1.13
++elif (automake-1.12 --version) < /dev/null > /dev/null 2>&1; then
++   AUTOMAKE=automake-1.12
++   ACLOCAL=aclocal-1.12
++elif (automake-1.11 --version) < /dev/null > /dev/null 2>&1; then
+    AUTOMAKE=automake-1.11
+    ACLOCAL=aclocal-1.11
+ elif (automake-1.10 --version) < /dev/null > /dev/null 2>&1; then
