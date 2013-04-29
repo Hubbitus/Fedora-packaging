@@ -10,7 +10,7 @@ Version: 2.7.0
 
 Summary:		The GIMP Animation Package
 Name:		gimp-gap
-Release:		3%{?GITrev:.GIT%{GITrev}}
+Release:		4%{?GITrev:.GIT%{GITrev}}%{?dist}
 Group:		Applications/Multimedia
 License:		GPLv2+
 URL:			https://github.com/GNOME/gimp-gap
@@ -50,8 +50,7 @@ rm -rf extern_libs vid_enc_avi vid_enc_ffmpeg gap/gap_mpege.c gap/gap_mpege.h \
 
 
 %build
-./autogen.sh
-%configure --disable-libavformat
+./autogen.sh --disable-libavformat --libdir=%{_libdir} CFLAGS="${CFLAGS:-%optflags}" LDFLAGS="${LDFLAGS:-%__global_ldflags}"
 
 # Parralel build terminated with error
 make LIBS="$LIBS -lm"
@@ -68,6 +67,10 @@ make LIBS="$LIBS -lm"
 %{gimpdatadir}/scripts/*
 
 %changelog
+* Mon Apr 29 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-4.GITe75bd46
+- Add %%{?dist} tag. Thanks to Vasiliy Glazov.
+- Try avoid second reconfigure by passing argument in autoden.sh. Thanks to Antonio Trande.
+
 * Mon Apr 29 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-3.GITe75bd46
 - For changes thanks to Antonio Trande and their comments in Fedora review (bz#954108).
 - Remove BR xvidcore-devel xvidcore (its is not required and does not present in Fedora).
