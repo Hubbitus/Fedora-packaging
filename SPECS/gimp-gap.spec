@@ -10,7 +10,7 @@ Version: 2.7.0
 
 Summary:		The GIMP Animation Package
 Name:		gimp-gap
-Release:		4%{?GITrev:.GIT%{GITrev}}%{?dist}
+Release:		5%{?GITrev:.GIT%{GITrev}}%{?dist}
 Group:		Applications/Multimedia
 License:		GPLv2+
 URL:			https://github.com/GNOME/gimp-gap
@@ -25,7 +25,7 @@ BuildRequires:	glib2-devel >= 2.2.0
 BuildRequires:	gimp-devel >= 2.6.0 sed gimp-devel-tools >= 2.6.0
 BuildRequires:	bzip2-devel libjpeg-turbo-devel
 
-Requires:		gimp >= 2.6.0 xvidcore
+Requires:		gimp >= 2.6.0
 
 # Account new version 1.12: https://bugzilla.gnome.org/show_bug.cgi?id=699207
 Patch0:		gimp-gap-2.7-autogen.sh-automake-1.12.patch
@@ -67,6 +67,9 @@ make LIBS="$LIBS -lm"
 %{gimpdatadir}/scripts/*
 
 %changelog
+* Tue Apr 30 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-5.GITe75bd46
+- Remove xvidcore from requires. Thanks to Vasiliy Glazov.
+
 * Mon Apr 29 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-4.GITe75bd46
 - Add %%{?dist} tag. Thanks to Vasiliy Glazov.
 - Try avoid second reconfigure by passing argument in autoden.sh. Thanks to Antonio Trande.
