@@ -10,7 +10,7 @@ Version: 2.7.0
 
 Summary:		The GIMP Animation Package
 Name:		gimp-gap
-Release:		5%{?GITrev:.GIT%{GITrev}}%{?dist}
+Release:		6%{?GITrev:.GIT%{GITrev}}%{?dist}
 Group:		Applications/Multimedia
 License:		GPLv2+
 URL:			https://github.com/GNOME/gimp-gap
@@ -50,7 +50,10 @@ rm -rf extern_libs vid_enc_avi vid_enc_ffmpeg gap/gap_mpege.c gap/gap_mpege.h \
 
 
 %build
-./autogen.sh --disable-libavformat --libdir=%{_libdir} CFLAGS="${CFLAGS:-%optflags}" LDFLAGS="${LDFLAGS:-%__global_ldflags}"
+# Disable call ./configure from autogen.sh because we want it with default configured parameters
+sed -i 's@$srcdir/configure@#$srcdir/configure@' autogen.sh
+./autogen.sh
+%configure --disable-libavformat
 
 # Parralel build terminated with error
 make LIBS="$LIBS -lm"
@@ -67,6 +70,9 @@ make LIBS="$LIBS -lm"
 %{gimpdatadir}/scripts/*
 
 %changelog
+* Thu May 2 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-6.GITe75bd46
+- Disable call of ./configure script from autogen.sh as excessive and run it manually via macros (Michael Schwendt insist).
+
 * Tue Apr 30 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-5.GITe75bd46
 - Remove xvidcore from requires. Thanks to Vasiliy Glazov.
 
