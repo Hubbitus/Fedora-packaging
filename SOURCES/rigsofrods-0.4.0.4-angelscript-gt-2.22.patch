@@ -1,0 +1,1018 @@
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/contextmgr/contextmgr.cpp rigsofrods-source-0.4.0.4/source/angelscript_addons/contextmgr/contextmgr.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/contextmgr/contextmgr.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/angelscript_addons/contextmgr/contextmgr.cpp	2013-01-27 18:18:56.288076718 +0400
+@@ -65,8 +65,8 @@
+ 
+ 		// We need to find the function that will be created as the co-routine
+ 		string decl = "void " + func + "(any @)";
+-		int funcId = engine->GetModule(mod.c_str())->GetFunctionIdByDecl(decl.c_str());
+-		if( funcId < 0 )
++		asIScriptFunction* funcPtr = engine->GetModule(mod.c_str())->GetFunctionByDecl(decl.c_str());
++		if( !funcPtr )
+ 		{
+ 			// No function could be found, raise an exception
+ 			ctx->SetException(("Function '" + decl + "' doesn't exist").c_str());
+@@ -74,7 +74,7 @@
+ 		}
+ 
+ 		// Create a new context for the co-routine
+-		asIScriptContext *coctx = g_ctxMgr->AddContextForCoRoutine(ctx, funcId);
++		asIScriptContext *coctx = g_ctxMgr->AddContextForCoRoutine(ctx, funcPtr);
+ 
+ 		// Pass the argument to the context
+ 		coctx->SetArgObject(0, arg);
+@@ -236,7 +236,7 @@
+ 	m_currentThread = 0;
+ }
+ 
+-asIScriptContext *CContextMgr::AddContext(asIScriptEngine *engine, int funcId)
++asIScriptContext *CContextMgr::AddContext(asIScriptEngine *engine, asIScriptFunction* funcPtr)
+ {
+ 	// Create the new context
+ 	asIScriptContext *ctx = engine->CreateContext();
+@@ -244,7 +244,7 @@
+ 		return 0;
+ 
+ 	// Prepare it to execute the function
+-	int r = ctx->Prepare(funcId);
++	int r = ctx->Prepare(funcPtr);
+ 	if( r < 0 )
+ 	{
+ 		ctx->Release();
+@@ -271,7 +271,7 @@
+ 	return ctx;
+ }
+ 
+-asIScriptContext *CContextMgr::AddContextForCoRoutine(asIScriptContext *currCtx, int funcId)
++asIScriptContext *CContextMgr::AddContextForCoRoutine(asIScriptContext *currCtx, asIScriptFunction* funcPtr)
+ {
+ 	asIScriptEngine *engine = currCtx->GetEngine();
+ 	asIScriptContext *coctx = engine->CreateContext();
+@@ -281,7 +281,7 @@
+ 	}
+ 
+ 	// Prepare the context
+-	int r = coctx->Prepare(funcId);
++	int r = coctx->Prepare(funcPtr);
+ 	if( r < 0 )
+ 	{
+ 		// Couldn't prepare the context
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/contextmgr/contextmgr.h rigsofrods-source-0.4.0.4/source/angelscript_addons/contextmgr/contextmgr.h
+--- rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/contextmgr/contextmgr.h	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/angelscript_addons/contextmgr/contextmgr.h	2013-01-27 18:19:32.834472668 +0400
+@@ -46,12 +46,12 @@
+ 	// Create a new context, prepare it with the function id, then return
+ 	// it so that the application can pass the argument values. The context
+ 	// will be released by the manager after the execution has completed.
+-    asIScriptContext *AddContext(asIScriptEngine *engine, int funcId);
++    asIScriptContext *AddContext(asIScriptEngine *engine, asIScriptFunction* funcPtr);
+ 
+ 	// Create a new context, prepare it with the function id, then return
+ 	// it so that the application can pass the argument values. The context
+ 	// will be added as a co-routine in the same thread as the currCtx.
+-	asIScriptContext *AddContextForCoRoutine(asIScriptContext *currCtx, int funcId);
++	asIScriptContext *AddContextForCoRoutine(asIScriptContext *currCtx, asIScriptFunction* funcPtr);
+ 
+ 	// Execute each script that is not currently sleeping. The function returns after
+ 	// each script has been executed once. The application should call this function
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/debugger/debugger.cpp rigsofrods-source-0.4.0.4/source/angelscript_addons/debugger/debugger.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/debugger/debugger.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/angelscript_addons/debugger/debugger.cpp	2013-01-27 16:32:26.024872969 +0400
+@@ -467,7 +467,8 @@
+ 				for( asUINT n = 0; n < mod->GetGlobalVarCount(); n++ )
+ 				{
+ 					const char *varName = 0;
+-					mod->GetGlobalVar(n, &varName, &typeId);
++					const char *nameSpace = 0;
++					mod->GetGlobalVar(n, &varName, &nameSpace, &typeId);
+ 					if( name == varName )
+ 					{
+ 						ptr = mod->GetAddressOfGlobalVar(n);
+@@ -542,7 +543,8 @@
+ 	for( asUINT n = 0; n < mod->GetGlobalVarCount(); n++ )
+ 	{
+ 		int typeId;
+-		mod->GetGlobalVar(n, 0, &typeId);
++		const char* nameSpace = 0;
++		mod->GetGlobalVar(n, 0, &nameSpace, &typeId);
+ 		s << mod->GetGlobalVarDeclaration(n) << " = " << ToString(mod->GetAddressOfGlobalVar(n), typeId, false, ctx->GetEngine()) << endl;
+ 	}
+ 	Output(s.str());
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scriptany/scriptany.cpp rigsofrods-source-0.4.0.4/source/angelscript_addons/scriptany/scriptany.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scriptany/scriptany.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/angelscript_addons/scriptany/scriptany.cpp	2013-01-27 16:32:26.024872969 +0400
+@@ -245,7 +245,7 @@
+ 	value.valueInt = 0;
+ 
+ 	// Notify the garbage collector of this object
+-	engine->NotifyGarbageCollectorOfNewObject(this, engine->GetTypeIdByDecl("any"));		
++	engine->NotifyGarbageCollectorOfNewObject(this, engine->GetObjectTypeByName("any"));
+ }
+ 
+ CScriptAny::CScriptAny(void *ref, int refTypeId, asIScriptEngine *engine)
+@@ -257,7 +257,7 @@
+ 	value.valueInt = 0;
+ 
+ 	// Notify the garbage collector of this object
+-	engine->NotifyGarbageCollectorOfNewObject(this, engine->GetTypeIdByDecl("any"));		
++	engine->NotifyGarbageCollectorOfNewObject(this, engine->GetObjectTypeByName("any"));
+ 
+ 	Store(ref, refTypeId);
+ }
+@@ -338,7 +338,7 @@
+ 		// Copy the object into the given reference
+ 		if( value.typeId == refTypeId )
+ 		{
+-			engine->CopyScriptObject(ref, value.valueObj, value.typeId);
++			engine->AssignScriptObject(ref, value.valueObj, value.typeId);
+ 
+ 			return true;
+ 		}
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scriptarray/scriptarray.cpp rigsofrods-source-0.4.0.4/source/angelscript_addons/scriptarray/scriptarray.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scriptarray/scriptarray.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/angelscript_addons/scriptarray/scriptarray.cpp	2013-01-27 16:32:26.025872986 +0400
+@@ -74,7 +74,7 @@
+ 			for( asUINT n = 0; n < subtype->GetBehaviourCount(); n++ )
+ 			{
+ 				asEBehaviours beh;
+-				int funcId = subtype->GetBehaviourByIndex(n, &beh);
++				int funcId = subtype->GetBehaviourByIndex(n, &beh)->GetId();
+ 				if( beh != asBEHAVE_CONSTRUCT ) continue;
+ 
+ 				asIScriptFunction *func = ot->GetEngine()->GetFunctionById(funcId);
+@@ -93,7 +93,7 @@
+ 			// Verify that there is a default factory
+ 			for( asUINT n = 0; n < subtype->GetFactoryCount(); n++ )
+ 			{
+-				int funcId = subtype->GetFactoryIdByIndex(n);
++				int funcId = subtype->GetFactoryByIndex(n)->GetId();
+ 				asIScriptFunction *func = ot->GetEngine()->GetFunctionById(funcId);
+ 				if( func->GetParamCount() == 0 )
+ 				{
+@@ -233,7 +233,7 @@
+ 
+ 	// Notify the GC of the successful creation
+ 	if( objType->GetFlags() & asOBJ_GC )
+-		objType->GetEngine()->NotifyGarbageCollectorOfNewObject(this, objType->GetTypeId());
++		objType->GetEngine()->NotifyGarbageCollectorOfNewObject(this, objType);
+ }
+ 
+ CScriptArray::CScriptArray(asUINT length, void *defVal, asIObjectType *ot)
+@@ -267,7 +267,7 @@
+ 
+ 	// Notify the GC of the successful creation
+ 	if( objType->GetFlags() & asOBJ_GC )
+-		objType->GetEngine()->NotifyGarbageCollectorOfNewObject(this, objType->GetTypeId());
++		objType->GetEngine()->NotifyGarbageCollectorOfNewObject(this, objType);
+ 
+ 	// Initialize the elements with the default value
+ 	for( asUINT n = 0; n < GetSize(); n++ )
+@@ -278,7 +278,7 @@
+ void CScriptArray::SetValue(asUINT index, void *value)
+ {
+ 	if( (subTypeId & ~asTYPEID_MASK_SEQNBR) && !(subTypeId & asTYPEID_OBJHANDLE) )
+-		objType->GetEngine()->CopyScriptObject(At(index), value, subTypeId);
++		objType->GetEngine()->AssignScriptObject(At(index), value, subTypeId);
+ 	else if( subTypeId & asTYPEID_OBJHANDLE )
+ 	{
+ 		*(void**)At(index) = *(void**)value;
+@@ -581,7 +581,7 @@
+ 
+ 		// Execute object opCmp
+ 		// TODO: Add proper error handling
+-		r = ctx->Prepare(cmpFuncId); assert(r >= 0);
++		r = ctx->Prepare(cmpFunc); assert(r >= 0);
+ 		r = ctx->SetObject((void*)a); assert(r >= 0);
+ 		r = ctx->SetArgAddress(0, (void*)b); assert(r >= 0);
+ 		r = ctx->Execute();
+@@ -638,10 +638,10 @@
+ 		int r = 0;
+ 
+ 		// Execute object opEquals if available
+-		if( eqFuncId >= 0 )
++		if( eqFunc )
+ 		{
+ 			// TODO: Add proper error handling
+-			r = ctx->Prepare(eqFuncId); assert(r >= 0);
++			r = ctx->Prepare(eqFunc); assert(r >= 0);
+ 			r = ctx->SetObject((void*)a); assert(r >= 0);
+ 			r = ctx->SetArgAddress(0, (void*)b); assert(r >= 0);
+ 			r = ctx->Execute();
+@@ -653,10 +653,10 @@
+ 		}
+ 
+ 		// Execute object opCmp if available
+-		if( cmpFuncId >= 0 )
++		if( cmpFunc )
+ 		{
+ 			// TODO: Add proper error handling
+-			r = ctx->Prepare(cmpFuncId); assert(r >= 0);
++			r = ctx->Prepare(cmpFunc); assert(r >= 0);
+ 			r = ctx->SetObject((void*)a); assert(r >= 0);
+ 			r = ctx->SetArgAddress(0, (void*)b); assert(r >= 0);
+ 			r = ctx->Execute();
+@@ -679,7 +679,7 @@
+ int CScriptArray::Find(asUINT index, void *value)
+ {
+ 	// Subtype isn't primitive and doesn't have opEquals / opCmp
+-	if( subTypeId > asTYPEID_DOUBLE && (cmpFuncId <= 0 && eqFuncId <= 0) )
++	if( subTypeId > asTYPEID_DOUBLE && (!cmpFunc && !eqFunc) )
+ 	{
+ 		asIScriptContext *ctx = asGetActiveContext();
+ 		asIObjectType* subType = objType->GetEngine()->GetObjectTypeById(subTypeId);
+@@ -794,7 +794,7 @@
+ void CScriptArray::Sort(asUINT index, asUINT count, bool asc)
+ {
+ 	// Subtype isn't primitive and doesn't have opCmp
+-	if( subTypeId > asTYPEID_DOUBLE && cmpFuncId <= 0 )
++	if( subTypeId > asTYPEID_DOUBLE && ! cmpFunc )
+ 	{
+ 		asIScriptContext *ctx = asGetActiveContext();
+ 		asIObjectType* subType = objType->GetEngine()->GetObjectTypeById(subTypeId);
+@@ -904,7 +904,7 @@
+ 				void **s   = (void**)src->data;
+ 
+ 				for( ; d < max; d++, s++ )
+-					engine->CopyScriptObject(*d, *s, subTypeId);
++					engine->AssignScriptObject(*d, *s, subTypeId);
+ 			}
+ 			else
+ 			{
+@@ -924,8 +924,8 @@
+ 
+ 	subTypeId = objType->GetSubTypeId();
+ 
+-	cmpFuncId = -1;
+-	eqFuncId = -1;
++	cmpFunc = 0;
++	eqFunc = 0;
+ 
+ 	// Object - search for opCmp / opEquals
+ 	if( subTypeId > asTYPEID_DOUBLE )
+@@ -948,15 +948,15 @@
+ 					{
+ 						if( returnTypeId == asTYPEID_INT32 && strcmp(func->GetName(), "opCmp") == 0 )
+ 						{
+-							cmpFuncId = subType->GetMethodIdByIndex(i);
++							cmpFunc = subType->GetMethodByIndex(i);
+ 						}
+ 
+ 						if( returnTypeId == asTYPEID_BOOL && strcmp(func->GetName(), "opEquals") == 0 )
+ 						{
+-							eqFuncId = subType->GetMethodIdByIndex(i);
++							eqFunc = subType->GetMethodByIndex(i);
+ 						}
+ 
+-						if( cmpFuncId >= 0 && eqFuncId >= 0 )
++						if( cmpFunc && eqFunc )
+ 						{
+ 							break;
+ 						}
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scriptarray/scriptarray.h rigsofrods-source-0.4.0.4/source/angelscript_addons/scriptarray/scriptarray.h
+--- rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scriptarray/scriptarray.h	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/angelscript_addons/scriptarray/scriptarray.h	2013-01-27 16:32:26.025872986 +0400
+@@ -56,8 +56,8 @@
+ 	asIObjectType    *objType;
+ 	SArrayBuffer     *buffer;
+ 	int               elementSize;
+-	int               cmpFuncId;
+-	int               eqFuncId;
++	asIScriptFunction* cmpFunc;
++	asIScriptFunction* eqFunc;
+ 	int               subTypeId;
+ 
+ 	bool  Less(const void *a, const void *b, bool asc, asIScriptContext *ctx);
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scriptbuilder/scriptbuilder.cpp rigsofrods-source-0.4.0.4/source/angelscript_addons/scriptbuilder/scriptbuilder.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scriptbuilder/scriptbuilder.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/angelscript_addons/scriptbuilder/scriptbuilder.cpp	2013-01-27 16:32:26.025872986 +0400
+@@ -433,7 +433,7 @@
+ 		else if( decl->type == 2 )
+ 		{
+ 			// Find the function id
+-			int funcId = module->GetFunctionIdByDecl(decl->declaration.c_str());
++			int funcId = module->GetFunctionByDecl(decl->declaration.c_str())->GetId();
+ 			if( funcId >= 0 )
+ 				funcMetadataMap.insert(map<int, string>::value_type(funcId, decl->metadata));
+ 		}
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scriptdictionary/scriptdictionary.cpp rigsofrods-source-0.4.0.4/source/angelscript_addons/scriptdictionary/scriptdictionary.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scriptdictionary/scriptdictionary.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/angelscript_addons/scriptdictionary/scriptdictionary.cpp	2013-01-27 16:32:26.026873003 +0400
+@@ -21,7 +21,7 @@
+ 
+ 	// Notify the garbage collector of this object
+ 	// TODO: The type id should be cached
+-	engine->NotifyGarbageCollectorOfNewObject(this, engine->GetTypeIdByDecl("dictionary"));
++	engine->NotifyGarbageCollectorOfNewObject(this, engine->GetObjectTypeByName("dictionary"));
+ }
+ 
+ CScriptDictionary::~CScriptDictionary()
+@@ -185,7 +185,7 @@
+ 			// Copy the object into the given reference
+ 			if( isCompatible )
+ 			{
+-				engine->CopyScriptObject(value, it->second.valueObj, typeId);
++				engine->AssignScriptObject(value, it->second.valueObj, typeId);
+ 
+ 				return true;
+ 			}
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scripthelper/scripthelper.cpp rigsofrods-source-0.4.0.4/source/angelscript_addons/scripthelper/scripthelper.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/scripthelper/scripthelper.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/angelscript_addons/scripthelper/scripthelper.cpp	2013-01-27 18:26:50.347816763 +0400
+@@ -14,7 +14,7 @@
+     //       then the method id and context should be cached between calls.
+ 
+ 	int retval = -1;
+-	int funcId = 0;
++	asIScriptFunction* funcPtr = 0;
+ 
+ 	asIObjectType *ot = engine->GetObjectTypeById(typeId);
+ 	if( ot )
+@@ -22,30 +22,30 @@
+ 		// Check if the object type has a compatible opCmp method
+ 		for( asUINT n = 0; n < ot->GetMethodCount(); n++ )
+ 		{
+-			asIScriptFunction *func = ot->GetMethodByIndex(n);
+-			if( strcmp(func->GetName(), "opCmp") == 0 &&
+-				func->GetReturnTypeId() == asTYPEID_INT32 &&
+-				func->GetParamCount() == 1 )
++			asIScriptFunction *funcPtr = ot->GetMethodByIndex(n);
++			if( strcmp(funcPtr->GetName(), "opCmp") == 0 &&
++				funcPtr->GetReturnTypeId() == asTYPEID_INT32 &&
++				funcPtr->GetParamCount() == 1 )
+ 			{
+ 				asDWORD flags;
+-				int paramTypeId = func->GetParamTypeId(0, &flags);
++				int paramTypeId = funcPtr->GetParamTypeId(0, &flags);
+ 				
+ 				// The parameter must be an input reference of the same type
+ 				if( flags != asTM_INREF || typeId != paramTypeId )
+ 					break;
+ 
+ 				// Found the method
+-				funcId = ot->GetMethodIdByIndex(n);
++				funcPtr = ot->GetMethodByIndex(n);
+ 				break;
+ 			}
+ 		}
+ 	}
+ 
+-	if( funcId )
++	if( funcPtr )
+ 	{
+ 		// Call the method
+ 		asIScriptContext *ctx = engine->CreateContext();
+-		ctx->Prepare(funcId);
++		ctx->Prepare(funcPtr);
+ 		ctx->SetObject(lobj);
+ 		ctx->SetArgAddress(0, robj);
+ 		int r = ctx->Execute();
+@@ -68,7 +68,7 @@
+ 	//       entry in a set, then the method id and context should be cached between calls.
+ 
+ 	int retval = -1;
+-	int funcId = 0;
++	asIScriptFunction* funcPtr = 0;
+ 
+ 	asIObjectType *ot = engine->GetObjectTypeById(typeId);
+ 	if( ot )
+@@ -76,30 +76,30 @@
+ 		// Check if the object type has a compatible opEquals method
+ 		for( asUINT n = 0; n < ot->GetMethodCount(); n++ )
+ 		{
+-			asIScriptFunction *func = ot->GetMethodByIndex(n);
+-			if( strcmp(func->GetName(), "opEquals") == 0 &&
+-				func->GetReturnTypeId() == asTYPEID_BOOL &&
+-				func->GetParamCount() == 1 )
++			asIScriptFunction *funcPtr = ot->GetMethodByIndex(n);
++			if( strcmp(funcPtr->GetName(), "opEquals") == 0 &&
++				funcPtr->GetReturnTypeId() == asTYPEID_BOOL &&
++				funcPtr->GetParamCount() == 1 )
+ 			{
+ 				asDWORD flags;
+-				int paramTypeId = func->GetParamTypeId(0, &flags);
++				int paramTypeId = funcPtr->GetParamTypeId(0, &flags);
+ 				
+ 				// The parameter must be an input reference of the same type
+ 				if( flags != asTM_INREF || typeId != paramTypeId )
+ 					break;
+ 
+ 				// Found the method
+-				funcId = ot->GetMethodIdByIndex(n);
++				funcPtr = ot->GetMethodByIndex(n);
+ 				break;
+ 			}
+ 		}
+ 	}
+ 
+-	if( funcId )
++	if( funcPtr )
+ 	{
+ 		// Call the method
+ 		asIScriptContext *ctx = engine->CreateContext();
+-		ctx->Prepare(funcId);
++		ctx->Prepare(funcPtr);
+ 		ctx->SetObject(lobj);
+ 		ctx->SetArgAddress(0, robj);
+ 		int r = ctx->Execute();
+@@ -135,17 +135,17 @@
+ 	asIScriptModule *execMod = mod ? mod : engine->GetModule("ExecuteString", asGM_ALWAYS_CREATE);
+ 	
+ 	// Compile the function that can be executed
+-	asIScriptFunction *func = 0;
+-	int r = execMod->CompileFunction("ExecuteString", funcCode.c_str(), -1, 0, &func);
++	asIScriptFunction *funcPtr = 0;
++	int r = execMod->CompileFunction("ExecuteString", funcCode.c_str(), -1, 0, &funcPtr);
+ 	if( r < 0 )
+ 		return r;
+ 
+ 	// If no context was provided, request a new one from the engine
+ 	asIScriptContext *execCtx = ctx ? ctx : engine->CreateContext();
+-	r = execCtx->Prepare(func->GetId());
++	r = execCtx->Prepare(funcPtr);
+ 	if( r < 0 )
+ 	{
+-		func->Release();
++		funcPtr->Release();
+ 		if( !ctx ) execCtx->Release();
+ 		return r;
+ 	}
+@@ -154,7 +154,7 @@
+ 	r = execCtx->Execute();
+ 	
+ 	// Clean up
+-	func->Release();
++	funcPtr->Release();
+ 	if( !ctx ) execCtx->Release();
+ 
+ 	return r;
+@@ -244,8 +244,8 @@
+ 		{
+ 			for( asUINT m = 0; m < type->GetMethodCount(); m++ )
+ 			{
+-				asIScriptFunction *func = type->GetMethodByIndex(m);
+-				fprintf(f, "intfmthd %s \"%s\"\n", typeDecl.c_str(), func->GetDeclaration(false));
++				asIScriptFunction *funcPtr = type->GetMethodByIndex(m);
++				fprintf(f, "intfmthd %s \"%s\"\n", typeDecl.c_str(), funcPtr->GetDeclaration(false));
+ 			}
+ 		}
+ 		else
+@@ -253,19 +253,19 @@
+ 			asUINT m;
+ 			for( m = 0; m < type->GetFactoryCount(); m++ )
+ 			{
+-				asIScriptFunction *func = engine->GetFunctionById(type->GetFactoryIdByIndex(m));
+-				fprintf(f, "objbeh \"%s\" %d \"%s\"\n", typeDecl.c_str(), asBEHAVE_FACTORY, func->GetDeclaration(false));
++				asIScriptFunction *funcPtr = engine->GetFunctionById(type->GetFactoryByIndex(m)->GetId());
++				fprintf(f, "objbeh \"%s\" %d \"%s\"\n", typeDecl.c_str(), asBEHAVE_FACTORY, funcPtr->GetDeclaration(false));
+ 			}
+ 			for( m = 0; m < type->GetBehaviourCount(); m++ )
+ 			{
+ 				asEBehaviours beh;
+-				asIScriptFunction *func = engine->GetFunctionById(type->GetBehaviourByIndex(m, &beh));
+-				fprintf(f, "objbeh \"%s\" %d \"%s\"\n", typeDecl.c_str(), beh, func->GetDeclaration(false));
++				asIScriptFunction *funcPtr = engine->GetFunctionById(type->GetBehaviourByIndex(m, &beh)->GetId());
++				fprintf(f, "objbeh \"%s\" %d \"%s\"\n", typeDecl.c_str(), beh, funcPtr->GetDeclaration(false));
+ 			}
+ 			for( m = 0; m < type->GetMethodCount(); m++ )
+ 			{
+-				asIScriptFunction *func = type->GetMethodByIndex(m);
+-				fprintf(f, "objmthd \"%s\" \"%s\"\n", typeDecl.c_str(), func->GetDeclaration(false));
++				asIScriptFunction *funcPtr = type->GetMethodByIndex(m);
++				fprintf(f, "objmthd \"%s\" \"%s\"\n", typeDecl.c_str(), funcPtr->GetDeclaration(false));
+ 			}
+ 			for( m = 0; m < type->GetPropertyCount(); m++ )
+ 			{
+@@ -280,8 +280,8 @@
+ 	c = engine->GetGlobalFunctionCount();
+ 	for( n = 0; n < c; n++ )
+ 	{
+-		asIScriptFunction *func = engine->GetFunctionById(engine->GetGlobalFunctionIdByIndex(n));
+-		fprintf(f, "func \"%s\"\n", func->GetDeclaration());
++		asIScriptFunction *funcPtr = engine->GetFunctionById(engine->GetGlobalFunctionByIndex(n)->GetId());
++		fprintf(f, "func \"%s\"\n", funcPtr->GetDeclaration());
+ 	}
+ 
+ 	// Write global properties
+@@ -291,9 +291,10 @@
+ 	for( n = 0; n < c; n++ )
+ 	{
+ 		const char *name;
++		const char *nameSpace;
+ 		int typeId;
+ 		bool isConst;
+-		engine->GetGlobalPropertyByIndex(n, &name, &typeId, &isConst);
++		engine->GetGlobalPropertyByIndex(n, &name, &nameSpace, &typeId, &isConst);
+ 		fprintf(f, "prop \"%s%s %s\"\n", isConst ? "const " : "", engine->GetTypeDeclaration(typeId), name);
+ 	}
+ 
+@@ -322,8 +323,7 @@
+ 	if( ctx->GetState() != asEXECUTION_EXCEPTION ) return;
+ 
+ 	asIScriptEngine *engine = ctx->GetEngine();
+-	int funcId = ctx->GetExceptionFunction();
+-	const asIScriptFunction *function = engine->GetFunctionById(funcId);
++	const asIScriptFunction *function = ctx->GetExceptionFunction();
+ 	printf("func: %s\n", function->GetDeclaration());
+ 	printf("modl: %s\n", function->GetModuleName());
+ 	printf("sect: %s\n", function->GetScriptSectionName());
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/serializer/serializer.cpp rigsofrods-source-0.4.0.4/source/angelscript_addons/serializer/serializer.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/angelscript_addons/serializer/serializer.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/angelscript_addons/serializer/serializer.cpp	2013-01-27 16:32:26.026873003 +0400
+@@ -57,7 +57,8 @@
+ 	{
+ 		const char *name;
+ 		int typeId;
+-		mod->GetGlobalVar(i, &name, &typeId);
++		const char *nameSpace = 0;
++		mod->GetGlobalVar(i, &name, &nameSpace, &typeId);
+ 		m_root.m_children.push_back(new CSerializedValue(&m_root, name, mod->GetAddressOfGlobalVar(i), typeId));
+ 	}
+ 
+@@ -85,7 +86,8 @@
+ 	{
+ 		const char *name;
+ 		int typeId;
+-		mod->GetGlobalVar(i, &name, &typeId);
++		const char *nameSpace = 0;
++		mod->GetGlobalVar(i, &name, &nameSpace, &typeId);
+ 
+ 		CSerializedValue *v = m_root.FindByName(name);
+ 		if( v )
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/main/physics/collision/Collisions.cpp rigsofrods-source-0.4.0.4/source/main/physics/collision/Collisions.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/main/physics/collision/Collisions.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/main/physics/collision/Collisions.cpp	2013-01-27 17:32:01.703914028 +0400
+@@ -499,7 +499,7 @@
+ 	return NULL;
+ }
+ 
+-int Collisions::addCollisionBox(SceneNode *tenode, bool rotating, bool virt, Vector3 pos, Ogre::Vector3 rot, Ogre::Vector3 l, Ogre::Vector3 h, Ogre::Vector3 sr, const Ogre::String &eventname, const Ogre::String &instancename, bool forcecam, Ogre::Vector3 campos, Ogre::Vector3 sc /* = Vector3::UNIT_SCALE */, Ogre::Vector3 dr /* = Vector3::ZERO */, int event_filter /* = EVENT_ALL */, int scripthandler /* = -1 */)
++int Collisions::addCollisionBox(SceneNode *tenode, bool rotating, bool virt, Vector3 pos, Ogre::Vector3 rot, Ogre::Vector3 l, Ogre::Vector3 h, Ogre::Vector3 sr, const Ogre::String &eventname, const Ogre::String &instancename, bool forcecam, Ogre::Vector3 campos, Ogre::Vector3 sc /* = Vector3::UNIT_SCALE */, Ogre::Vector3 dr /* = Vector3::ZERO */, int event_filter /* = EVENT_ALL */, AngelScript::asIScriptFunction* scripthandler /* = -1 */)
+ {
+ 	Quaternion rotation  = Quaternion(Degree(rot.x), Vector3::UNIT_X) * Quaternion(Degree(rot.y), Vector3::UNIT_Y) * Quaternion(Degree(rot.z), Vector3::UNIT_Z);
+ 	Quaternion direction = Quaternion(Degree(dr.x), Vector3::UNIT_X) * Quaternion(Degree(dr.y), Vector3::UNIT_Y) * Quaternion(Degree(dr.z), Vector3::UNIT_Z);
+@@ -641,7 +641,7 @@
+ 		// box content
+ 		ManualObject *mo = gEnv->sceneManager->createManualObject();
+ 		String matName = "tracks/debug/collision/box";
+-		if (virt && scripthandler == -1)
++		if (virt && !scripthandler)
+ 			matName = "tracks/debug/eventbox/unused";
+ 		else if (virt)
+ 			matName = "tracks/debug/eventbox/used";
+@@ -716,7 +716,7 @@
+ 		{
+ 			String labelName = "collision_box_label_"+TOSTRING(free_collision_box);
+ 			String labelCaption = "EVENTBOX\nevent:"+String(eventname) + "\ninstance:" + String(instancename);
+-			if (scripthandler != -1)
++			if (scripthandler)
+ 				labelCaption += "\nhandler:" + TOSTRING(scripthandler);
+ 			MovableText *mt = new MovableText(labelName, labelCaption);
+ 			mt->setFontName("highcontrast_black");
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/main/physics/collision/Collisions.h rigsofrods-source-0.4.0.4/source/main/physics/collision/Collisions.h
+--- rigsofrods-source-0.4.0.4.orig/source/main/physics/collision/Collisions.h	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/main/physics/collision/Collisions.h	2013-01-27 17:19:53.834871522 +0400
+@@ -23,6 +23,8 @@
+ 
+ #include "RoRPrerequisites.h"
+ 
++#include <angelscript.h>
++
+ #include "BeamData.h" // for collision_box_t
+ #include "Ogre.h"
+ 
+@@ -32,7 +34,7 @@
+ 	char boxname[256];
+ 	Ogre::SceneNode *snode;
+ 	Ogre::Quaternion direction;
+-	int scripthandler;
++	AngelScript::asIScriptFunction* scripthandler;
+ 	int cbox;
+ 	bool enabled;
+ } eventsource_t;
+@@ -166,7 +168,7 @@
+ 	void primitiveCollision(node_t *node, Ogre::Vector3 &normal, Ogre::Vector3 &force, Ogre::Vector3 &velocity, float dt, ground_model_t* gm, float* nso, float penetration=0, float reaction=-1.0f);
+ 	void printStats();
+ 
+-	int addCollisionBox(Ogre::SceneNode *tenode, bool rotating, bool virt, Ogre::Vector3 pos, Ogre::Vector3 rot, Ogre::Vector3 l, Ogre::Vector3 h, Ogre::Vector3 sr, const Ogre::String &eventname, const Ogre::String &instancename, bool forcecam, Ogre::Vector3 campos, Ogre::Vector3 sc = Ogre::Vector3::UNIT_SCALE, Ogre::Vector3 dr = Ogre::Vector3::ZERO, int event_filter = EVENT_ALL, int scripthandler = -1);
++	int addCollisionBox(Ogre::SceneNode *tenode, bool rotating, bool virt, Ogre::Vector3 pos, Ogre::Vector3 rot, Ogre::Vector3 l, Ogre::Vector3 h, Ogre::Vector3 sr, const Ogre::String &eventname, const Ogre::String &instancename, bool forcecam, Ogre::Vector3 campos, Ogre::Vector3 sc = Ogre::Vector3::UNIT_SCALE, Ogre::Vector3 dr = Ogre::Vector3::ZERO, int event_filter = EVENT_ALL, AngelScript::asIScriptFunction* scripthandler = 0);
+ 	int addCollisionMesh(Ogre::String meshname, Ogre::Vector3 pos, Ogre::Quaternion q, Ogre::Vector3 scale, ground_model_t *gm=0, std::vector<int> *collTris=0);
+ 	int addCollisionTri(Ogre::Vector3 p1, Ogre::Vector3 p2, Ogre::Vector3 p3, ground_model_t* gm);
+ 	int createCollisionDebugVisualization();
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/main/scripting/GameScript.cpp rigsofrods-source-0.4.0.4/source/main/scripting/GameScript.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/main/scripting/GameScript.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/main/scripting/GameScript.cpp	2013-01-27 18:07:37.000315403 +0400
+@@ -303,7 +303,7 @@
+ 		return;
+ 	}
+ 	if (!mod) return;
+-	int functionPtr = mod->GetFunctionIdByName(eventhandler.c_str());
++	AngelScript::asIScriptFunction* functionPtr = mod->GetFunctionByName(eventhandler.c_str());
+ 
+ 	// trying to create the new object
+ 	SceneNode *bakeNode = gEnv->sceneManager->getRootSceneNode()->createChildSceneNode();
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/main/scripting/LocalStorage.cpp rigsofrods-source-0.4.0.4/source/main/scripting/LocalStorage.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/main/scripting/LocalStorage.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/main/scripting/LocalStorage.cpp	2013-01-27 18:13:16.671063462 +0400
+@@ -30,7 +30,7 @@
+ 	refCount++;
+ 	cgflag=false;
+ 	this->engine = engine_in;
+-	engine->NotifyGarbageCollectorOfNewObject(this, engine->GetTypeIdByDecl("LocalStorage"));
++	engine->NotifyGarbageCollectorOfNewObject(this, engine->GetObjectTypeByName("LocalStorage"));
+ 
+ 	// inversed logic, better use a whiteliste instead of a blacklist, so you are on the safe side ;) - tdev
+ 	std::string allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
+@@ -53,7 +53,7 @@
+ 	this->engine = engine_in;
+ 	refCount++;
+ 
+-	engine->NotifyGarbageCollectorOfNewObject(this, engine->GetTypeIdByDecl("LocalStorage"));	
++	engine->NotifyGarbageCollectorOfNewObject(this, engine->GetObjectTypeByName("LocalStorage"));	
+ 	saved = true;
+ }
+ 
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/main/scripting/ScriptEngine.cpp rigsofrods-source-0.4.0.4/source/main/scripting/ScriptEngine.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/main/scripting/ScriptEngine.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/main/scripting/ScriptEngine.cpp	2013-01-27 18:07:04.042745559 +0400
+@@ -18,6 +18,8 @@
+ along with Rigs of Rods.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ // created on 24th of February 2009 by Thomas Fischer
++#include <angelscript.h>
++
+ #include "ScriptEngine.h"
+ 
+ // AS addons start
+@@ -67,21 +69,21 @@
+ 	  mefl(efl)
+ 	, coll(coll)
+ 	, context(0)
+-	, defaultEventCallbackFunctionPtr(-1)
++	, defaultEventCallbackFunctionPtr(0)
+ 	, engine(0)
+-	, eventCallbackFunctionPtr(-1)
++	, eventCallbackFunctionPtr(0)
+ 	, eventMask(0)
+-	, frameStepFunctionPtr(-1)
++	, frameStepFunctionPtr(0)
+ 	, scriptHash()
+ 	, scriptLog(0)
+ 	, scriptName()
+-	, wheelEventFunctionPtr(-1)
++	, wheelEventFunctionPtr(0)
+ {
+ 	setSingleton(this);
+-	callbacks["on_terrain_loading"] = std::vector<int>();
+-	callbacks["frameStep"] = std::vector<int>();
+-	callbacks["wheelEvents"] = std::vector<int>();
+-	callbacks["eventCallback"] = std::vector<int>();
++	callbacks["on_terrain_loading"] = std::vector<AngelScript::asIScriptFunction*>();
++	callbacks["frameStep"] = std::vector<AngelScript::asIScriptFunction*>();
++	callbacks["wheelEvents"] = std::vector<AngelScript::asIScriptFunction*>();
++	callbacks["eventCallback"] = std::vector<AngelScript::asIScriptFunction*>();
+ 
+ 	// create our own log
+ 	scriptLog = LogManager::getSingleton().createLog(SSETTING("Log Path", "")+"/Angelscript.log", false);
+@@ -116,8 +118,7 @@
+ void ScriptEngine::ExceptionCallback(AngelScript::asIScriptContext *ctx, void *param)
+ {
+ 	AngelScript::asIScriptEngine *engine = ctx->GetEngine();
+-	int funcID = ctx->GetExceptionFunction();
+-	const AngelScript::asIScriptFunction *function = engine->GetFunctionById(funcID);
++	const AngelScript::asIScriptFunction *function = ctx->GetExceptionFunction();
+ 	SLOG("--- exception ---");
+ 	SLOG("desc: " + String(ctx->GetExceptionString()));
+ 	SLOG("func: " + String(function->GetDeclaration()));
+@@ -544,7 +545,7 @@
+ 	Beam **trucks = BeamFactory::getSingleton().getTrucks();
+ 	int free_truck = BeamFactory::getSingleton().getTruckCount();
+ 	// check for all truck wheels
+-	if (coll && wheelEventFunctionPtr > 0)
++	if (coll && wheelEventFunctionPtr)
+ 	{
+ 		for (int t = 0; t < free_truck; t++)
+ 		{
+@@ -611,7 +612,7 @@
+ 	}
+ 
+ 	// framestep stuff below
+-	if (frameStepFunctionPtr<=0) return 1;
++	if (!frameStepFunctionPtr) return 1;
+ 	if (!engine) return 0;
+ 	if (!context) context = engine->CreateContext();
+ 	context->Prepare(frameStepFunctionPtr);
+@@ -633,8 +634,8 @@
+ {
+ 	if (!engine) return 0;
+ 	AngelScript::asIScriptModule *mod = engine->GetModule(moduleName, AngelScript::asGM_CREATE_IF_NOT_EXISTS);
+-	int functionPtr = mod->GetFunctionIdByDecl("void fireEvent(string, float)"); // TODO: this shouldn't be hard coded --neorej16
+-	if (functionPtr<0) return 0;
++	AngelScript::asIScriptFunction* functionPtr = mod->GetFunctionByDecl("void fireEvent(string, float)"); // TODO: this shouldn't be hard coded --neorej16
++	if (!functionPtr) return 0;
+ 	if (!context) context = engine->CreateContext();
+ 	context->Prepare(functionPtr);
+ 
+@@ -654,14 +655,14 @@
+ 	return 0;
+ }
+ 
+-int ScriptEngine::envokeCallback(int functionPtr, eventsource_t *source, node_t *node, int type)
++int ScriptEngine::envokeCallback(AngelScript::asIScriptFunction* functionPtr, eventsource_t *source, node_t *node, int type)
+ {
+ 	if (!engine) return 0;
+-	if (functionPtr <= 0 && defaultEventCallbackFunctionPtr > 0)
++	if (!functionPtr && defaultEventCallbackFunctionPtr)
+ 	{
+ 		// use the default event handler instead then
+ 		functionPtr = defaultEventCallbackFunctionPtr;
+-	} else if (functionPtr <= 0)
++	} else if (!functionPtr)
+ 	{
+ 		// no default callback available, discard the event
+ 		return 0;
+@@ -716,8 +717,8 @@
+ 	if (!context) context = engine->CreateContext();
+ 	AngelScript::asIScriptModule *mod = engine->GetModule(moduleName, AngelScript::asGM_CREATE_IF_NOT_EXISTS);
+ 
+-	AngelScript::asIScriptFunction *func = 0;
+-	int r = mod->CompileFunction("addfunc", arg.c_str(), 0, AngelScript::asCOMP_ADD_TO_MODULE, &func);
++	AngelScript::asIScriptFunction* funcPtr = 0;
++	int r = mod->CompileFunction("addfunc", arg.c_str(), 0, AngelScript::asCOMP_ADD_TO_MODULE, &funcPtr);
+ 	
+ 	if ( r < 0 )
+ 	{
+@@ -730,51 +731,48 @@
+ 		// successfully added function
+ 		// Check if we added a "special" function
+ 		
+-		// get the id of the function
+-		int funcId = func->GetId();
+-		
+ 		// compare the id of the newly added function with the special functions
+-		if ( funcId == mod->GetFunctionIdByDecl("void frameStep(float)") )
++		if ( funcPtr == mod->GetFunctionByDecl("void frameStep(float)") )
+ 		{	
+-			if (frameStepFunctionPtr < 0) frameStepFunctionPtr = funcId;
+-			callbacks["frameStep"].push_back(funcId);
++			if (!frameStepFunctionPtr) frameStepFunctionPtr = funcPtr;
++			callbacks["frameStep"].push_back(funcPtr);
+ 		}
+-		else if ( funcId == mod->GetFunctionIdByDecl("void wheelEvents(int, string, string, string)") )
++		else if ( funcPtr == mod->GetFunctionByDecl("void wheelEvents(int, string, string, string)") )
+ 		{	
+-			if (wheelEventFunctionPtr < 0) wheelEventFunctionPtr = funcId;
+-			callbacks["wheelEvents"].push_back(funcId);
++			if (!wheelEventFunctionPtr) wheelEventFunctionPtr = funcPtr;
++			callbacks["wheelEvents"].push_back(funcPtr);
+ 		}
+-		else if ( funcId == mod->GetFunctionIdByDecl("void eventCallback(int, int)") )
++		else if ( funcPtr == mod->GetFunctionByDecl("void eventCallback(int, int)") )
+ 		{
+-			if (eventCallbackFunctionPtr < 0) eventCallbackFunctionPtr = funcId;
+-			callbacks["eventCallback"].push_back(funcId);
++			if (!eventCallbackFunctionPtr) eventCallbackFunctionPtr = funcPtr;
++			callbacks["eventCallback"].push_back(funcPtr);
+ 		}
+-		else if ( funcId == mod->GetFunctionIdByDecl("void defaultEventCallback(int, string, string, int)") )
++		else if ( funcPtr == mod->GetFunctionByDecl("void defaultEventCallback(int, string, string, int)") )
+ 		{	
+-			if (defaultEventCallbackFunctionPtr < 0) defaultEventCallbackFunctionPtr = funcId;
+-			callbacks["defaultEventCallback"].push_back(funcId);
++			if (defaultEventCallbackFunctionPtr) defaultEventCallbackFunctionPtr = funcPtr;
++			callbacks["defaultEventCallback"].push_back(funcPtr);
+ 		}
+-		else if ( funcId == mod->GetFunctionIdByDecl("void on_terrain_loading(string lines)") )
++		else if ( funcPtr == mod->GetFunctionByDecl("void on_terrain_loading(string lines)") )
+ 		{	
+-			callbacks["on_terrain_loading"].push_back(funcId);
++			callbacks["on_terrain_loading"].push_back(funcPtr);
+ 		}
+ 	}
+ 
+ 	// We must release the function object
+-	if ( func )
+-		func->Release();
++	if ( funcPtr )
++		funcPtr->Release();
+ 
+ 	return r;
+ }
+ 
+ int ScriptEngine::functionExists(const String &arg)
+ {
+-	if (!engine) return -1;
++	if (!engine) return 0;
+ 	if (!context) context = engine->CreateContext();
+ 	AngelScript::asIScriptModule *mod = engine->GetModule(moduleName, AngelScript::asGM_ONLY_IF_EXISTS);
+ 
+ 	if (mod == 0) return AngelScript::asNO_FUNCTION;
+-	else return mod->GetFunctionIdByDecl(arg.c_str());
++	else AngelScript::asSUCCESS;
+ }
+ 
+ int ScriptEngine::deleteFunction(const String &arg)
+@@ -791,31 +789,31 @@
+ 		return AngelScript::asNO_FUNCTION;
+ 	}
+ 
+-	int id = mod->GetFunctionIdByDecl(arg.c_str());
+-	if ( id > 0 )
++	AngelScript::asIScriptFunction* func = mod->GetFunctionByDecl(arg.c_str());
++	if ( func )
+ 	{
+ 		// Warning: The function is not destroyed immediately, only when no more references point to it.
+-		mod->RemoveFunction(id);
++		mod->RemoveFunction(func);
+ 
+ 		// Since functions can be recursive, we'll call the garbage
+ 		// collector to make sure the object is really freed
+ 		engine->GarbageCollect();
+ 		
+ 		// Check if we removed a "special" function
+-		for (std::map< std::string , std::vector<int> >::iterator it=callbacks.begin(); it!=callbacks.end(); it++)
++		for (std::map< std::string , std::vector<AngelScript::asIScriptFunction*> >::iterator it=callbacks.begin(); it!=callbacks.end(); it++)
+ 		{
+-			std::vector<int>::iterator key = std::find(it->second.begin(), it->second.end(), id);
+-			if ( *key == id )
++			std::vector<AngelScript::asIScriptFunction*>::iterator key = std::find(it->second.begin(), it->second.end(), func);
++			if ( *key == func )
+ 				it->second.erase(key);
+ 		}
+-		if ( frameStepFunctionPtr == id )
+-			frameStepFunctionPtr = -1;
+-		if ( wheelEventFunctionPtr == id )
+-			wheelEventFunctionPtr = -1;
+-		if ( eventCallbackFunctionPtr == id )
+-			eventCallbackFunctionPtr = -1;
+-		if ( defaultEventCallbackFunctionPtr == id )
+-			defaultEventCallbackFunctionPtr = -1;
++		if ( frameStepFunctionPtr == func )
++			frameStepFunctionPtr = 0;
++		if ( wheelEventFunctionPtr == func )
++			wheelEventFunctionPtr = 0;
++		if ( eventCallbackFunctionPtr == func )
++			eventCallbackFunctionPtr = 0;
++		if ( defaultEventCallbackFunctionPtr == func )
++			defaultEventCallbackFunctionPtr = 0;
+ 	}
+ 	else
+ 	{
+@@ -824,7 +822,7 @@
+ 		SLOG(tmp);
+ 	}
+ 
+-	return id;
++	return func->GetId();
+ }
+ 
+ int ScriptEngine::addVariable(const String &arg)
+@@ -876,7 +874,7 @@
+ void ScriptEngine::triggerEvent(int eventnum, int value)
+ {
+ 	if (!engine) return;
+-	if (eventCallbackFunctionPtr<=0) return;
++	if (!eventCallbackFunctionPtr) return;
+ 	if (eventMask & eventnum)
+ 	{
+ 		// script registered for that event, so sent it
+@@ -963,24 +961,24 @@
+ 	}
+ 
+ 	// get some other optional functions
+-	frameStepFunctionPtr = mod->GetFunctionIdByDecl("void frameStep(float)");
+-	if (frameStepFunctionPtr > 0) callbacks["frameStep"].push_back(frameStepFunctionPtr);
++	frameStepFunctionPtr = mod->GetFunctionByDecl("void frameStep(float)");
++	if (frameStepFunctionPtr) callbacks["frameStep"].push_back(frameStepFunctionPtr);
+ 	
+-	wheelEventFunctionPtr = mod->GetFunctionIdByDecl("void wheelEvents(int, string, string, string)");
+-	if (wheelEventFunctionPtr > 0) callbacks["wheelEvents"].push_back(wheelEventFunctionPtr);
++	wheelEventFunctionPtr = mod->GetFunctionByDecl("void wheelEvents(int, string, string, string)");
++	if (wheelEventFunctionPtr) callbacks["wheelEvents"].push_back(wheelEventFunctionPtr);
+ 
+-	eventCallbackFunctionPtr = mod->GetFunctionIdByDecl("void eventCallback(int, int)");
+-	if (eventCallbackFunctionPtr > 0) callbacks["eventCallback"].push_back(eventCallbackFunctionPtr);
++	eventCallbackFunctionPtr = mod->GetFunctionByDecl("void eventCallback(int, int)");
++	if (eventCallbackFunctionPtr) callbacks["eventCallback"].push_back(eventCallbackFunctionPtr);
+ 
+-	defaultEventCallbackFunctionPtr = mod->GetFunctionIdByDecl("void defaultEventCallback(int, string, string, int)");
+-	if (defaultEventCallbackFunctionPtr > 0) callbacks["defaultEventCallback"].push_back(defaultEventCallbackFunctionPtr);
++	defaultEventCallbackFunctionPtr = mod->GetFunctionByDecl("void defaultEventCallback(int, string, string, int)");
++	if (defaultEventCallbackFunctionPtr) callbacks["defaultEventCallback"].push_back(defaultEventCallbackFunctionPtr);
+ 
+-	int cb = mod->GetFunctionIdByDecl("void on_terrain_loading(string lines)");
++	AngelScript::asIScriptFunction* cb = mod->GetFunctionByDecl("void on_terrain_loading(string lines)");
+ 	if (cb > 0) callbacks["on_terrain_loading"].push_back(cb);
+ 
+ 	// Find the function that is to be called.
+-	int funcId = mod->GetFunctionIdByDecl("void main()");
+-	if ( funcId < 0 )
++	AngelScript::asIScriptFunction* funcPtr = mod->GetFunctionByDecl("void main()");
++	if ( !funcPtr )
+ 	{
+ 		// The function couldn't be found. Instruct the script writer to include the
+ 		// expected function in the script.
+@@ -1017,7 +1015,7 @@
+ 	// executed. Note, that if you intend to execute the same function several
+ 	// times, it might be a good idea to store the function id returned by
+ 	// GetFunctionIDByDecl(), so that this relatively slow call can be skipped.
+-	result = context->Prepare(funcId);
++	result = context->Prepare(funcPtr);
+ 	if (result < 0)
+ 	{
+ 		SLOG("Failed to prepare the context.");
+@@ -1044,8 +1042,7 @@
+ 			SLOG("An exception '" + String(context->GetExceptionString()) + "' occurred. Please correct the code in file '" + scriptName + "' and try again.");
+ 
+ 			// Write some information about the script exception
+-			int funcID = context->GetExceptionFunction();
+-			AngelScript::asIScriptFunction *func = engine->GetFunctionById(funcID);
++			AngelScript::asIScriptFunction *func = context->GetExceptionFunction();
+ 			SLOG("func: " + String(func->GetDeclaration()));
+ 			SLOG("modl: " + String(func->GetModuleName()));
+ 			SLOG("sect: " + String(func->GetScriptSectionName()));
+@@ -1080,8 +1077,7 @@
+ 
+ 	for (unsigned int i = 0; i < mod->GetFunctionCount(); i++)
+ 	{
+-		int idx = mod->GetFunctionIdByIndex(i);
+-		AngelScript::asIScriptFunction *desc = engine->GetFunctionById(idx); //mod->GetFunctionDescriptorById(idx);
++		AngelScript::asIScriptFunction *desc = mod->GetFunctionByIndex(i); //mod->GetFunctionDescriptorById(idx);
+ 		result.push_back(String(desc->GetName()));
+ 		//SLOG(" FUNCTION > " + String(desc->GetName()));
+ 	}
+@@ -1090,10 +1086,11 @@
+ 	for (unsigned int i = 0; i < engine->GetGlobalPropertyCount(); i++)
+ 	{
+ 		const char *name;
++		const char *nameSpace;
+ 		int  typeId = 0;
+ 		bool isConst = false;
+ 
+-		if (!engine->GetGlobalPropertyByIndex(i, &name, &typeId, &isConst))
++		if (!engine->GetGlobalPropertyByIndex(i, &name, &nameSpace, &typeId, &isConst))
+ 		{
+ 			result.push_back(String(name));
+ 			//SLOG(" PROPERTY > " + String(name));
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/main/scripting/ScriptEngine.h rigsofrods-source-0.4.0.4/source/main/scripting/ScriptEngine.h
+--- rigsofrods-source-0.4.0.4.orig/source/main/scripting/ScriptEngine.h	2013-01-27 05:33:43.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/main/scripting/ScriptEngine.h	2013-01-27 18:00:41.211280778 +0400
+@@ -130,7 +130,7 @@
+ 
+ 	int fireEvent(std::string instanceName, float intensity);
+ 
+-	int envokeCallback(int functionPtr, eventsource_t *source, node_t *node=0, int type=0);
++	int envokeCallback(AngelScript::asIScriptFunction* functionPtr, eventsource_t *source, node_t *node=0, int type=0);
+ 
+ 	AngelScript::asIScriptEngine *getEngine() { return engine; };
+ 
+@@ -156,13 +156,13 @@
+ 	Collisions *coll;
+     AngelScript::asIScriptEngine *engine;   //!< instance of the scripting engine
+ 	AngelScript::asIScriptContext *context; //!< context in which all scripting happens
+-	int frameStepFunctionPtr;               //!< script function pointer to the frameStep function
+-	int wheelEventFunctionPtr;              //!< script function pointer
+-	int eventCallbackFunctionPtr;           //!< script function pointer to the event callback function
+-	int defaultEventCallbackFunctionPtr;    //!< script function pointer for spawner events
++	AngelScript::asIScriptFunction* frameStepFunctionPtr;            //!< script function pointer to the frameStep function
++	AngelScript::asIScriptFunction* wheelEventFunctionPtr;           //!< script function pointer
++	AngelScript::asIScriptFunction* eventCallbackFunctionPtr;        //!< script function pointer to the event callback function
++	AngelScript::asIScriptFunction* defaultEventCallbackFunctionPtr; //!< script function pointer for spawner events
+ 	Ogre::String scriptName;
+ 	Ogre::String scriptHash;
+-	std::map <std::string , std::vector<int> > callbacks;
++	std::map <std::string , std::vector<AngelScript::asIScriptFunction*> > callbacks;
+ 	
+ 	InterThreadStoreVector< Ogre::String > stringExecutionQueue;     //!< The string execution queue \see queueStringForExecution
+ 
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/main/terrain/TerrainObjectManager.cpp rigsofrods-source-0.4.0.4/source/main/terrain/TerrainObjectManager.cpp
+--- rigsofrods-source-0.4.0.4.orig/source/main/terrain/TerrainObjectManager.cpp	2012-09-06 13:04:24.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/main/terrain/TerrainObjectManager.cpp	2013-01-27 17:22:27.759609885 +0400
+@@ -665,7 +665,7 @@
+ 	obj.enabled = false;
+ }
+ 
+-void TerrainObjectManager::loadObject(const Ogre::String &name, const Ogre::Vector3 &pos, const Ogre::Vector3 &rot, Ogre::SceneNode *bakeNode, const Ogre::String &instancename, const Ogre::String &type, bool enable_collisions /* = true */, int scripthandler /* = -1 */, bool uniquifyMaterial /* = false */)
++void TerrainObjectManager::loadObject(const Ogre::String &name, const Ogre::Vector3 &pos, const Ogre::Vector3 &rot, Ogre::SceneNode *bakeNode, const Ogre::String &instancename, const Ogre::String &type, bool enable_collisions /* = true */, AngelScript::asIScriptFunction* scripthandler /* = -1 */, bool uniquifyMaterial /* = false */)
+ {
+ 	ScopeLog log("object_"+name);
+ 
+diff -NurEbBH -x bin -x CMakeCache.txt -x CMakeCache.txt.orig -x CMakeOutput.log -x CMakeCXXCompiler.cmake -x configurations.xml -x Package-Default.bash -x '*.includes' -x build.make -x flags.make -x link.txt -x '*.o' -x nbproject -x Progress -x cmake_install.cmake -x rorconfig.dir -x RoR.dir -x CMakeCache.txtr -x '*.angelscriptOld' -x '*.cmake' -x '*.includecache' rigsofrods-source-0.4.0.4.orig/source/main/terrain/TerrainObjectManager.h rigsofrods-source-0.4.0.4/source/main/terrain/TerrainObjectManager.h
+--- rigsofrods-source-0.4.0.4.orig/source/main/terrain/TerrainObjectManager.h	2013-01-27 05:33:43.000000000 +0400
++++ rigsofrods-source-0.4.0.4/source/main/terrain/TerrainObjectManager.h	2013-01-27 17:28:16.851414820 +0400
+@@ -23,6 +23,7 @@
+ #include "RoRPrerequisites.h"
+ 
+ #include "IManager.h"
++#include <angelscript.h>
+ 
+ #ifdef USE_PAGED
+ #include "OGRE/PagedGeometry/BatchPage.h"
+@@ -119,7 +120,7 @@
+ 	} loadedObject_t;
+ 	std::map< std::string, loadedObject_t> loadedObjects;
+ 
+-	void loadObject(const Ogre::String &name, const Ogre::Vector3 &pos, const Ogre::Vector3 &rot, Ogre::SceneNode *bakeNode, const Ogre::String &instancename, const Ogre::String &type, bool enable_collisions = true, int scripthandler = -1, bool uniquifyMaterial = false);
++	void loadObject(const Ogre::String &name, const Ogre::Vector3 &pos, const Ogre::Vector3 &rot, Ogre::SceneNode *bakeNode, const Ogre::String &instancename, const Ogre::String &type, bool enable_collisions = true, AngelScript::asIScriptFunction* scripthandler = 0, bool uniquifyMaterial = false);
+ 	void unloadObject(const Ogre::String &instancename);
+ 
+ 	void loadPreloadedTrucks();

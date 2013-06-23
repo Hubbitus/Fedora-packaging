@@ -1,0 +1,12 @@
+diff -NurEbBH ogre_src_v1-8-1.orig/Tools/XMLConverter/CMakeLists.txt ogre_src_v1-8-1/Tools/XMLConverter/CMakeLists.txt
+--- ogre_src_v1-8-1.orig/Tools/XMLConverter/CMakeLists.txt	2012-09-02 09:27:16.000000000 +0400
++++ ogre_src_v1-8-1/Tools/XMLConverter/CMakeLists.txt	2013-01-27 02:09:22.875939663 +0400
+@@ -13,8 +13,6 @@
+   include/OgreXMLMeshSerializer.h
+   include/OgreXMLPrerequisites.h
+   include/OgreXMLSkeletonSerializer.h
+-  include/tinystr.h
+-  include/tinyxml.h
+ )
+ 
+ set(SOURCE_FILES 
