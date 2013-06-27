@@ -1,0 +1,13 @@
+#!/bin/bash
+
+APP=tora
+
+rm -rf $APP
+#REV=$( svn export svn://svn.code.sf.net/p/tora/code/trunk/tora $APP | tail -n 1 | grep -Po '\d+' )
+# Preserve .svn as it needed for not released build
+REV=$( svn checkout svn://svn.code.sf.net/p/tora/code/trunk/tora $APP | tail -n 1 | grep -Po '\d+' )
+echo REV=$REV
+
+TARF=$APP-3-svn${REV}.tar.xz
+tar -cJf $TARF $APP
+echo "[$TARF] created"

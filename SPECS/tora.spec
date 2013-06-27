@@ -1,3 +1,5 @@
+%global SVN 4651
+
 %ifarch ppc ppc64
 %define oraclever 10.2.0.2
 %else
@@ -14,29 +16,28 @@
 %endif
 
 
-Summary:                Toolkit for Oracle
-Name:                   tora
-Version:                2.1.3
-Release:                1%{?dist}
-URL:                    http://tora.sourceforge.net
-Group:                  Development/Databases
-License:                GPLv2
+Summary:       Toolkit for Oracle
+Name:          tora
+Version:       3
+Release:       0.1%{?SVN:.svn%{SVN}}%{?dist}
+URL:           http://tora.sourceforge.net
+Group:         Applications/Databases
+License:       GPLv2
 
-Source:                 %{name}-%{version}.tar.bz2
-
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+# See soure1 script to reproduce tarball
+Source0:       %{name}-%{version}%{?SVN:-svn%{SVN}}.tar.xz
+Source1:       tora.get.tarball.svn
 
 BuildRequires: desktop-file-utils
 BuildRequires: postgresql-devel
-BuildRequires: oracle-instantclient-devel = %{oraclever}
-BuildRequires: oracle-instantclient-sqlplus = %{oraclever}
-BuildRequires: qt4-devel >= 4.3.0 
+#- BuildRequires: oracle-instantclient-devel = %%{oraclever}
+#- BuildRequires: oracle-instantclient-sqlplus = %%{oraclever}
+BuildRequires: qt-devel >= 4.3.0
 BuildRequires: qscintilla-devel >= 2.0.0
 BuildRequires: cmake >= 2.4.0
 BuildRequires: perl openssl-devel glib2-devel
 
-Requires:  qt-mysql qt-postgresql
-
+Requires:      qt-mysql qt-postgresql
 
 %description
 TOra - Toolkit for Oracle
@@ -44,21 +45,13 @@ TOra - Toolkit for Oracle
 TOra is supported for running with an Oracle 8.1.7 or newer
 client installation. It has been verified to work with Oracle 10g and 11g.
 
-This RPM is build to work with Oracle client %{oraclever}.
-
 TOra also supports PostgreSQL and MySQL.
 
-TOra is developed by a community of Open Source developers. The original
-(pre 1.3.15) development was done by Henrik Johnson of Quest Software, Inc.
-
-The homepage for the TOra project is http://tora.sourceforge.net. If you
-encounter problems you can find both mailinglists and bugtracking tools
-from this page.
-
-See the README file
+This RPM is built to work with PostgreSQL and MySQL. Oracle %{oraclever}
+should work also, but does not tested.
 
 %prep
-%setup -q
+%setup -q -n %{name}
 
 cat >%{name}.desktop <<EOF
 [Desktop Entry]
@@ -73,50 +66,49 @@ Categories=Development;
 EOF
 
 
-%{__rm} -rf CMakeFiles CMakeCache.txt
+rm -rf CMakeFiles CMakeCache.txt
 
 %cmake \
-        -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
-        -DORACLE_PATH_INCLUDES=%{oracleinc} \
-        -DORACLE_PATH_LIB=%{oraclelib} \
-        -DPOSTGRESQL_PATH_INCLUDES=%{_includedir} \
+    -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
+    -DORACLE_PATH_INCLUDES=%{oracleinc} \
+    -DORACLE_PATH_LIB=%{oraclelib} \
+    -DPOSTGRESQL_PATH_INCLUDES=%{_includedir} \
         .
 
 
 %build
-%{__make}
-
+make %{?_smp_mflags}
 
 %install
-%{__rm} -rf "${RPM_BUILD_ROOT}" 
+rm -rf %{buildroot}
 
-%{__mkdir_p} "${RPM_BUILD_ROOT}%{_prefix}/bin"
-%{__mkdir_p} "${RPM_BUILD_ROOT}%{_libdir}/tora/help"
-%{__mkdir_p} "${RPM_BUILD_ROOT}%{_libdir}/tora/help/images"
-%{__mkdir_p} "${RPM_BUILD_ROOT}%{_libdir}/tora/help/api"
-%{__mkdir_p} "${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/16x16/apps"
-%{__mkdir_p} "${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/32x32/apps"
-%{__make} DESTDIR="${RPM_BUILD_ROOT}" install
+mkdir -p "%{buildroot}%{_prefix}/bin"
+mkdir -p "%{buildroot}%{_libdir}/tora/help"
+mkdir -p "%{buildroot}%{_libdir}/tora/help/images"
+mkdir -p "%{buildroot}%{_libdir}/tora/help/api"
+mkdir -p "%{buildroot}%{_datadir}/icons/hicolor/16x16/apps"
+mkdir -p "%{buildroot}%{_datadir}/icons/hicolor/32x32/apps"
+make DESTDIR="%{buildroot}" install
 
-%{__install} --mode=644 doc/help/*.html "${RPM_BUILD_ROOT}%{_libdir}/tora/help/"
-%{__install} --mode=644 doc/help/images/*.png "${RPM_BUILD_ROOT}%{_libdir}/tora/help/images/"
-#%{__install} --mode=644 doc/help/api/*.html "${RPM_BUILD_ROOT}%{_libdir}/tora/help/api/"
+install --mode=644 doc/help/*.html "%{buildroot}%{_libdir}/tora/help/"
+install --mode=644 doc/help/images/*.png "%{buildroot}%{_libdir}/tora/help/images/"
+#install --mode=644 doc/help/api/*.html "%%{buildroot}%%{_libdir}/tora/help/api/"
 
-%{__install} --mode=644 src/icons/tora.xpm     "${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/32x32/apps/tora.xpm"
-%{__install} --mode=644 src/icons/toramini.xpm "${RPM_BUILD_ROOT}%{_datadir}/icons/hicolor/16x16/apps/tora.xpm"
+install --mode=644 src/icons/tora.xpm     "%{buildroot}%{_datadir}/icons/hicolor/32x32/apps/tora.xpm"
+install --mode=644 src/icons/toramini.xpm "%{buildroot}%{_datadir}/icons/hicolor/16x16/apps/tora.xpm"
 
-%{__rm} -rf ${RPM_BUILD_ROOT}/%{_datadir}/doc/%{name}
+rm -rf %{buildroot}/%{_datadir}/doc/%{name}
 
 desktop-file-install \
-  --dir $RPM_BUILD_ROOT%{_datadir}/applications		\
-  %{name}.desktop
+  --dir %{buildroot}%{_datadir}/applications \
+    %{name}.desktop
 
 
-%files 
-%defattr(-,root,root)
+%files
 %doc AUTHORS BUGS COPYING ChangeLog NEWS README* TODO
-%{_prefix}/bin/%{name}
+%{_bindir}/%{name}
 %{_libdir}/%{name}
+%{_datadir}/%{name}
 %{_datadir}/icons/hicolor/*/apps/%{name}.xpm
 %{_datadir}/applications/%{name}.desktop
 
@@ -135,12 +127,10 @@ if [ $1 -eq 0 ] ; then
 fi
 update-desktop-database &> /dev/null || :
 
-
-%clean
-%{__rm} -rf "${RPM_BUILD_ROOT}"
-
-
 %changelog
+* Fri Jun 14 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 3-0.1.svn4651
+- Import from https://raw.github.com/remicollet/remirepo/master/tora/tora.spec (2.1.3 version) and reworked
+
 * Thu Sep 23 2010 Remi Collet <RPMS@famillecollet.com> 2.1.3-1
 - update to 2.1.3
 
@@ -161,7 +151,7 @@ update-desktop-database &> /dev/null || :
 
 * Tue Oct  7 2008 Michael Mraka <michael.mraka@redhat.com> 2.0.0-0.3041svn
 - changed to cmake driven build for 2.0.0 version
-- built against oracle-instantclient 
+- built against oracle-instantclient
 
 * Mon Jun 29 2005 Nathan Neulinger <nneul@neulinger.org>
 - standardize on a single tora spec file
