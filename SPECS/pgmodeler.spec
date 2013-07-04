@@ -7,6 +7,7 @@ Summary:        PostgreSQL Database Modeler
 
 License:        GPLv3
 URL:            http://www.pgmodeler.com.br/
+Group:          Applications/Databases
 # Script to generate main source0
 Source1:        %{name}.get.tarball
 Source0:        %{name}-be5b74a.tar.xz
