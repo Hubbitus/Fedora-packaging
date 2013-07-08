@@ -1,0 +1,64 @@
+diff -up pagedGeometry-1.1.0/CMakeLists.txt.shared pagedGeometry-1.1.0/CMakeLists.txt
+--- pagedGeometry-1.1.0/CMakeLists.txt.shared	2010-04-09 02:19:20.000000000 -0400
++++ pagedGeometry-1.1.0/CMakeLists.txt	2010-12-21 15:31:57.775241999 -0500
+@@ -29,7 +29,7 @@ project(PagedGeometry)
+ include(CMakeDependenciesConfig.txt)
+ 
+ # build static libs by default
+-SET(BUILD_SHARED_LIBS OFF)
++SET(BUILD_SHARED_LIBS ON)
+ 
+ # setup paths
+ SET(RUNTIME_OUTPUT_DIRECTORY "${PagedGeometry_SOURCE_DIR}/bin/")
+@@ -114,19 +114,19 @@ IF(NOT WIN32)
+ endif()
+ 
+ # Set visibility options if available
+-IF(NOT WIN32)
+-	CHECK_C_SOURCE_COMPILES("int foo() __attribute__((destructor));
+-								int main() {return 0;}" HAVE_GCC_DESTRUCTOR)
+-
+-	CHECK_C_COMPILER_FLAG(-fvisibility=hidden HAVE_VISIBILITY_SWITCH)
+-	IF(HAVE_VISIBILITY_SWITCH)
+-		CHECK_C_SOURCE_COMPILES("int foo() __attribute__((visibility(\"default\")));
+-									int main() {return 0;}" HAVE_GCC_VISIBILITY)
+-		IF(HAVE_GCC_VISIBILITY)
+-			ADD_DEFINITIONS(-fvisibility=hidden -DHAVE_GCC_VISIBILITY)
+-		ENDIF()
+-	ENDIF()
+-ENDIF()
++# IF(NOT WIN32)
++#	CHECK_C_SOURCE_COMPILES("int foo() __attribute__((destructor));
++#								int main() {return 0;}" HAVE_GCC_DESTRUCTOR)
++#
++#	CHECK_C_COMPILER_FLAG(-fvisibility=hidden HAVE_VISIBILITY_SWITCH)
++#	IF(HAVE_VISIBILITY_SWITCH)
++#		CHECK_C_SOURCE_COMPILES("int foo() __attribute__((visibility(\"default\")));
++#									int main() {return 0;}" HAVE_GCC_VISIBILITY)
++#		IF(HAVE_GCC_VISIBILITY)
++#			ADD_DEFINITIONS(-fvisibility=hidden -DHAVE_GCC_VISIBILITY)
++#		ENDIF()
++#	ENDIF()
++# ENDIF()
+ 
+ 
+ # now add the directories
+@@ -134,4 +134,4 @@ add_subdirectory(source)
+ 
+ if(PAGEDGEOMETRY_BUILD_SAMPLES)
+ 	add_subdirectory(examples)
+-endif(PAGEDGEOMETRY_BUILD_SAMPLES)
+\ No newline at end of file
++endif(PAGEDGEOMETRY_BUILD_SAMPLES)
+diff -up pagedGeometry-1.1.0/source/CMakeLists.txt.shared pagedGeometry-1.1.0/source/CMakeLists.txt
+--- pagedGeometry-1.1.0/source/CMakeLists.txt.shared	2010-04-09 01:59:14.000000000 -0400
++++ pagedGeometry-1.1.0/source/CMakeLists.txt	2010-12-21 15:31:13.510241999 -0500
+@@ -8,7 +8,7 @@ FILE(GLOB sources *.cpp ${PagedGeometry_
+ 
+ set(LIBNAME "PagedGeometry")
+ 
+-ADD_LIBRARY(${LIBNAME} STATIC ${sources})
++ADD_LIBRARY(${LIBNAME} ${sources})
+ windows_hacks(${LIBNAME})
+ 
+ # install the library

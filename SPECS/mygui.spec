@@ -1,10 +1,10 @@
 Name:           mygui
 Version:        3.2.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        Fast, simple and flexible GUI library for Ogre
 Group:          Development/Libraries
 # UnitTests include agg-2.4, which is under a BSD variant (not built or installed here)
-License:        LGPLv3+
+License:        LGPLv3+ 
 URL:            http://mygui.info/
 Source0:        http://downloads.sourceforge.net/my-gui/MyGUI_%{version}.zip
 # Helper to run demos, based on A. Torkhov Ogre-Samples shipped with ogre-samples
@@ -16,15 +16,7 @@ Source3:        resources.xml
 # LayoutEditor desktop entry
 Source4:        mygui-layouteditor.desktop
 # Fix multilib and flags with cmake
-Patch0:         MyGUI_3.2.0_multilib.patch
-# Fix compilation problems with gcc4.4
-#? Patch1:         mygui_missing_headers.patch
-# Explicitly include thread library used by Ogre to avoid DSO issue
-#? Patch2:         mygui-ogrethreadlibs.patch
-# Get find poco from ogre
-Patch3:         mygui-add-findpoco.patch
-# Fix pc file issues.
-#? Patch4:         mygui-pc-fixes.patch
+Patch0:         mygui_multilib_cflags.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  automake, autoconf, libtool, freetype-devel, desktop-file-utils
@@ -39,8 +31,8 @@ Requires:       dejavu-sans-fonts
 
 
 %description
-MyGUI is a GUI library for Ogre Rendering Engine which aims to be fast,
-flexible and simple in using.
+MyGUI is a GUI library for Ogre Rendering Engine which aims to be fast, 
+flexible and simple in using. 
 
 %package        devel
 Summary:        Development files for MyGUI
@@ -76,31 +68,22 @@ script MyGUI-Demos is provided and installed in %{_bindir}.
 
 
 %package tools
-Summary:        MyGUI tools
+Summary:        MyGUI tools 
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 
 %description tools
-This package contains the MyGUI tools, installed in %{_libdir}/MYGUI/Tools.
+This package contains the MyGUI tools, installed in %{_libdir}/MYGUI/Tools. 
 LayoutEditor is an application for designing UIs using MyGUI library,
 ImageSetViewer and FontViewer are simple tools to preview graphical
-resources in the media repository.
+resources in the media repository. 
 An helper script MyGUI-Tools is provided and installed in %{_bindir}.
 
 
 %prep
-%setup -q -n MyGUI_%{version}
-%patch0 -p1
-#?% patch1 -p0
-#?% patch2 -p0
-%patch3 -p0
-#? %patch4 -p1
-
-# http://openmw.org/forum/viewtopic.php?f=6&t=685
-sed -i 's:check_cxx_compiler_flag(-fvisibility:#check_cxx_compiler_flag(-fvisibility:' CMakeLists.txt
-
-
-# Fix eol
+%setup -n MyGUI_%{version}
+%patch0 -p0 -b .multilib
+# Fix eol 
 sed -i 's/\r//' COPYING.LESSER
 # Fix non-UTF8 files
 for file in Tools/LayoutEditor/Readme.txt ; do
@@ -111,7 +94,7 @@ for file in Tools/LayoutEditor/Readme.txt ; do
 done
 # Generate README for -tools and -demos
 cat > Tools/README << EOT
-This package contains the MyGUI tools: ImageSetViewer, FontViewer
+This package contains the MyGUI tools: ImageSetViewer, FontViewer 
 and LayoutEditor; to run the tools, launch the helper script
 %{_bindir}/MyGUI-Tools
 EOT
@@ -122,8 +105,6 @@ EOT
 
 
 %build
-export CXXFLAGS="$RPM_OPT_FLAGS -lboost_system"
-
 # Plugins are windows only atm
 %cmake . \
    -DMYGUI_INSTALL_PDB:INTERNAL=FALSE -DCMAKE_BUILD_TYPE:STRING=Release \
@@ -141,9 +122,9 @@ popd
 rm -rf %{buildroot}
 make install DESTDIR=%{buildroot} INSTALL="install -p"
 # install missing headers
-mkdir -p %{buildroot}/%{_includedir}/MYGUI/
-install -Dp -m 644 MyGUIEngine/include/*Alloc*.h %{buildroot}/%{_includedir}/MYGUI/
-install -Dp -m 644 Platforms/Ogre/OgrePlatform/include/* %{buildroot}/%{_includedir}/MYGUI/
+mkdir -p %{buildroot}/%{_includedir}/MyGUI/
+install -Dp -m 644 MyGUIEngine/include/*Alloc*.h %{buildroot}/%{_includedir}/MyGUI/
+install -Dp -m 644 Platforms/Ogre/OgrePlatform/include/* %{buildroot}/%{_includedir}/MyGUI/
 
 # Remove any archive
 find %{buildroot} -name '*.la' -exec rm -f {} ';'
@@ -152,17 +133,15 @@ rm -rf %{buildroot}/%{_bindir}/
 
 # Create config for ldconfig
 mkdir -p %{buildroot}/etc/ld.so.conf.d
-echo "%{_libdir}/MYGUI" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
+echo "%{_libdir}/MYGUI" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf 
 
-# Install the samples
-mkdir -p %{buildroot}%{_libdir}/MYGUI/Demos
+# Install the samples 
+mkdir -p %{buildroot}%{_libdir}/MYGUI/Demos 
 cp -p %{SOURCE3} bin/plugins.cfg %{buildroot}%{_libdir}/MYGUI/Demos
 sed -i 's|^PluginFolder=.*$|PluginFolder=%{_libdir}/OGRE|' \
     %{buildroot}%{_libdir}/MYGUI/Demos/plugins.cfg
 sed -i 's|^Plugin=RenderSystem_Direct3D9$|#Plugin=RenderSystem_Direct3D9|' \
     %{buildroot}%{_libdir}/MYGUI/Demos/plugins.cfg
-# Remove sample showing plugin usage
-#? rm bin/Demo_PluginStrangeButton
 for file in bin/Demo_* ; do
   install -Dp -m 755 $file %{buildroot}%{_libdir}/MYGUI/Demos/`basename $file`
 done
@@ -192,15 +171,12 @@ cp -a Media %{buildroot}%{_datadir}/MyGUI/
 mkdir -p %{buildroot}%{_libdir}/MYGUI
 install -Dp -m 755 %{_lib}/libMyGUI.OgrePlatform.so %{buildroot}%{_libdir}/MYGUI/
 
-#+ Install libCommon.so
-install -Dp -m 755 %{_lib}/libCommon.so %{buildroot}%{_libdir}/
-
 # Move plugins to %{libdir}/MYGUI (no plugins atm)
 #mv %{buildroot}%{_libdir}/libPlugin*.so %{buildroot}%{_libdir}/MYGUI
 
 # Strip away code in media dir
 #rm -rf %{buildroot}%{_datadir}/MyGUI/Media/Tools/LayoutEditor/CodeTemplates/
-# Strip away unittests media
+# Strip away unittests media 
 rm -rf %{buildroot}%{_datadir}/MyGUI/Media/UnitTests
 
 # Remove CMake stuff from Media
@@ -231,7 +207,7 @@ rm -rf %{buildroot}
 %dir %{_datadir}/MyGUI/Media
 %{_datadir}/MyGUI/Media/Common
 %{_datadir}/MyGUI/Media/MyGUI_Media
-%config(noreplace) %{_sysconfdir}/ld.so.conf.d/*
+%config(noreplace) %{_sysconfdir}/ld.so.conf.d/* 
 
 
 %files devel
@@ -265,14 +241,27 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Sun Jan 27 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 3.2.0-2
-- Rebuild against ogre 1.8.1
-- Add explicit linking to boost_system (https://svn.boost.org/trac/boost/ticket/7241)
+* Sun Feb 10 2013 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 3.2.0-4
+- Rebuild for Boost-1.53.0
 
-* Sun Jun 24 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 3.2.0-1
-- Update to 3.2.0 version which needed to rigsofrods.
-- Fix build on gcc >= 4.7 (http://openmw.org/forum/viewtopic.php?f=6&t=685).
-- Rebase mygui_multilib_cflags.patch to new version - MyGUI_3.2.0_multilib.patch
+* Sat Feb 09 2013 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 3.2.0-3
+- Rebuild for Boost-1.53.0
+
+* Wed Dec 26 2012 Kevin Fenzi <kevin@scrye.com> 3.2.0-2
+- Rebuild for new libCommon
+
+* Tue Dec 04 2012 Bruno Wolff III <bruno@wolff.to> - 3.2.0-1
+- Update to upstream 3.2.0
+- Changelog: http://redmine.mygui.info/repositories/entry/mygui/tags/MyGUI3.2/ChangeLog.txt
+
+* Fri Aug 10 2012 Bruno Wolff III <bruno@wolff.to> - 3.0.1-16
+- Rebuild for boost 1.50
+
+* Fri Jul 20 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.0.1-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Wed Apr 04 2012 Bruno Wolff III <bruno@wolff.to> - 3.0.1-14
+- Rebuild for ogre 1.7.4
 
 * Tue Feb 28 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.0.1-13
 - Rebuilt for c++ ABI breakage
@@ -283,7 +272,7 @@ rm -rf %{buildroot}
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.0.1-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
-* Fri Nov 20 2011 Bruno Wolff III <bruno@wolff.to> - 3.0.1-10
+* Sun Nov 20 2011 Bruno Wolff III <bruno@wolff.to> - 3.0.1-10
 - Rebuild for boost soname bump
 
 * Fri Jul 22 2011 Bruno Wolff III <bruno@wolff.to> - 3.0.1-9
@@ -330,7 +319,7 @@ rm -rf %{buildroot}
 - Fix includes dir
 - Remove plugin
 
-* Fri Oct 13 2009 Guido Grazioli <guido.grazioli@gmail.com> - 3.0.0-1.2332svn
+* Fri Oct 23 2009 Guido Grazioli <guido.grazioli@gmail.com> - 3.0.0-1.2332svn
 - Upstream to svn revision 2332
 - Patch cmake build scripts to support multilib
 - Fix package summaries

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+rm -rf gimp-gap
+git clone --depth 1 https://github.com/GNOME/gimp-gap.git gimp-gap
+GHASH=$( git --git-dir ./gimp-gap/.git reflog | cut -d' ' -f1 )
+rm -rf gimp-gap/.git
+TARF=gimp-gap-$GHASH.tar.xz
+tar -cJf $TARF gimp-gap
+echo "[$TARF] created"

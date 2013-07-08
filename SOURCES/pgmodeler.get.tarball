@@ -1,0 +1,11 @@
+#!/bin/bash
+
+APP=pgmodeler
+
+rm -rf $APP
+git clone --depth 1 https://github.com/pgmodeler/$APP.git $APP
+GHASH=$( git --git-dir ./$APP/.git reflog | cut -d' ' -f1 )
+rm -rf $APP/.git
+TARF=$APP-$GHASH.tar.xz
+tar -cJf $TARF $APP
+echo "[$TARF] created"
