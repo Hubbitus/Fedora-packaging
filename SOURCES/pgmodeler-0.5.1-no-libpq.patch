@@ -1,0 +1,17 @@
+diff --git a/pgmodeler.pro b/pgmodeler.pro
+index c29d9a8..5e8f5ad 100644
+--- a/pgmodeler.pro
++++ b/pgmodeler.pro
+@@ -9,9 +9,10 @@
+ ############################################################
+ unix {
+  !macx:CONFIG += link_pkgconfig
+- !macx:PKGCONFIG = libpq libxml-2.0
+- !macx:PGSQL_LIB = -lpq
++ !macx:PKGCONFIG = libxml-2.0
+  !macx:XML_LIB = -lxml2
++ QMAKE_CXXFLAGS = -I/usr/include/pgsql
++ QMAKE_LFLAGS = -lpq
+ }
+
+ macx {

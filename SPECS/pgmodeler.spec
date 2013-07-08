@@ -2,7 +2,7 @@
 
 Name:           pgmodeler
 Version:        0.5.1_r1
-Release:        1%{?GITrev:.GIT%{GITrev}}%{?dist}
+Release:        2%{?GITrev:.GIT%{GITrev}}%{?dist}
 Summary:        PostgreSQL Database Modeler
 
 License:        GPLv3
@@ -13,13 +13,15 @@ Source1:        %{name}.get.tarball
 Source0:        %{name}-be5b74a.tar.xz
 Source2:        %{name}.desktop
 
-BuildRequires:  qt-devel > 4.0
+BuildRequires:  qt-devel > 4.0, libxml2-devel, postgresql-devel
 BuildRequires:  desktop-file-utils
 #Requires:
 
 # Two patches to build against qt4 instead of qt5 for current Fedora releases
 Patch0:         pgmodeler-0.5.1-Qutf8.patch
 Patch1:         pgmodeler-0.5.1-qt4.patch
+# Temporary fedora-related for to do not puch postgres updates (https://bugzilla.redhat.com/show_bug.cgi?id=977116#c1)
+Patch2:         pgmodeler-0.5.1-no-libpq.patch
 
 Requires(postun): /sbin/ldconfig
 Requires(post):   /sbin/ldconfig
@@ -37,6 +39,7 @@ by the user to SQL code and apply them onto database clusters (Version
 
 %patch0 -p1 -b .QTutf8
 %patch1 -p1 -b .QT4
+%patch2 -p1 -b .no-libpq
 
 %build
 qmake-qt4 %{name}.pro
@@ -119,6 +122,10 @@ desktop-file-install --vendor="" --mode 644 \
 %{_datadir}/applications/%{name}.desktop
 
 %changelog
+* Sun Jul 7 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.5.1_r1-2.GITbe5b74a
+- Add Pavel Raiskup patch (https://bugzilla.redhat.com/show_bug.cgi?id=977116#c1) to build without libpq pkg-config file.
+- Add BR libxml2-devel, postgresql-devel
+
 * Wed Jun 12 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.5.1_r1-1.GITbe5b74a
 - Initial version.
 - Reported https://github.com/pgmodeler/pgmodeler/issues/260 about incorrect-fsf-address /libpgmodeler_ui/src/modeloverviewwidget.h
