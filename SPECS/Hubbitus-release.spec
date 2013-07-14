@@ -1,1 +1,1 @@
-Hubbitus-release.spec.F17
+Hubbitus-release.spec.F19

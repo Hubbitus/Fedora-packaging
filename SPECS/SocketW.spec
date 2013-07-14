@@ -28,15 +28,12 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-%post -p /sbin/ldconfig
-
-%postun -p /sbin/ldconfig
-
 %prep
 %setup -q -n %{name}%{version}
-%patch0 -p1 -b.path
-%patch1 -d src -p0 -b.include
-%patch2 -p1 -b.fedora-flags
+
+%patch0 -p1 -b .path
+%patch1 -d src -p0 -b .include
+%patch2 -p1 -b .fedora-flags
 
 %build
 make %{?_smp_mflags} shared CXXFLAGS="$RPM_OPT_FLAGS"
@@ -51,6 +48,10 @@ rm %{buildroot}%{_libdir}/*.a
 iconv -f ISO-8859-1 -t UTF-8 README > README.new
 touch --reference README README.new
 mv README.new README
+
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %files
 %doc LICENSE README WhatsNew Todo examples docs
@@ -72,7 +73,8 @@ mv README.new README
 - Remove %%defattr
 - Add to docs Todo file and examples docs dirs.
 - Drop the "It is a" from the summary.
-- Mail about forgotten include (Patch1: SocketW031026-include.patch) to upstream author. Add patch comment.
+- Mail about forgotten include (Patch1: SocketW031026-include.patch) to upstream
+    author. Add patch comment.
 - Try honnor Fedora compile flags. Add patch2.
 
 * Sun Aug 26 2012 Pavel Alexeev <Pahan@Hubbitus.info> - 031026-1
