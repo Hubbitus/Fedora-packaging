@@ -3,15 +3,13 @@
 Summary:		Mail Retrieval Proxy
 Name:		perdition
 Version:		1.19
-Release:		rc5.0.2%{?dist}
+Release:		rc5.0.3%{?dist}
 License:		GPLv2+
 Group:		Applications/Internet
 URL:			http://horms.net/projects/perdition/
 Source:		http://horms.net/projects/%{name}/download/%{vers}/perdition-%{vers}.tar.bz2
 # My systemd service template
 Source1:		%{name}-template.service
-# EPEL still require this
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	automake autoconf libtool vanessa_logger-devel >= 0.0.10
 BuildRequires:	vanessa_adt-devel >= 0.0.6 vanessa_socket-devel >= 0.0.7
 BuildRequires:	gdbm-devel mysql-devel postgresql-devel openldap-devel
@@ -22,6 +20,7 @@ Requires:		vanessa_logger >= 0.0.10 vanessa_adt >= 0.0.6 vanessa_socket >= 0.0.7
 Requires:		initscripts
 #???
 Patch0:		perdition-1.19-rc5-const-version.patch
+%systemd_requires
 
 %description
 Perdition is a fully featured POP3 and IMAP4 proxy server. It is able to
@@ -123,7 +122,6 @@ which do not support the systemd unit file format.
 %patch0 -p1 -b .const
 
 %build
-
 CFLAGS="${CFLAGS:-%optflags} -I/usr/kerberos/include" ; export CFLAGS
 if [ -f configure.in ]; then
 	aclocal
@@ -136,11 +134,13 @@ fi
 	--with-ldap-schema-directory=%{_sysconfdir}/openldap/schema \
 	--enable-shared
 
-make
+# Remove rpath
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+
+make %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
-
 mkdir -p %{buildroot}{%{_initrddir},%{_sysconfdir}/sysconfig}
 
 make DESTDIR=%{buildroot} install-strip
@@ -159,38 +159,32 @@ sed '/Default-Start/a# chkconfig:         - 95 05/' -i %{buildroot}%{_sysconfdir
 rm -f %{buildroot}%{_libdir}/*.{a,la,so}
 
 %clean
-rm -rf %{buildroot}
 
 %post
 /sbin/ldconfig
-
-	if [ $1 -eq 1 ]; then
-	# Initial installation
-	/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-	fi
+%systemd_post %{name}-pop3.service
+%systemd_post %{name}-pop3s.service
+%systemd_post %{name}-imap4.service
+%systemd_post %{name}-imap4s.service
+%systemd_post %{name}-managesieve.service
 
 %post sysvinit
 /sbin/chkconfig --add %{name}
 
 %postun
 /sbin/ldconfig
-
-/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-	if [ $1 -ge 1 ] ; then
-	# Package upgrade, not uninstall
-		for service in pop3 pop3s imap4 imap4s managesieve; do
-		/bin/systemctl try-restart %{name}-$service.service >/dev/null 2>&1 || :
-		done
-	fi
+%systemd_postun_with_restart %{name}-pop3.service
+%systemd_postun_with_restart %{name}-pop3s.service
+%systemd_postun_with_restart %{name}-imap4.service
+%systemd_postun_with_restart %{name}-imap4s.service
+%systemd_postun_with_restart %{name}-managesieve.service
 
 %preun
-	if [ $1 -eq 0 ] ; then
-	# Package removal, not upgrade
-		for service in pop3 pop3s imap4 imap4s managesieve; do
-		/bin/systemctl --no-reload disable %{name}-$service.service > /dev/null 2>&1 || :
-		/bin/systemctl stop %{name}-$service.service > /dev/null 2>&1 || :
-		done
-	fi
+%systemd_preun %{name}-pop3.service
+%systemd_preun %{name}-pop3s.service
+%systemd_preun %{name}-imap4.service
+%systemd_preun %{name}-imap4s.service
+%systemd_preun %{name}-managesieve.service
 
 %preun sysvinit
 if [ $1 = 0 ]; then
@@ -218,7 +212,6 @@ fi
 
 
 %files
-%defattr(-,root,root,-)
 %doc README AUTHORS COPYING ChangeLog NEWS TODO
 %{_sbindir}/%{name}
 %{_sbindir}/%{name}.pop3
@@ -270,19 +263,16 @@ fi
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 
 %files bdb
-%defattr(-,root,root,-)
 %{_libdir}/lib%{name}db_bdb.so.0
 %{_libdir}/lib%{name}db_bdb.so.0.0.0
 %{_bindir}/makebdb
 %{_mandir}/man1/makebdb.*
 
 %files cdb
-%defattr(-,root,root,-)
 %{_libdir}/lib%{name}db_cdb.so.0
 %{_libdir}/lib%{name}db_cdb.so.0.0.0
 
 %files ldap
-%defattr(-,root,root,-)
 %{_libdir}/lib%{name}db_ldap.so.0
 %{_libdir}/lib%{name}db_ldap.so.0.0.0
 %{_sbindir}/%{name}db_ldap_makedb
@@ -290,27 +280,31 @@ fi
 %config(noreplace) %{_sysconfdir}/openldap/schema/%{name}.schema
 
 %files mysql
-%defattr(-,root,root,-)
 %{_libdir}/lib%{name}db_mysql.so.0
 %{_libdir}/lib%{name}db_mysql.so.0.0.0
 %{_sbindir}/%{name}db_mysql_makedb
 %{_mandir}/man8/%{name}db_mysql_makedb.*
 
 %files postgresql
-%defattr(-,root,root,-)
 %{_libdir}/lib%{name}db_postgresql.so.0
 %{_libdir}/lib%{name}db_postgresql.so.0.0.0
 %{_sbindir}/%{name}db_postgresql_makedb
 %{_mandir}/man8/%{name}db_postgresql_makedb.*
 
 %files odbc
-%defattr(-,root,root,-)
 %{_libdir}/lib%{name}db_odbc.so.0
 %{_libdir}/lib%{name}db_odbc.so.0.0.0
 %{_sbindir}/%{name}db_odbc_makedb
 %{_mandir}/man8/%{name}db_odbc_makedb.*
 
 %changelog
+* Sun Jul 21 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 1.19-rc5.0.3
+- Add %%{?_smp_mflags} to make.
+- Remove rpath.
+- Changes by Christopher Meng comments in review bz#518317:
+- Drop El5 support, remove related legacy stuff like BuildRoot, explicit %%defattrs and cleanups.
+- "Macroisation" deal wich systemd services (http://fedoraproject.org/wiki/Packaging:ScriptletSnippets#Macroized_scriptlets_.28Fedora_18.2B.29).
+
 * Mon Mar 25 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 1.19-rc5.0.2
 - Add patch0 - perdition-1.19-rc5-const-version.patch to build against new Fedora version of gdbm.
 - Make add requirements arch-dependant by adding %%{?_isa} (thanks to Mario Blättermann).
