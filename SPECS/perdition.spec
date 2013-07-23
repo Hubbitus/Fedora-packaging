@@ -3,7 +3,7 @@
 Summary:		Mail Retrieval Proxy
 Name:		perdition
 Version:		1.19
-Release:		rc5.0.3%{?dist}
+Release:		rc5.0.4%{?dist}
 License:		GPLv2+
 Group:		Applications/Internet
 URL:			http://horms.net/projects/perdition/
@@ -20,7 +20,9 @@ Requires:		vanessa_logger >= 0.0.10 vanessa_adt >= 0.0.6 vanessa_socket >= 0.0.7
 Requires:		initscripts
 #???
 Patch0:		perdition-1.19-rc5-const-version.patch
-%systemd_requires
+Requires(post):	systemd
+Requires(preun):	systemd
+Requires(postun):	systemd
 
 %description
 Perdition is a fully featured POP3 and IMAP4 proxy server. It is able to
@@ -223,7 +225,7 @@ fi
 #% {_libdir}/libjain.so.0
 #% {_libdir}/libjain.so.0.0.0
 %config(noreplace) %{_sysconfdir}/pam.d/%{name}
-%config(noreplace) %{_sysconfdir}/%{name}/%{name}.conf
+%config(noreplace) %{_sysconfdir}/%{name}
 %{_mandir}/man8/%{name}.*
 %{_mandir}/man5/%{name}db.*
 
@@ -298,6 +300,12 @@ fi
 %{_mandir}/man8/%{name}db_odbc_makedb.*
 
 %changelog
+* Wed Jul 24 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 1.19-rc5.0.4
+- For comments thanks Michael Schwendt in review (bz#518317):
+- Macros %%systemd_requires expanded in plain requires to do not break build for f19.
+- Own %%{_sysconfdir}/%%{name}
+- Fix old changelog dates.
+
 * Sun Jul 21 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 1.19-rc5.0.3
 - Add %%{?_smp_mflags} to make.
 - Remove rpath.
@@ -366,13 +374,13 @@ fi
 - Change from Release:	1 to Release:	%%{rel}%%{?dist}.Hu.0
 - Remove (comment out) #-Hu Docdir:	%%{prefix}/doc
 
-* Fri Mar  1 2004 Horms <horms@verge.net.au>
+* Mon Mar  1 2004 Horms <horms@verge.net.au>
 - Set localstatedir to /var
 
-* Fri Oct 30 2002 Horms <horms@verge.net.au>
+* Wed Oct 30 2002 Horms <horms@verge.net.au>
 - Fixed BDB mess!
 
-* Fri Mar 31 2002 Horms <horms@verge.net.au>
+* Sun Mar 31 2002 Horms <horms@verge.net.au>
 - added BDB
 
 * Tue Mar 26 2002 Horms <horms@verge.net.au>
