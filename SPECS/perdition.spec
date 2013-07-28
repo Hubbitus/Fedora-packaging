@@ -3,7 +3,7 @@
 Summary:		Mail Retrieval Proxy
 Name:		perdition
 Version:		1.19
-Release:		rc5.0.4%{?dist}
+Release:		rc5.0.5%{?dist}
 License:		GPLv2+
 Group:		Applications/Internet
 URL:			http://horms.net/projects/perdition/
@@ -145,7 +145,7 @@ make %{?_smp_mflags}
 %install
 mkdir -p %{buildroot}{%{_initrddir},%{_sysconfdir}/sysconfig}
 
-make DESTDIR=%{buildroot} install-strip
+make DESTDIR=%{buildroot} install
 
 install -m755 ./%{_initrddir}/%{name}.rh %{buildroot}%{_initrddir}/%{name}
 install -m644 ./%{_sysconfdir}/sysconfig/%{name} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
@@ -300,6 +300,9 @@ fi
 %{_mandir}/man8/%{name}db_odbc_makedb.*
 
 %changelog
+* Sat Jul 27 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 1.19-rc5.0.5
+- In make replace install-strip to just install for -debuginfo reproducing. Thanks for the hint to Michael Schwendt.
+
 * Wed Jul 24 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 1.19-rc5.0.4
 - For comments thanks Michael Schwendt in review (bz#518317):
 - Macros %%systemd_requires expanded in plain requires to do not break build for f19.
