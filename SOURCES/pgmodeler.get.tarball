@@ -1,11 +1,12 @@
 #!/bin/bash
 
 APP=pgmodeler
+VER=0.6.0_alpha
 
-rm -rf $APP
-git clone --depth 1 https://github.com/pgmodeler/$APP.git $APP
-GHASH=$( git --git-dir ./$APP/.git reflog | cut -d' ' -f1 )
-rm -rf $APP/.git
-TARF=$APP-$GHASH.tar.xz
-tar -cJf $TARF $APP
+rm -rf $APP-$VER
+git clone -b reveng-support --depth 1  https://bitbucket.org/pgmodeler/pgmodeler.git $APP-$VER
+GHASH=$( git --git-dir ./$APP-$VER/.git reflog | cut -d' ' -f1 )
+rm -rf $APP-$VER/.git
+TARF=$APP-${VER}GIT$GHASH.tar.xz
+tar -cJf $TARF $APP-$VER
 echo "[$TARF] created"
