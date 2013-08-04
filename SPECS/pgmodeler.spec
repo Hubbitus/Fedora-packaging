@@ -145,8 +145,8 @@ desktop-file-install --mode 644 \
 - Crashhandler naming issue resolved: https://bitbucket.org/pgmodeler/pgmodeler/issue/282/please-move-crashhandler-to-libexec-dir and
     suggested build from reveng-support 0.6.0-alpha branch.
 - BR qt-devel up to qt5-qtbase-devel.
-- Delete qt4-compatability patches.
-- Add binaries wrapper and real binaries rename with -bin suffix to include envitronment variables for correct start.
+- Delete qt4-compatibility patches.
+- Add binaries wrapper and real binaries rename with -bin suffix to include environment variables for correct start.
 
 * Sat Jul 13 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.5.1_r1-3.GITbe5b74a
 - Changes by comments in review bz#977116 by Volker Fröhlich.
