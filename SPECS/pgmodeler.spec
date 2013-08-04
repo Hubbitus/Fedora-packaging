@@ -67,7 +67,7 @@ make %{?_smp_mflags} CXX="g++ -std=c++11"
 mkdir -p %{buildroot}%{_bindir}
 install -m755 -D build/%{name} %{buildroot}%{_bindir}/%{name}-bin
 install -m755 -D build/%{name}-cli %{buildroot}%{_bindir}/%{name}-cli-bin
-install -m755 -D build/pgmodeler-ch %{buildroot}%{_libexecdir}/pgmodeler-ch
+install -m755 -D build/%{name}-ch %{buildroot}%{_libexecdir}/%{name}-ch
 
 mkdir -p %{buildroot}%{_sysconfdir}
 cp -rp conf %{buildroot}/%{_sysconfdir}/%{name}
@@ -87,7 +87,7 @@ export PGMODELER_TMP_DIR="/tmp"
 export PGMODELER_SCHEMAS_DIR="%{_sysconfdir}/%{name}/schemas"
 export PGMODELER_LANG_DIR="%{_sysconfdir}/%{name}/lang"
 export PGMODELER_PLUGINS_DIR="%{_libdir}/%{name}/plugins"
-export PGMODELER_CHANDLER_PATH="%{_libexecdir}/pgmodeler-ch"
+export PGMODELER_CHANDLER_PATH="%{_libexecdir}/%{name}-ch"
 EOF
 
 # Wrappers to include enviroment-file on first run
@@ -127,7 +127,7 @@ desktop-file-install --mode 644 \
 %{_bindir}/%{name}-bin
 %{_bindir}/%{name}-cli
 %{_bindir}/%{name}-cli-bin
-%{_libexecdir}/pgmodeler-ch
+%{_libexecdir}/%{name}-ch
 %{_libdir}/lib*.so.1*
 %{_libdir}/%{name}/plugins
 %config(noreplace) %{_sysconfdir}/%{name}
