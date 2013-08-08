@@ -2,7 +2,7 @@
 
 Name:             pgmodeler
 Version:          0.6.0_alpha
-Release:          0.1%{?GITrev:.git.%{GITrev}}%{?dist}
+Release:          0.2%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -51,7 +51,7 @@ qmake-qt5 %{name}.pro
 # HACK
 ls -1 */*.pro */*/*.pro | xargs -r -I{} sh -c 'F={}; echo =$F=; sed -i "s/QT += core gui uitools/QT += core gui/g" $F; cd $(dirname $F); qmake-qt5 ${F/*\//}'
 for item in libutils libobjrenderer libparsers libpgmodeler libdbconnect libpgmodeler_ui; do
-    sed -i.sed "s# /${item}.so# ../${item}/${item}.so#g" */Makefile
+	sed -i.sed "s# /${item}.so# ../${item}/${item}.so#g" */Makefile
 done
 
 # May be used instead of providing CXX to make
@@ -82,7 +82,11 @@ cat <<EOF > %{buildroot}%{_sysconfdir}/profile.d/%{name}.bash
 # Specify here the full path to the pgmodeler's root directory
 export PGMODELER_ROOT="%{_datarootdir}/%{name}"
 
-export PGMODELER_CONF_DIR="%{_sysconfdir}/%{name}"
+	if [ ! -e ~/.config/%{name}/%{name}.conf ]; then
+		cp -pr %{_sysconfdir}/%{name} ~/.config/
+	fi
+
+export PGMODELER_CONF_DIR="\$HOME/.config/%{name}"
 export PGMODELER_TMP_DIR="/tmp"
 export PGMODELER_SCHEMAS_DIR="%{_sysconfdir}/%{name}/schemas"
 export PGMODELER_LANG_DIR="%{_sysconfdir}/%{name}/lang"
@@ -140,6 +144,9 @@ desktop-file-install --mode 644 \
 %{_includedir}/%{name}
 
 %changelog
+* Wed Aug 7 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.6.0_alpha-0.2.git.ec8d48f
+- Move config to ~/.config/%%{name} before use
+
 * Sun Jul 28 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.6.0_alpha-0.1.git.ec8d48f
 - Repository moved to bitbucket.org.
 - Crashhandler naming issue resolved: https://bitbucket.org/pgmodeler/pgmodeler/issue/282/please-move-crashhandler-to-libexec-dir and
