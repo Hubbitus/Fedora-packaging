@@ -99,7 +99,5 @@ make DESTDIR=%{buildroot} install
 %changelog
 * Sun Aug 25 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.5.0-1
 - Import package from ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home%3A/awk2007%3A/scm/Fedora_17/src/ulatencyd-9999-9.1.src.rpm
+  was created Tue May 03 2011 with version 9999-9.1 by Anonymous (for the infor and clear useless changelog entry).
 - Rework to prepare for Fedora.
-
-* Tue May 03 2011 Anonymous - 9999-9.1
-- Initial package
