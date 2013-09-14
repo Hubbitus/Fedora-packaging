@@ -16,10 +16,10 @@
 %endif
 
 
-Summary:       Toolkit for Oracle
+Summary:       Toolkit for Oracle (Postgres and MySQL supported too)
 Name:          tora
 Version:       3
-Release:       0.1%{?SVN:.svn%{SVN}}%{?dist}
+Release:       0.2%{?SVN:.svn%{SVN}}%{?dist}
 URL:           http://tora.sourceforge.net
 Group:         Applications/Databases
 License:       GPLv2
@@ -27,6 +27,7 @@ License:       GPLv2
 # See soure1 script to reproduce tarball
 Source0:       %{name}-%{version}%{?SVN:-svn%{SVN}}.tar.xz
 Source1:       tora.get.tarball.svn
+Source2:       tora.desktop
 
 BuildRequires: desktop-file-utils
 BuildRequires: postgresql-devel
@@ -53,19 +54,6 @@ should work also, but does not tested.
 %prep
 %setup -q -n %{name}
 
-cat >%{name}.desktop <<EOF
-[Desktop Entry]
-Encoding=UTF-8
-Name=Toolkit for Oracle
-Comment=TOra - Toolkit for Oracle - version %{version}
-Exec=tora
-Icon=tora
-Terminal=false
-Type=Application
-Categories=Development;
-EOF
-
-
 rm -rf CMakeFiles CMakeCache.txt
 
 %cmake \
@@ -75,25 +63,23 @@ rm -rf CMakeFiles CMakeCache.txt
     -DPOSTGRESQL_PATH_INCLUDES=%{_includedir} \
         .
 
+# To make rpmlint happy
+dos2unix src/toraversion.h
+chmod -x src/{toraversion.h,totabwidget.h,totabwidget.cpp}
+
+# ISO-8859-1 is my assumption.
+iconv -f ISO-8859-1 -t UTF-8 NEWS > NEWS.new
+touch --reference NEWS NEWS.new
+mv NEWS.new NEWS
 
 %build
 make %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
-
-mkdir -p "%{buildroot}%{_prefix}/bin"
-mkdir -p "%{buildroot}%{_libdir}/tora/help"
-mkdir -p "%{buildroot}%{_libdir}/tora/help/images"
-mkdir -p "%{buildroot}%{_libdir}/tora/help/api"
-mkdir -p "%{buildroot}%{_datadir}/icons/hicolor/16x16/apps"
-mkdir -p "%{buildroot}%{_datadir}/icons/hicolor/32x32/apps"
 make DESTDIR="%{buildroot}" install
 
-install --mode=644 doc/help/*.html "%{buildroot}%{_libdir}/tora/help/"
-install --mode=644 doc/help/images/*.png "%{buildroot}%{_libdir}/tora/help/images/"
-#install --mode=644 doc/help/api/*.html "%%{buildroot}%%{_libdir}/tora/help/api/"
-
+mkdir -p "%{buildroot}%{_datadir}/icons/hicolor/16x16/apps"
+mkdir -p "%{buildroot}%{_datadir}/icons/hicolor/32x32/apps"
 install --mode=644 src/icons/tora.xpm     "%{buildroot}%{_datadir}/icons/hicolor/32x32/apps/tora.xpm"
 install --mode=644 src/icons/toramini.xpm "%{buildroot}%{_datadir}/icons/hicolor/16x16/apps/tora.xpm"
 
@@ -101,13 +87,12 @@ rm -rf %{buildroot}/%{_datadir}/doc/%{name}
 
 desktop-file-install \
   --dir %{buildroot}%{_datadir}/applications \
-    %{name}.desktop
+    %{SOURCE2}
 
 
 %files
-%doc AUTHORS BUGS COPYING ChangeLog NEWS README* TODO
+%doc AUTHORS BUGS COPYING ChangeLog NEWS README* TODO doc/help
 %{_bindir}/%{name}
-%{_libdir}/%{name}
 %{_datadir}/%{name}
 %{_datadir}/icons/hicolor/*/apps/%{name}.xpm
 %{_datadir}/applications/%{name}.desktop
@@ -128,13 +113,22 @@ fi
 update-desktop-database &> /dev/null || :
 
 %changelog
+* Sat Sep 14 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 3-0.2.svn4651
+- Changes by review comments (bz#979166), thanks to Matthias Kuhn.
+- Move content of tora-desktop to separate source2.
+- Move help files into doc from libdir.
+- Change some source file permissions.
+- Encode NEWS into UTF-8.
+- Mention MySQL and Postgres in Summary.
+- Report upstream about incorrect fsf address: https://sourceforge.net/p/tora/bugs/872/
+
 * Fri Jun 14 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 3-0.1.svn4651
 - Import from https://raw.github.com/remicollet/remirepo/master/tora/tora.spec (2.1.3 version) and reworked
 
 * Thu Sep 23 2010 Remi Collet <RPMS@famillecollet.com> 2.1.3-1
 - update to 2.1.3
 
-* Tue May 10 2010 Remi Collet <RPMS@famillecollet.com> 2.1.2-1
+* Mon May 10 2010 Remi Collet <RPMS@famillecollet.com> 2.1.2-1
 - update to 2.1.2
 
 * Fri Sep 25 2009 Remi Collet <RPMS@famillecollet.com> 2.1.0-1
@@ -153,5 +147,5 @@ update-desktop-database &> /dev/null || :
 - changed to cmake driven build for 2.0.0 version
 - built against oracle-instantclient
 
-* Mon Jun 29 2005 Nathan Neulinger <nneul@neulinger.org>
+* Wed Jun 29 2005 Nathan Neulinger <nneul@neulinger.org>
 - standardize on a single tora spec file

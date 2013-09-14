@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Toolkit for Oracle
+Comment=TOra - Toolkit for Oracle
+Exec=tora
+Icon=tora
+Terminal=false
+Type=Application
+Categories=Development;
