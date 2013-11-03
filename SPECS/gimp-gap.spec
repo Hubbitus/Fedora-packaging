@@ -10,7 +10,7 @@ Version: 2.7.0
 
 Summary:		The GIMP Animation Package
 Name:		gimp-gap
-Release:		6%{?GITrev:.GIT%{GITrev}}%{?dist}
+Release:		7%{?GITrev:.GIT%{GITrev}}%{?dist}
 Group:		Applications/Multimedia
 License:		GPLv2+
 URL:			https://github.com/GNOME/gimp-gap
@@ -19,11 +19,10 @@ URL:			https://github.com/GNOME/gimp-gap
 Source0:		gimp-gap-%{GITrev}.tar.xz
 Source1:		gimp-gap.get.tarball
 
-BuildRequires:	autoconf >= 2.54 automake >= 1.7 intltool >= 0.17
+BuildRequires:	autoconf >= 2.54, automake >= 1.7, intltool >= 0.17
 # glib-gettextize >= 2.2.0
-BuildRequires:	glib2-devel >= 2.2.0
-BuildRequires:	gimp-devel >= 2.6.0 sed gimp-devel-tools >= 2.6.0
-BuildRequires:	bzip2-devel libjpeg-turbo-devel
+BuildRequires:	pkgconfig(gimp-2.0), gimp-devel-tools >= 2.6.0
+BuildRequires:	bzip2-devel, glib2-devel >= 2.2.0, libjpeg-turbo-devel
 
 Requires:		gimp >= 2.6.0
 
@@ -70,6 +69,9 @@ make LIBS="$LIBS -lm"
 %{gimpdatadir}/scripts/*
 
 %changelog
+* Sun Nov 3 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-7.GITe75bd46
+- Change BR "gimp-devel >= 2.6.0" on "pkgconfig(gimp-2.0)", remove sed. Thanks to Mario Blättermann (review bz#954108).
+
 * Thu May 2 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-6.GITe75bd46
 - Disable call of ./configure script from autogen.sh as excessive and run it manually via macros (Michael Schwendt insist).
 
