@@ -1,13 +1,11 @@
-%global vers 1.19-rc5
-
 Summary:		Mail Retrieval Proxy
 Name:		perdition
-Version:		1.19
-Release:		rc5.0.5%{?dist}
+Version:		2.0
+Release:		1%{?dist}
 License:		GPLv2+
 Group:		Applications/Internet
 URL:			http://horms.net/projects/perdition/
-Source:		http://horms.net/projects/%{name}/download/%{vers}/perdition-%{vers}.tar.bz2
+Source:		http://horms.net/projects/%{name}/download/%{version}/perdition-%{version}.tar.bz2
 # My systemd service template
 Source1:		%{name}-template.service
 BuildRequires:	automake autoconf libtool vanessa_logger-devel >= 0.0.10
@@ -119,7 +117,7 @@ which do not support the systemd unit file format.
 
 
 %prep
-%setup -q -n %{name}-%{vers}
+%setup -q -n %{name}-%{version}
 
 %patch0 -p1 -b .const
 
@@ -300,6 +298,10 @@ fi
 %{_mandir}/man8/%{name}db_odbc_makedb.*
 
 %changelog
+* Sun Nov 3 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.0-1
+- Version 2.0 release.
+- Gone vers short macro.
+
 * Sat Jul 27 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 1.19-rc5.0.5
 - In make replace install-strip to just install for -debuginfo reproducing. Thanks for the hint to Michael Schwendt.
 
