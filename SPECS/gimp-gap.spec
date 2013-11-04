@@ -10,7 +10,7 @@ Version: 2.7.0
 
 Summary:		The GIMP Animation Package
 Name:		gimp-gap
-Release:		7%{?GITrev:.GIT%{GITrev}}%{?dist}
+Release:		8%{?GITrev:.GIT%{GITrev}}%{?dist}
 Group:		Applications/Multimedia
 License:		GPLv2+
 URL:			https://github.com/GNOME/gimp-gap
@@ -47,6 +47,14 @@ rm -rf extern_libs vid_enc_avi vid_enc_ffmpeg gap/gap_mpege.c gap/gap_mpege.h \
     libgapvidapi/gap_vid_api_ffmpeg.c libgapvidapi/gap_vid_api_mpeg3.c \
     libgapvidapi/gap_vid_api_mpeg3toc.c
 
+# 1 symbol only not in UTF-8. iso8859-1 encoding my guess
+iconv -f iso8859-1 -t utf8 ChangeLog > ChangeLog.tmp
+touch -r ChangeLog ChangeLog.tmp
+mv -f ChangeLog.tmp ChangeLog
+
+# Try make rpmlint happy
+find \( -iname '*.c' -or -iname '*.h' \) -exec chmod -x {} \;
+find -type d -exec chmod 0755 {} \;
 
 %build
 # Disable call ./configure from autogen.sh because we want it with default configured parameters
@@ -69,6 +77,12 @@ make LIBS="$LIBS -lm"
 %{gimpdatadir}/scripts/*
 
 %changelog
+* Mon Nov 4 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-8.GITe75bd46
+- Review in progress (bz#954108), for comments thanks to Mario Blättermann.
+- Filled bug about incorrect FSF address - https://bugzilla.gnome.org/show_bug.cgi?id=711402
+- Encode Changelog into UTF-8.
+- Make rpmlint for debuginfo happy by drop executable permissions from source files and chmod directories to 0755.
+
 * Sun Nov 3 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-7.GITe75bd46
 - Change BR "gimp-devel >= 2.6.0" on "pkgconfig(gimp-2.0)", remove sed. Thanks to Mario Blättermann (review bz#954108).
 
