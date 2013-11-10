@@ -1,26 +1,26 @@
-%global SVN 4651
+%global SVN 4930
 
 %ifarch ppc ppc64
-%define oraclever 10.2.0.2
+%global oraclever 10.2.0.2
 %else
-%define oraclever 11.1.0.7
+%global oraclever 11.1.0.7
 %endif
 
 %ifarch x86_64
 # "client64" is only on 11.1 and x86_64, (10.2 use client)
-%define oraclelib %{_libdir}/oracle/%{oraclever}/client64/lib
-%define oracleinc %{_includedir}/oracle/%{oraclever}/client64
+%global oraclelib %{_libdir}/oracle/%{oraclever}/client64/lib
+%global oracleinc %{_includedir}/oracle/%{oraclever}/client64
 %else
-%define oraclelib %{_libdir}/oracle/%{oraclever}/client/lib
-%define oracleinc %{_includedir}/oracle/%{oraclever}/client
+%global oraclelib %{_libdir}/oracle/%{oraclever}/client/lib
+%global oracleinc %{_includedir}/oracle/%{oraclever}/client
 %endif
 
 
 Summary:       Toolkit for Oracle (Postgres and MySQL supported too)
 Name:          tora
 Version:       3
-Release:       0.2%{?SVN:.svn%{SVN}}%{?dist}
-URL:           http://tora.sourceforge.net
+Release:       0.4%{?SVN:.svn%{SVN}}%{?dist}
+URL:           http://torasql.com/
 Group:         Applications/Databases
 License:       GPLv2
 
@@ -31,41 +31,51 @@ Source2:       tora.desktop
 
 BuildRequires: desktop-file-utils
 BuildRequires: postgresql-devel
-#- BuildRequires: oracle-instantclient-devel = %%{oraclever}
-#- BuildRequires: oracle-instantclient-sqlplus = %%{oraclever}
-BuildRequires: qt-devel >= 4.3.0
+# Uncomment such lines only if you are willing try to rebuild such rpm with Oracle support.
+#BuildRequires: oracle-instantclient-devel = %%{oraclever}
+#BuildRequires: oracle-instantclient-sqlplus = %%{oraclever}
+BuildRequires: qt-devel
 BuildRequires: qscintilla-devel >= 2.0.0
 BuildRequires: cmake >= 2.4.0
-BuildRequires: perl openssl-devel glib2-devel
+BuildRequires: perl openssl-devel glib2-devel loki-lib-devel
 
 Requires:      qt-mysql qt-postgresql
 
 %description
-TOra - Toolkit for Oracle
-
 TOra is supported for running with an Oracle 8.1.7 or newer
 client installation. It has been verified to work with Oracle 10g and 11g.
 
 TOra also supports PostgreSQL and MySQL.
 
-This RPM is built to work with PostgreSQL and MySQL. Oracle %{oraclever}
-should work also, but does not tested.
+This RPM is built to work with PostgreSQL and MySQL.
+Oracle %{oraclever} may work also, but does not tested and supported.
 
 %prep
 %setup -q -n %{name}
 
-rm -rf CMakeFiles CMakeCache.txt
+# Remove cache and 3rd party libs
+#? rm -rf CMakeFiles CMakeCache.txt
+# libantlr3cpp-3.5.1 ??
+# libermodel - tora specific library (https://sourceforge.net/p/tora/bugs/873/)
+# stack - Tora specific library. Used only for debug builds.
+# trotl - Tora specific library. C++ OCI wrapper. This one must stay.
+rm -rf src/extlibs/{libantlr3c-3.3,loki,loki-extra,parsing,parsing.cpp,qscintilla2,stack}
+
+# You may try add these options to rebuild with Oracle support which can't be done for official Fedora
+# -DORACLE_PATH_INCLUDES=%{oracleinc} \
+# -DORACLE_PATH_LIB=%{oraclelib} \
 
 %cmake \
     -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} \
-    -DORACLE_PATH_INCLUDES=%{oracleinc} \
-    -DORACLE_PATH_LIB=%{oraclelib} \
     -DPOSTGRESQL_PATH_INCLUDES=%{_includedir} \
+    -DENABLE_ORACLE:BOOLEAN=false \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_SKIP_RPATH:BOOL=YES \
         .
 
 # To make rpmlint happy
-dos2unix src/toraversion.h
-chmod -x src/{toraversion.h,totabwidget.h,totabwidget.cpp}
+#? dos2unix src/toraversion.h
+#? chmod -x src/{toraversion.h,totabwidget.h,totabwidget.cpp}
 
 # ISO-8859-1 is my assumption.
 iconv -f ISO-8859-1 -t UTF-8 NEWS > NEWS.new
@@ -80,8 +90,8 @@ make DESTDIR="%{buildroot}" install
 
 mkdir -p "%{buildroot}%{_datadir}/icons/hicolor/16x16/apps"
 mkdir -p "%{buildroot}%{_datadir}/icons/hicolor/32x32/apps"
-install --mode=644 src/icons/tora.xpm     "%{buildroot}%{_datadir}/icons/hicolor/32x32/apps/tora.xpm"
-install --mode=644 src/icons/toramini.xpm "%{buildroot}%{_datadir}/icons/hicolor/16x16/apps/tora.xpm"
+install -pm644 src/icons/tora.xpm     "%{buildroot}%{_datadir}/icons/hicolor/32x32/apps/tora.xpm"
+install -pm644 src/icons/toramini.xpm "%{buildroot}%{_datadir}/icons/hicolor/16x16/apps/tora.xpm"
 
 rm -rf %{buildroot}/%{_datadir}/doc/%{name}
 
@@ -91,9 +101,9 @@ desktop-file-install \
 
 
 %files
-%doc AUTHORS BUGS COPYING ChangeLog NEWS README* TODO doc/help
+%doc AUTHORS COPYING ChangeLog NEWS README* TODO doc/help
 %{_bindir}/%{name}
-%{_datadir}/%{name}
+%{_datadir}/%{name}-3.0.0alpha
 %{_datadir}/icons/hicolor/*/apps/%{name}.xpm
 %{_datadir}/applications/%{name}.desktop
 
@@ -102,7 +112,7 @@ desktop-file-install \
 update-desktop-database &> /dev/null || :
 touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 if [ -x %{_bindir}/gtk-update-icon-cache ]; then
-  %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor || :
+    %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor || :
 fi
 
 %postun
@@ -113,6 +123,24 @@ fi
 update-desktop-database &> /dev/null || :
 
 %changelog
+* Sun Nov 10 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 3-0.4.svn4930
+- Build again, hope Postgres segfault fixed - https://sourceforge.net/p/tora/bugs/869/
+
+* Sat Oct 26 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 3-0.3.svn4920
+- New build. Work in progress under libs unbundling (https://sourceforge.net/p/tora/bugs/873/).
+- Fixed build without Oracle.
+- Add -DCMAKE_BUILD_TYPE=Release, -DCMAKE_SKIP_RPATH:BOOL=YES options.
+
+* Sun Sep 15 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 3-0.3.svn4832
+- Add BR loki-lib-devel
+- Changes by review comments (bz#979166), thanks to Matthias Kuhn.
+- Update to revision 4832.
+- Small correct description
+- Prefer %%global over %%define
+- Change URL to http://torasql.com/ (tora.sf.net was)
+- Make qt-devel BR unversioned (but it have no really sense).
+- Add -p key to install command to preserve time.
+
 * Sat Sep 14 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 3-0.2.svn4651
 - Changes by review comments (bz#979166), thanks to Matthias Kuhn.
 - Move content of tora-desktop to separate source2.
