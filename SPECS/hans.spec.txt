@@ -1,0 +1,4 @@
+
+1) 
+rpmlint throws 'only-non-binary-in-usr-lib' as systemd unit-files are now installed under /usr/lib
+https://bugzilla.redhat.com/show_bug.cgi?id=794777

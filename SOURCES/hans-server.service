@@ -1,0 +1,11 @@
+[Unit]
+Description=IP over ICMP tunneling solution. Server
+After=syslog.target network.target
+
+[Service]
+Type=forking
+EnvironmentFile=-/etc/sysconfig/hans-server
+ExecStart=/usr/sbin/hans $OPTIONS
+
+[Install]
+WantedBy=multi-user.target

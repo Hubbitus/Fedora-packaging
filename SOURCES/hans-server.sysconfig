@@ -1,0 +1,6 @@
+# For more detailes run hans without arguments
+# -s network [-fvr] [-p password] [-u unprivileged_user] [-d tun_device] [-m reference_mtu] [-a ip]"
+# You probably may need run:
+# echo 1 > /proc/sys/net/ipv4/icmp_echo_ignore_all
+# as root on server side
+OPTIONS="-s 10.1.2.0 -p password -v -r -u hans"
