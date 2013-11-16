@@ -1,7 +1,7 @@
 Summary:		Mail Retrieval Proxy
 Name:		perdition
 Version:		2.0
-Release:		1%{?dist}
+Release:		2%{?dist}
 License:		GPLv2+
 Group:		Applications/Internet
 URL:			http://horms.net/projects/perdition/
@@ -18,6 +18,8 @@ Requires:		vanessa_logger >= 0.0.10 vanessa_adt >= 0.0.6 vanessa_socket >= 0.0.7
 Requires:		initscripts
 #???
 Patch0:		perdition-1.19-rc5-const-version.patch
+# Debian patch http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=729028
+Patch1:		perdition-2.0-starttls.patch
 Requires(post):	systemd
 Requires(preun):	systemd
 Requires(postun):	systemd
@@ -120,6 +122,7 @@ which do not support the systemd unit file format.
 %setup -q -n %{name}-%{version}
 
 %patch0 -p1 -b .const
+%patch1 -p1 -b .starttls
 
 %build
 CFLAGS="${CFLAGS:-%optflags} -I/usr/kerberos/include" ; export CFLAGS
@@ -298,6 +301,10 @@ fi
 %{_mandir}/man8/%{name}db_odbc_makedb.*
 
 %changelog
+* Sat Nov 16 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.0-2
+- Apply debian patch1 (perdition-2.0-starttls.patch) http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=729028
+	by request Murray McAllister.
+
 * Sun Nov 3 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.0-1
 - Version 2.0 release.
 - Gone vers short macro.

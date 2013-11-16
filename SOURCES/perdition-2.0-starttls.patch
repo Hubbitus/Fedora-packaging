@@ -1,0 +1,12 @@
+diff -r 046a7b19cd5b perdition/perdition.c
+--- a/perdition/perdition.c	Thu Nov 07 21:23:31 2013 -0500
++++ b/perdition/perdition.c	Thu Nov 07 21:49:39 2013 -0500
+@@ -985,7 +985,7 @@
+     else if((opt.ssl_mode & SSL_MODE_TLS_OUTGOING) &&
+           (status & PROTOCOL_S_STARTTLS)) {
+       server_io=perdition_ssl_client_connection(server_io, opt.ssl_ca_file, 
+-		      opt.ssl_ca_path, opt.ssl_listen_ciphers, servername);
++		      opt.ssl_ca_path, opt.ssl_outgoing_ciphers, servername);
+       if(!server_io) {
+         VANESSA_LOGGER_DEBUG("perdition_ssl_connection outgoing");
+         VANESSA_LOGGER_ERR("Fatal error establishing SSL connection");
