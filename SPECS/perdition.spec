@@ -1,7 +1,7 @@
 Summary:		Mail Retrieval Proxy
 Name:		perdition
 Version:		2.0
-Release:		2%{?dist}
+Release:		3%{?dist}
 License:		GPLv2+
 Group:		Applications/Internet
 URL:			http://horms.net/projects/perdition/
@@ -15,7 +15,6 @@ BuildRequires:	popt-devel pam-devel zlib-devel openssl-devel ghostscript
 BuildRequires:	tetex-latex tetex-dvips libtiff unixODBC-devel tinycdb-devel
 BuildRequires:	libidn-devel libdb-devel
 Requires:		vanessa_logger >= 0.0.10 vanessa_adt >= 0.0.6 vanessa_socket >= 0.0.7
-Requires:		initscripts
 #???
 Patch0:		perdition-1.19-rc5-const-version.patch
 # Debian patch http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=729028
@@ -110,8 +109,14 @@ access databases via ODBC.
 
 
 %package	sysvinit
-Summary:	Legacy SysV initscripts for %{name}
-Group:	System Environment/Daemons
+BuildArch:	noarch
+Summary:		Legacy SysV initscripts for %{name}
+Group:		System Environment/Daemons
+Requires(post):	chkconfig
+Requires(preun):	chkconfig
+# This is for /sbin/service
+Requires(preun):	initscripts
+Requires(postun):	initscripts
 
 %description sysvinit
 Legacy SysV initscripts for init mechanisms such as upstart
@@ -152,7 +157,7 @@ install -m755 ./%{_initrddir}/%{name}.rh %{buildroot}%{_initrddir}/%{name}
 install -m644 ./%{_sysconfdir}/sysconfig/%{name} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
 
 # Do not start by default
-sed '/Default-Start/a# chkconfig:         - 95 05/' -i %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+sed -i '/# Default-Start:/d' %{buildroot}%{_initrddir}/%{name}
 
 	for service in pop3 pop3s imap4 imap4s managesieve; do
 	sed "s/{name}/$service/g;s/{NAME}/$(echo $service | tr '[a-z]' '[A-Z]')/g" %{SOURCE1} > %{name}-$service.service
@@ -226,7 +231,8 @@ fi
 #% {_libdir}/libjain.so.0
 #% {_libdir}/libjain.so.0.0.0
 %config(noreplace) %{_sysconfdir}/pam.d/%{name}
-%config(noreplace) %{_sysconfdir}/%{name}
+%dir %{_sysconfdir}/%{name}
+%config(noreplace) %{_sysconfdir}/%{name}/%{name}.conf
 %{_mandir}/man8/%{name}.*
 %{_mandir}/man5/%{name}db.*
 
@@ -301,6 +307,12 @@ fi
 %{_mandir}/man8/%{name}db_odbc_makedb.*
 
 %changelog
+* Sun Nov 17 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.0-3
+- Make sysvinit subpackage noarch.
+- Fix error by default disabling service.
+- Mention %%{_sysconfdir}/%%{name} as %%dir to do not include files twice (thanks to Christopher Meng in review bz#518317)
+- Add Requires(post): chkconfig, Requires(preun): chkconfig, Requires(preun): initscripts, Requires(postun): initscripts, drop initscripts R from main package.
+
 * Sat Nov 16 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.0-2
 - Apply debian patch1 (perdition-2.0-starttls.patch) http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=729028
 	by request Murray McAllister.
