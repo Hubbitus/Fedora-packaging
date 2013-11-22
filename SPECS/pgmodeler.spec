@@ -2,7 +2,7 @@
 
 Name:             pgmodeler
 Version:          0.6.0_alpha
-Release:          0.2%{?GITrev:.git.%{GITrev}}%{?dist}
+Release:          0.3%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -63,7 +63,6 @@ make %{?_smp_mflags} CXX="g++ -std=c++11"
 # Official install target do almost nothing
 #% make_install
 
-
 mkdir -p %{buildroot}%{_bindir}
 install -m755 -D build/%{name} %{buildroot}%{_bindir}/%{name}-bin
 install -m755 -D build/%{name}-cli %{buildroot}%{_bindir}/%{name}-cli-bin
@@ -108,8 +107,8 @@ EOF
 
 chmod 0755 %{buildroot}%{_bindir}/%{name} %{buildroot}%{_bindir}/%{name}-cli
 
-mkdir -p %{buildroot}%{_libdir}
-cp -dp build/*.so* %{buildroot}%{_libdir}/
+mkdir -p %{buildroot}%{_libdir}/%{name}/
+cp -dp build/*.so* %{buildroot}%{_libdir}/%{name}/
 
 mkdir -p %{buildroot}%{_includedir}/%{name}
 cp -dp lib*/src/*.h %{buildroot}%{_includedir}/%{name}/
@@ -120,6 +119,10 @@ cp -p plugins/*/build/*.so %{buildroot}%{_libdir}/%{name}/plugins/
 desktop-file-install --mode 644 \
     --dir %{buildroot}%{_datadir}/applications/ \
         %{SOURCE2}
+
+# icon and menu-entry
+install -p -dm 755 %{buildroot}%{_datadir}/pixmaps
+install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/pixmaps
 
 %post -p /sbin/ldconfig
 
@@ -132,18 +135,23 @@ desktop-file-install --mode 644 \
 %{_bindir}/%{name}-cli
 %{_bindir}/%{name}-cli-bin
 %{_libexecdir}/%{name}-ch
-%{_libdir}/lib*.so.1*
-%{_libdir}/%{name}/plugins
+%{_libdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/profile.d/%{name}.bash
 %{_datarootdir}/%{name}
+%{_datadir}/pixmaps
 %{_datadir}/applications/%{name}.desktop
 
 %files devel
-%{_libdir}/lib*.so
+%{_libdir}/%{name}/lib*.so
 %{_includedir}/%{name}
 
 %changelog
+* Sun Sep 29 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.6.0_alpha-0.3.git.ec8d48f
+- By comments of Volker Fröhlich, thanks.
+- Copy icon into pixmaps.
+- Move all libs into %%{_libdir}/%%{name} subdir.
+
 * Wed Aug 7 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.6.0_alpha-0.2.git.ec8d48f
 - Move config to ~/.config/%%{name} before use
 
