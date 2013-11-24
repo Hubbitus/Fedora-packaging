@@ -1,7 +1,7 @@
 Summary:		Mail Retrieval Proxy
 Name:		perdition
 Version:		2.0
-Release:		3%{?dist}
+Release:		4%{?dist}
 License:		GPLv2+
 Group:		Applications/Internet
 URL:			http://horms.net/projects/perdition/
@@ -161,7 +161,7 @@ sed -i '/# Default-Start:/d' %{buildroot}%{_initrddir}/%{name}
 
 	for service in pop3 pop3s imap4 imap4s managesieve; do
 	sed "s/{name}/$service/g;s/{NAME}/$(echo $service | tr '[a-z]' '[A-Z]')/g" %{SOURCE1} > %{name}-$service.service
-	install -Dm 600 %{name}-$service.service %{buildroot}/%{_unitdir}/%{name}-$service.service
+	install -Dm 644 %{name}-$service.service %{buildroot}/%{_unitdir}/%{name}-$service.service
 	done
 
 rm -f %{buildroot}%{_libdir}/*.{a,la,so}
@@ -307,6 +307,9 @@ fi
 %{_mandir}/man8/%{name}db_odbc_makedb.*
 
 %changelog
+* Sun Nov 24 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.0-4
+- Change *.service file permissions to 0644.
+
 * Sun Nov 17 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.0-3
 - Make sysvinit subpackage noarch.
 - Fix error by default disabling service.
