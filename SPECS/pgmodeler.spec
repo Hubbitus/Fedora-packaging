@@ -1,8 +1,8 @@
-%global GITrev ec8d48f
+#% global GITrev ec8d48f
 
 Name:             pgmodeler
-Version:          0.6.0_alpha
-Release:          0.3%{?GITrev:.git.%{GITrev}}%{?dist}
+Version:          0.7.0_pre
+Release:          0.1%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -10,15 +10,13 @@ URL:              http://www.pgmodeler.com.br/
 Group:            Applications/Databases
 # Script to generate main source0
 Source1:          %{name}.get.tarball
-Source0:          %{name}-%{version}GIT%{GITrev}.tar.xz
+#Source0:          %{name}-%{version}GIT%{GITrev}.tar.xz
+Source0:          https://github.com/pgmodeler/pgmodeler/archive/v0.7.0-pre_20140103.tar.gz
 Source2:          %{name}.desktop
 
 BuildRequires:    qt5-qtbase-devel, libxml2-devel, postgresql-devel
 BuildRequires:    desktop-file-utils, gettext
 #Requires:
-
-# Temporary fedora-related for to do not patch postgres updates (https://bugzilla.redhat.com/show_bug.cgi?id=977116#c1)
-Patch1:           %{name}-0.5.1-no-libpq.patch
 
 Requires(postun): /sbin/ldconfig
 Requires(post):   /sbin/ldconfig
@@ -41,15 +39,13 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q
-
-%patch1 -p1 -b .no-libpq
+%setup -q -n %{name}-%( echo %{version} | sed 's/_/-/' )_20140103
 
 %build
-qmake-qt5 %{name}.pro
+%_qt5_qmake %{name}.pro
 
 # HACK
-ls -1 */*.pro */*/*.pro | xargs -r -I{} sh -c 'F={}; echo =$F=; sed -i "s/QT += core gui uitools/QT += core gui/g" $F; cd $(dirname $F); qmake-qt5 ${F/*\//}'
+ls -1 */*.pro */*/*.pro | xargs -r -I{} sh -c 'F={}; echo =$F=; sed -i "s/QT += core gui uitools/QT += core gui/g" $F; cd $(dirname $F); %_qt5_qmake ${F/*\//}'
 for item in libutils libobjrenderer libparsers libpgmodeler libdbconnect libpgmodeler_ui; do
 	sed -i.sed "s# /${item}.so# ../${item}/${item}.so#g" */Makefile
 done
@@ -147,6 +143,11 @@ install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/pixmaps
 %{_includedir}/%{name}
 
 %changelog
+* Tue Jan 7 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.7.0_pre-0.1
+- Step to version 0.7.0-pre
+- Replace qmake-qt5 by macros %%_qt5_qmake
+- Drop Patch1: %%{name}-0.5.1-no-libpq.patch
+
 * Sun Sep 29 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.6.0_alpha-0.3.git.ec8d48f
 - By comments of Volker Fröhlich, thanks.
 - Copy icon into pixmaps.
