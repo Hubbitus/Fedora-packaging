@@ -22,7 +22,8 @@ Source51:		root.toprc
 BuildArch:	noarch
 Requires:		Hubbitus-release
 Requires:		screen, mc, bash-completion, colorize, subversion, git
-Requires:		moreutils, ferm, wireshark, grin, sshfs, atop, iotop, strace
+Requires:		moreutils, ferm, wireshark, grin, sshfs, atop, htop, iotop,
+Requires:		strace, bmon, sysstat, dstat
 Requires(pre):	/usr/sbin/useradd
 Requires(post):subversion
 
