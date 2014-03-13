@@ -1,45 +1,24 @@
-#
-# spec file for package python-nbxmpp
-#
-# Copyright (c) 2013 SUSE LINUX Products GmbH, Nuernberg, Germany.
-#
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
-
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
-#
-
 Name:           python-nbxmpp
-Version:        0.2
-Release:        1.1
+Version:        0.3
+Release:        1%{?dist}
 Summary:        XMPP library by Gajim team
-License:        GPL-3.0
-Group:          Development/Languages/Python
+License:        GPLv3
+Group:          Development/Languages
 Url:            http://python-nbxmpp.gajim.org/
-Source0:        https://pypi.python.org/packages/source/n/nbxmpp/nbxmpp-%{version}.tar.gz
+# https://fedoraproject.org/wiki/Packaging:SourceURL?rd=Packaging/SourceURL#Troublesome_URLs
+Source0:        https://python-nbxmpp.gajim.org/downloads/3#/nbxmpp-%{version}.tar.gz
 BuildRequires:  fdupes
 BuildRequires:  python-devel
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-%if 0%{?suse_version} <= 1110
-%{!?python_sitelib: %global python_sitelib %(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%else
 BuildArch:      noarch
-%endif
 
 %description
 Python-nbxmpp is a Python library that provides a way for Python
 applications to use Jabber/XMPP networks in a non-blocking way. This
-library is initialy a fork of xmpppy one, but using non-blocking sockets.
+library is initially a fork of xmpppy one, but using non-blocking sockets.
 
 %package doc
 Summary:        Nbxmpp Documentation
-Group:          Development/Languages/Python
+Group:          Development/Languages
 
 %description doc
 This packages provides documentation of Nbxmpp API.
@@ -55,16 +34,18 @@ python setup.py install -O1 --skip-build --root %{buildroot} --prefix=%{_prefix}
 %fdupes %{buildroot}%{python_sitelib}
 
 %files
-%defattr(-,root,root)
 %doc COPYING
 %{python_sitelib}/nbxmpp-*.egg-info
 %{python_sitelib}/nbxmpp/
 
 %files doc
-%defattr(-,root,root)
 %doc ChangeLog README doc/apidocs doc/examples
 
 %changelog
+* Wed Mar 12 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.3-1
+- Import package ftp://ftp.muug.mb.ca/mirror/opensuse/ports/aarch64/source/factory/repo/oss/suse/src/python-nbxmpp-0.2-1.1.src.rpm, rework
+- Update to 0.3
+
 * Sun Dec  8 2013 p.drouand@gmail.com
 - Update to version 0.2
   + Add some namespace
