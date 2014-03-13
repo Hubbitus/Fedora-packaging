@@ -1,17 +1,12 @@
 Summary:	Jabber client written in PyGTK
 Name:	gajim
-%global	majorver 0.16
 Version:	0.16.beta2
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPLv3
-Group:		Applications/Internet
+Group:	Applications/Internet
 URL:		http://gajim.org/
-#Source0:	http://gajim.org/downloads/%{majorver}/%{name}-%{version}.tar.bz2
 Source0:	https://gajim.org/downloads/0.16/gajim-0.16-beta2.tar.bz2
 BuildArch:	noarch
-
-# bz#953243 - Gajim IndexError: list index out of range
-#? Patch0001:	gajim-0.15.3-14476-17df4ebe8da8.patch
 
 Requires:	avahi-ui-tools
 # for NSLookupResolver; a fallback when libasyncns does not work
@@ -35,6 +30,7 @@ Requires:	python-kerberos
 Requires:	python-libasyncns
 Requires:	python-pyasn1
 Requires:	gupnp-igd-python
+Requires:	python-nbxmpp
 
 # these are dlopen'd using ctypes find_library/LoadLibrary:
 Requires:	gtkspell
@@ -62,7 +58,6 @@ Gajim does not require GNOME to run, even though it exists with it nicely.
 
 %prep
 %setup -q -n %{name}-0.16-beta2
-#? % patch1 -p1
 
 %build
 %configure --docdir=%{_docdir}/%{name}-%{version}
@@ -118,8 +113,13 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/%{name}/src
 
 %changelog
+* Wed Mar 12 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.16.beta2-2
+- Add Requires: python-nbxmpp
+- Drop Patch0001: gajim-0.15.3-14476-17df4ebe8da8.patch
+- Some cleanup.
+
 * Wed Mar 12 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.16.beta2-1
-- Built of 0.16-beta2 version - it have xep-0308 [Last Message Correction] (according to https://plus.google.com/+NicolasV%C3%A9rit%C3%A9/posts/ZTpK9p4KWQi).
+- Built of 0.16-beta2 version - it have xep-0308 [Last Message Correction] (according to https://plus.google.com/+NicolasV%%C3%%A9rit%%C3%%A9/posts/ZTpK9p4KWQi).
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.15.3-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
