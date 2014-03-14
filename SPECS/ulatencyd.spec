@@ -1,18 +1,35 @@
-Name:           ulatencyd
-Version:        0.5.0
-Release:        1
-Summary:        Daemon to minimize latency on a Linux system using cgroups
-Summary(ru):    Демон для минимизации задержек на Linux системе используя cgroups
-URL:            https://github.com/poelzi/ulatencyd
+# https://fedoraproject.org/wiki/Packaging:SourceURL#Github
+%global commit b2830551e9270c1bd182b2e72637daa99ffab5ec
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-Group:          System Environment/Base
-License:        GPLv3+
-Source0:        https://github.com/poelzi/%{name}/archive/%{version}.tar.gz
+Name:             ulatencyd
+Version:          0.5.0
+Release:          2%{?shortcommit:.git.%{shortcommit}}%{?dist}
+Summary:          Daemon to minimize latency on a Linux system using cgroups
+Summary(ru):      Демон для минимизации задержек на Linux системе используя cgroups
+Group:            System Environment/Base
+License:          GPLv3+
 
-BuildRequires:  cmake glib2-devel dbus-glib-devel dbus-python-devel PyQt4 polkit-devel libxcb-devel
-BuildRequires:  lua-devel lua-posix doxygen perl-Moose pandoc libcgroup-devel libXau-devel
-Requires:       dbus-python systemd lua lua-posix
-BuildRequires:  systemd
+URL:              https://github.com/poelzi/ulatencyd
+%if 0%{?shortcommit:1}
+# See Source1 script for tarball creation
+Source0:          %{name}.git.%{shortcommit}.tar.xz
+%else
+Source0:          https://github.com/poelzi/%{name}/archive/%{version}.tar.gz
+%endif
+# Script to create tarball
+Source1:          %{name}.git
+#? Patch0:           ulatencyd-0.5.0-no-bundled-libs.patch
+
+
+BuildRequires:    cmake, glib2-devel, dbus-glib-devel, dbus-python-devel, PyQt4
+BuildRequires:    polkit-devel, libxcb-devel, procps-ng-devel, lua-devel
+BuildRequires:    lua-posix, doxygen, perl-Moose pandoc, libcgroup-devel, libXau-devel
+Requires:         dbus-python lua lua-posix
+Requires(post):   systemd
+Requires(preun):  systemd
+Requires(postun): systemd
+BuildRequires:    systemd
 
 %description
 == What is ulatency ==
@@ -51,10 +68,12 @@ Ulatencyd отслеживает процессы в системе и расп�
 какой-то процесс который может длиться весьма продолжительное время.
 
 %prep
-%setup -q
+%setup -q -n %{name}.%{shortcommit}
+
+#? % patch0 -p0 -b .no-bundled
 
 # Remove bundled libs
-#rm -rf src/{bc,coreutils,proc}/*
+rm -rf src/{bc,coreutils,proc}
 
 # Correct hardcoded pathes
 sed -i.sed 's#SET(SYSTEMD_DIR "/lib/systemd/system" CACHE STRING#SET(SYSTEMD_DIR "%{_unitdir}" CACHE STRING#' CMakeLists.txt
@@ -66,12 +85,22 @@ cmake \
   -DCMAKE_INSTALL_PREFIX=%{_prefix} \
   -DENABLE_DBUS=1 \
   -DLUA_JIT=0 \
+  -DPROCPS_STATIC:BOOL=OFF \
   .
 
 make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
+
+%post
+%systemd_post %{name}.service
+
+%preun
+%systemd_preun %{name}.service
+
+%postun
+%systemd_postun_with_restart %{name}.service
 
 %files
 %doc AUTHORS COPYING ChangeLog NEWS README TODO
@@ -97,7 +126,11 @@ make DESTDIR=%{buildroot} install
 %{_datadir}/polkit-1/actions/org.quamquam.%{name}.policy
 
 %changelog
+* Thu Mar 13 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.5.0-2.git.b283055
+- Bundled libs issue resolved - https://github.com/poelzi/ulatencyd/issues/46.
+- Enhance systemd support.
+- Add BR procps-ng-devel
+
 * Sun Aug 25 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.5.0-1
-- Import package from ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home%3A/awk2007%3A/scm/Fedora_17/src/ulatencyd-9999-9.1.src.rpm
-  was created Tue May 03 2011 with version 9999-9.1 by Anonymous (for the infor and clear useless changelog entry).
+- Import package from one of OpenSuse found package (author ask to do not have link here).
 - Rework to prepare for Fedora.
