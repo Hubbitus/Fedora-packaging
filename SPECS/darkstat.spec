@@ -7,7 +7,7 @@ Group:         Applications/Internet
 URL:           http://unix4lyfe.org/darkstat/
 Source:        http://unix4lyfe.org/%{name}/%{name}-%{version}.tar.bz2
 
-BuildRequires: libpcap-devel
+BuildRequires: libpcap-devel, zlib-devel
 
 %description
 darkstat is a network traffic analyzer. It's basically a packet sniffer
@@ -37,3 +37,4 @@ make install DESTDIR="%{buildroot}"
 - Update URLs.
 - Remove INSTALL file from docs (install-file-in-docs rpmlint warning).
 - darkstat.x86_64: E: missing-call-to-setgroups /usr/sbin/darkstat, darkstat.x86_64: E: incorrect-fsf-address /usr/share/doc/darkstat/COPYING.GPL issues mailed to author.
+- Add BR zlib-devel
