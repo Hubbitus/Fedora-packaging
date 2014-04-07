@@ -1,0 +1,11 @@
+--- diffmark/cmd/dm.cc	2010-12-26 20:21:24.000000000 +0100
++++ full-diffmark/cmd/dm.cc	2014-03-31 17:50:27.000000000 +0200
+@@ -56,7 +56,7 @@
+ 
+     xmlChar *mem = 0;
+     int size = 0;
+-    xmlDocDumpFormatMemory(diff, &mem, &size, 1);
++    xmlDocDumpFormatMemoryEnc(diff, &mem, &size, "UTF-8", 1);
+     
+     std::copy(reinterpret_cast<char *>(mem),
+ 	reinterpret_cast<char *>(mem + size),
