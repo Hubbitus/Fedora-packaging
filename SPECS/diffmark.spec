@@ -1,6 +1,6 @@
 Name:       diffmark
 Version:    0.10
-Release:    6%{?dist}
+Release:    7%{?dist}
 Summary:    XML diff and merge
 Group:      Applications/Text
 # The library code has it's own license
@@ -11,6 +11,8 @@ URL:        http://www.mangrove.cz/%{name}/
 Source0:    %{url}%{name}-%{version}.tar.gz
 # Superfluous RPATH in programs
 Patch0:     %{name}-0.09-remove_rpath.patch
+Patch1:     diffmark-0.10-encoding.patch
+
 BuildRequires:  libxml2-devel
 # Because of diffmark-0.08-remove_rpath.patch:
 # And to update config.sub to support aarch64, bug #925255:
@@ -18,7 +20,7 @@ BuildRequires: autoconf, automake, libtool
 
 %description
 This is a XML diff and merge package. It consists of a shared library and
-two utilities: dm and dm-merge. 
+two utilities: dm and dm-merge.
 
 %package        devel
 Summary:        Development files for %{name} library
@@ -31,6 +33,7 @@ Header files and libraries for developing applications that use %{name}.
 %prep
 %setup -q
 %patch0 -p1 -b .rpath
+%patch1 -p1 -b .unicode
 # automake -i -f to support aarch64, bug #925255
 libtoolize --force && autoreconf -i -f
 
@@ -47,7 +50,7 @@ find "$RPM_BUILD_ROOT" -name '*.la' -exec rm -f {} +
 %postun -p /sbin/ldconfig
 
 %files
-%doc COPYING doc/*.html README 
+%doc COPYING doc/*.html README
 %{_bindir}/*
 %{_libdir}/*.so.*
 
@@ -56,6 +59,9 @@ find "$RPM_BUILD_ROOT" -name '*.la' -exec rm -f {} +
 %{_libdir}/*.so
 
 %changelog
+* Fri Apr 4 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.10-7
+- Add Patch1: diffmark-0.10-encoding.patch (by upstream author mail) to try add UTF-8 support.
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.10-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
