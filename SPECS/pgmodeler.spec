@@ -1,17 +1,16 @@
 #% global GITrev ec8d48f
 
 Name:             pgmodeler
-Version:          0.7.0_pre
-Release:          0.1%{?GITrev:.git.%{GITrev}}%{?dist}
+Version:          0.7.1
+Release:          1%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
 URL:              http://www.pgmodeler.com.br/
 Group:            Applications/Databases
-# Script to generate main source0
+# Script to generate main source0 for git based builds
 Source1:          %{name}.get.tarball
-#Source0:          %{name}-%{version}GIT%{GITrev}.tar.xz
-Source0:          https://github.com/pgmodeler/pgmodeler/archive/v0.7.0-pre_20140103.tar.gz
+Source0:          https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
 Source2:          %{name}.desktop
 
 BuildRequires:    qt5-qtbase-devel, libxml2-devel, postgresql-devel
@@ -39,7 +38,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q -n %{name}-%( echo %{version} | sed 's/_/-/' )_20140103
+%setup -q
 
 %build
 %_qt5_qmake %{name}.pro
@@ -143,6 +142,9 @@ install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/pixmaps
 %{_includedir}/%{name}
 
 %changelog
+* Sun Apr 20 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.7.1-1
+- Update to 0.7.1
+
 * Tue Jan 7 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.7.0_pre-0.1
 - Step to version 0.7.0-pre
 - Replace qmake-qt5 by macros %%_qt5_qmake
