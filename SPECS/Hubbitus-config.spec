@@ -1,6 +1,6 @@
 Name:		Hubbitus-config
 Version:		1
-Release:		12
+Release:		15.2%{?dist}
 Summary:		Hubbitus system configuration
 Summary(ru):	Настройки системы Hubbitus
 
@@ -32,14 +32,14 @@ My initially settings of new system.
 Mostly it contain Requires of useful packages and some settings.
 Also creates pasha user without password but with access by keys.
 THIS PACKAGE DOES NOT INTENDED FOR FOREIGN USE, but may be good idea to start
-customize it fo own needs.
+customize it for you own needs.
 
 %description -l ru
 Мои основные настройки новой системы.
 Прежде всего пакет содержит зависимости к другим пакетам, которые я считаю
 необходимыми, но также ещё некоторые настройки и скрипты.
-ПАКЕТ НЕ ПРЕДНАЗНАЧЕН ДЛЯ ВНЕШНЕГО ИСПОЛЬЗОВАНИЯ, но моет быть хорошим стартом
-для создания подобного для себя.
+ПАКЕТ НЕ ПРЕДНАЗНАЧЕН ДЛЯ ВНЕШНЕГО ИСПОЛЬЗОВАНИЯ, но может стать хорошим стартом
+для создания подобного для своих нужд.
 
 %package gui
 Group:		System Environment/Base
@@ -93,20 +93,15 @@ rm -rf %{buildroot}
 /usr/sbin/useradd pasha 2>/dev/null || :
 
 %post
-# $1 - svn URL
-# $2 - svn local dir
-function svn_up(){
-	if svn info "$2" &>/dev/null ; then
-	svn up "$2"
-	else
-	svn co "$1" "$2"
-	fi
+function git_up(){
+	svn info "$2" &>/dev/null && rm -rf "$2" # migration from SVN
+	git -C "$2" pull --strategy=recursive || git clone "$1" "$2"
 }
 
 # Checkout ~/bin
-svn_up "svn+ssh://pasha@x-www.info/svn/scripts/trunk" "/home/pasha/bin"
-svn_up "svn+ssh://pasha@x-www.info/svn/scripts/trunk/root" "/root/bin"
-svn_up "svn+ssh://pasha@x-www.info/svn/_SHARED_/trunk" "/home/_SHARED_"
+git_up 'https://github.com/Hubbitus/HuPHP.git' '/home/_SHARED_'
+git_up 'https://github.com/Hubbitus/shell.scripts.git' '/home/pasha/bin'
+git_up 'https://github.com/Hubbitus/shell.scripts.git' '/root/bin'
 
 %files
 %defattr(-,root,root,-)
@@ -128,6 +123,17 @@ svn_up "svn+ssh://pasha@x-www.info/svn/_SHARED_/trunk" "/home/_SHARED_"
 %files gui
 
 %changelog
+* Wed Apr 16 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1-15.2
+- Add -C option in git, add --strategy=recursive option.
+
+* Tue Apr 15 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1-15.1
+- Migrate also bin-scripts from private svn to github git repository. Unify root and not-root.
+- Drop svn repos support.
+
+* Mon Apr 14 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1-14
+- Migrate HuPHP framework from private svn to git repo on github.
+- Bump version to 1-14
+
 * Tue Oct 4 2011 Pavel Alexeev <Pahan@Hubbitus.info> - 1-12
 - Add .rsync_shared_options
 
