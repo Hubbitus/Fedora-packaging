@@ -2,7 +2,7 @@
 
 Name:             pgmodeler
 Version:          0.7.1
-Release:          1%{?GITrev:.git.%{GITrev}}%{?dist}
+Release:          2%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -86,6 +86,7 @@ export PGMODELER_SCHEMAS_DIR="%{_sysconfdir}/%{name}/schemas"
 export PGMODELER_LANG_DIR="%{_sysconfdir}/%{name}/lang"
 export PGMODELER_PLUGINS_DIR="%{_libdir}/%{name}/plugins"
 export PGMODELER_CHANDLER_PATH="%{_libexecdir}/%{name}-ch"
+export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:%{_libdir}/%{name}
 EOF
 
 # Wrappers to include enviroment-file on first run
@@ -142,6 +143,9 @@ install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/pixmaps
 %{_includedir}/%{name}
 
 %changelog
+* Tue Apr 22 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.7.1-2
+- Adjust also LD_LIBRARY_PATH
+
 * Sun Apr 20 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.7.1-1
 - Update to 0.7.1
 
