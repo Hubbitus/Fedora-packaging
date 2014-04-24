@@ -1,5 +1,5 @@
 # -c server [-fv]  [-p password] [-u unprivileged_user] [-d tun_device] [-m reference_mtu] [-w polls]
-# If it does not vork on client, try add -f option
+# If it does not work on client, try add -f option
 # For client you MUST change server IP address
 # If static IP address desired -a 10.1.2.101 may be helpfull, otherwise dinamic
 OPTIONS="-v -f -c <SERVER_IP> -p password -a 10.1.2.101 -u hans"
