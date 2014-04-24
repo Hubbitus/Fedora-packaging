@@ -1,0 +1,11 @@
+[Unit]
+Description=Network traffic analyzer
+After=syslog.target network.target
+
+[Service]
+Type=forking
+EnvironmentFile=-/etc/sysconfig/darkstat
+ExecStart=/usr/sbin/darkstat $OPTIONS
+
+[Install]
+WantedBy=multi-user.target

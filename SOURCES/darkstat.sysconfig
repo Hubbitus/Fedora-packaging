@@ -1,0 +1,3 @@
+# As base only specify network interface is mandatory.
+# For more options see man darkstat
+OPTIONS="-i p10p1"
