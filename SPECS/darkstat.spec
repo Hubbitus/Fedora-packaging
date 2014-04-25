@@ -1,7 +1,7 @@
 Name:          darkstat
 Summary:       Network traffic analyzer
 Version:       3.0.718
-Release:       2%{?dist}
+Release:       3%{?dist}
 License:       GPLv2
 Group:         Applications/Internet
 URL:           http://unix4lyfe.org/darkstat/
@@ -25,7 +25,7 @@ all sorts of useless but interesting statistics.
 %setup -q
 
 %build
-%configure
+%configure --disable-silent-rules
 make %{?_smp_mflags}
 
 %install
@@ -55,7 +55,10 @@ exit 0
 %{_unitdir}/%{name}.service
 
 %changelog
-* Thu Apr 24 2014 Pavel Alexeev <Pahan@Hubbitus.info> - - 3.0.718-2
+* Fri Apr 25 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 3.0.718-3
+- Add --disable-silent-rules to configure call.
+
+* Thu Apr 24 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 3.0.718-2
 - Do not mark man ad %%doc.
 - Add systemd stuff.
 - Provide separate user for service.
