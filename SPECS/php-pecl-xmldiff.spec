@@ -15,7 +15,7 @@ Source0:          http://pecl.php.net/get/%peclName-%{version}.tgz
 
 BuildRequires:    php-pear
 BuildRequires:    php-devel
-BuildRequires:    diffmark-devel, dos2unix
+BuildRequires:    libxml2-devel, diffmark-devel, dos2unix
 # dom.so needed by %%check
 BuildRequires:    php-xml
 Requires(post):   %{__pecl}
