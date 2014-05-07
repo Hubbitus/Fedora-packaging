@@ -1,11 +1,13 @@
+%global prerel rc1
+
 Summary:	Jabber client written in PyGTK
 Name:	gajim
-Version:	0.16.beta2
-Release:	2%{?dist}
+Version:	0.16
+Release:	0.1%{?prerel:.%prerel}%{?dist}
 License:	GPLv3
 Group:	Applications/Internet
 URL:		http://gajim.org/
-Source0:	https://gajim.org/downloads/0.16/gajim-0.16-beta2.tar.bz2
+Source0:	https://gajim.org/downloads/0.16/gajim-%{version}%{?prerel:-%prerel}.tar.bz2
 BuildArch:	noarch
 
 Requires:	avahi-ui-tools
@@ -30,7 +32,7 @@ Requires:	python-kerberos
 Requires:	python-libasyncns
 Requires:	python-pyasn1
 Requires:	gupnp-igd-python
-Requires:	python-nbxmpp
+Requires:	python-nbxmpp > 0.3.3
 
 # these are dlopen'd using ctypes find_library/LoadLibrary:
 Requires:	gtkspell
@@ -57,7 +59,7 @@ to provide a full featured and easy to use xmpp client for the GTK+ users.
 Gajim does not require GNOME to run, even though it exists with it nicely.
 
 %prep
-%setup -q -n %{name}-0.16-beta2
+%setup -q -n %{name}-%{version}%{?prerel:-%prerel}
 
 %build
 %configure --docdir=%{_docdir}/%{name}-%{version}
@@ -113,6 +115,14 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/%{name}/src
 
 %changelog
+* Wed May 7 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.16-0.1.rc1
+- Specify version require python-nbxmpp > 0.3.3
+- Introduce usage of %%prerel
+- Change version-release handling according Fedora guidelines for pre releases (0.16.rc1-1 -> 0.16-0.1.rc1)
+
+* Wed May 7 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.16.rc1-1
+- Version 0.16-rc1
+
 * Wed Mar 12 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.16.beta2-2
 - Add Requires: python-nbxmpp
 - Drop Patch0001: gajim-0.15.3-14476-17df4ebe8da8.patch
