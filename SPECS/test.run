@@ -1,0 +1,13 @@
+#!/bin/bash
+
+rpmbuild -ba test.spec
+
+echo "Prepare-cleanup"
+sudo rpm -e test
+
+sudo rpm -Uhv /home/pasha/SOFT/rpmbuild/RPMS/noarch/test-1-1.fc20.noarch.rpm
+
+echo -e '\n\n\n\n\n'
+echo "START ==== START ==== START ==== START ==== START"
+sudo rpm -Uhv /home/pasha/SOFT/rpmbuild/RPMS/noarch/test-1-2.fc20.noarch.rpm
+
