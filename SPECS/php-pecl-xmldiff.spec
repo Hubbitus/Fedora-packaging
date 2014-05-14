@@ -12,7 +12,7 @@
 
 Name:             php-pecl-%peclName
 Version:          0.9.2
-Release:          2%{?dist}
+Release:          3%{?dist}
 Summary:          Pecl package for XML diff and merge
 Group:            Development/Languages
 
@@ -36,7 +36,9 @@ Provides:         php-%peclName = %{version}
 Provides:         php-%peclName%{?_isa} = %{version}
 
 # Filter private shared (RPM 4.9) (f20+ (and rhel7) does not require that)
+%if 0%{?fedora} < 20 && 0%{?rhel} < 7
 %global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}%{php_extdir}/.*\\.so$
+%endif
 
 %description
 The extension is able to produce diffs of two XML documents and then
@@ -77,14 +79,14 @@ cat << 'EOF' | tee %{buildroot}%{php_inidir}/%{ini_name}
 extension=%{php_extdir}/%peclName.so
 EOF
 
-mkdir -p ./%{pecl_docdir}
-mv {CREDITS,LICENSE} ./%{pecl_docdir}/
+mkdir -p %{buildroot}/%{pecl_docdir}/%peclName/
+mv {CREDITS,LICENSE} %{buildroot}/%{pecl_docdir}/%peclName/
 
 rm -rf %{buildroot}/%{_includedir}/php/ext/%peclName/
 
 %check
 # only check if build extension can be loaded
-%{_bindir}/php \
+php \
     --no-php-ini \
     --define extension=dom.so \
     --define extension=%{buildroot}%{php_extdir}/%peclName.so \
@@ -92,11 +94,11 @@ rm -rf %{buildroot}/%{_includedir}/php/ext/%peclName/
 
 cd %peclName-%{version}
 
-# Can't do just 'make %{?_smp_mflags} test' because path and option hardcoded. Makefali patching needed or run tests manually
+# Can't do just 'make %{?_smp_mflags} test' because path and option hardcoded. Makefile patching needed or run tests manually
 TEST_PHP_EXECUTABLE=%{__php} \
   NO_INTERACTION=1 \
     TEST_PHP_ARGS="-n -d extension=dom.so -d extension=%{buildroot}%{php_extdir}/%peclName.so" \
-    php -n run-tests.php
+      php -n run-tests.php
 
 %post
 %{pecl_install} %{pecl_xmldir}/%{name}.xml >/dev/null || :
@@ -108,12 +110,17 @@ if [ "$1" -eq "0" ]; then
 fi
 
 %files
-%doc %peclName-%{version}/%{pecl_docdir}/{CREDITS,LICENSE}
+%doc %{pecl_docdir}/%peclName/CREDITS
+%doc %{pecl_docdir}/%peclName/LICENSE
 %config(noreplace) %{php_inidir}/%{ini_name}
 %{php_extdir}/%peclName.so
 %{pecl_xmldir}/%{name}.xml
 
 %changelog
+* Tue May 13 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.9.2-3
+- Surround filter provides by condition %%if 0%%{?fedora} < 20 && 0%%{?rhel} < 7
+- Fix %%doc installation issue.
+
 * Mon May 12 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.9.2-2
 - Changes by Fedora review bz#1094864 from Remi Collet comments.
 - Remove define php_apiver, php_extdir.
