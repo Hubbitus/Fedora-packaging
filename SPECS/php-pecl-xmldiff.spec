@@ -12,7 +12,7 @@
 
 Name:             php-pecl-%peclName
 Version:          0.9.2
-Release:          3%{?dist}
+Release:          4%{?dist}
 Summary:          Pecl package for XML diff and merge
 Group:            Development/Languages
 
@@ -110,13 +110,15 @@ if [ "$1" -eq "0" ]; then
 fi
 
 %files
-%doc %{pecl_docdir}/%peclName/CREDITS
-%doc %{pecl_docdir}/%peclName/LICENSE
+%doc %{pecl_docdir}/%peclName
 %config(noreplace) %{php_inidir}/%{ini_name}
 %{php_extdir}/%peclName.so
 %{pecl_xmldir}/%{name}.xml
 
 %changelog
+* Wed May 14 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.9.2-4
+- Own %%{pecl_docdir}/%%peclName dir.
+
 * Tue May 13 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.9.2-3
 - Surround filter provides by condition %%if 0%%{?fedora} < 20 && 0%%{?rhel} < 7
 - Fix %%doc installation issue.
