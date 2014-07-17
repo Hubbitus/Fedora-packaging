@@ -46,7 +46,7 @@ Group:		System Environment/Base
 Summary:		Hubbitus system configuration
 Requires:		%{name} = %{version}-%{release}
 Requires:		firefox, thunderbird, gajim, meld, java-1.7.0-openjdk
-Requires:		wireshark-gnome, mplayer
+Requires:		wireshark-gnome, mplayer, glances
 
 %description gui
 My initially settings of new system with GUI.
