@@ -1,12 +1,12 @@
 Name:           python-nbxmpp
-Version:        0.4
+Version:        0.5
 Release:        1%{?dist}
 Summary:        XMPP library by Gajim team
 License:        GPLv3
 Group:          Development/Languages
 Url:            http://python-nbxmpp.gajim.org/
 # https://fedoraproject.org/wiki/Packaging:SourceURL?rd=Packaging/SourceURL#Troublesome_URLs
-Source0:        https://python-nbxmpp.gajim.org/downloads/4#/nbxmpp-%{version}.tar.gz
+Source0:        https://python-nbxmpp.gajim.org/downloads/5#/nbxmpp-%{version}.tar.gz
 BuildRequires:  fdupes
 BuildRequires:  python-devel
 BuildArch:      noarch
@@ -42,6 +42,9 @@ python setup.py install -O1 --skip-build --root %{buildroot} --prefix=%{_prefix}
 %doc ChangeLog README doc/apidocs doc/examples
 
 %changelog
+* Sun Aug 3 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.5-1
+- Version 0.5
+
 * Wed May 7 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.4-1
 - Version 0.4
 

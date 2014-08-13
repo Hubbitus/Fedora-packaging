@@ -1,4 +1,4 @@
-%global prerel rc1
+%global prerel rc2
 
 Summary:	Jabber client written in PyGTK
 Name:	gajim
@@ -32,7 +32,7 @@ Requires:	python-kerberos
 Requires:	python-libasyncns
 Requires:	python-pyasn1
 Requires:	gupnp-igd-python
-Requires:	python-nbxmpp > 0.3.3
+Requires:	python-nbxmpp >= 0.5
 
 # these are dlopen'd using ctypes find_library/LoadLibrary:
 Requires:	gtkspell
@@ -115,6 +115,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/%{name}/src
 
 %changelog
+* Sun Aug 3 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.16-0.1.rc2
+- RC2
+- Requires: python-nbxmpp >= 0.5
+
 * Wed May 7 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.16-0.1.rc1
 - Specify version require python-nbxmpp > 0.3.3
 - Introduce usage of %%prerel
