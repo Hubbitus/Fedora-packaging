@@ -1,11 +1,11 @@
 Name:           blink
-Version:        0.9.0
+Version:        0.9.1
 Release:        1%{?dist}
 Summary:        Real-time communications client using SIP protocol
 
 License:        GPLv3
 URL:            http://icanblink.com/
-Source0:        http://download.ag-projects.com/BlinkQt/blink-0.9.0.tar.gz
+Source0:        http://download.ag-projects.com/BlinkQt/%{name}-%{version}.tar.gz
 
 BuildRequires:  cdbs >= 0.4.47
 BuildRequires:  python2-devel >= 2.7
@@ -31,8 +31,8 @@ Requires:       python-twisted-names
 
 %description
 Blink is the best real-time communications client using SIP protocol.
-You can use it with many SIP providers, on the LAN using Bonjour and SIP2SIP free service.
-Blink is elegant, simple to use and feature-full.
+You can use it with many SIP providers, on the LAN using Bonjour and SIP2SIP
+free service. Blink is elegant, simple to use and feature-full.
 
 %prep
 %setup -q
@@ -55,5 +55,8 @@ python setup.py install --root %{buildroot}
 
 
 %changelog
+* Thu Aug 14 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.9.1-1
+- Update to 0.9.1
+
 * Thu Jul 17 2014 Pavel Alexeev (aka Pahan-Hubbitus) <Pahan@Hubbitus.info> - 0.9.0-1
 - Initial spec
