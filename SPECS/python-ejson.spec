@@ -9,7 +9,7 @@ Summary:        Extensible json serializer/deserializer library
 
 License:        GPLv3
 URL:            https://pypi.python.org/pypi/ejson
-Source0:        https://pypi.python.org/packages/source/e/ejson/ejson-0.1.6.tar.gz
+Source0:        https://pypi.python.org/packages/source/e/ejson/ejson-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python-devel
