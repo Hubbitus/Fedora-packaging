@@ -5,7 +5,7 @@ Version:        1.1.0
 Release:        1%{?dist}
 Summary:        Fast JSON encoder/decoder for Python
 
-License:        LGPL
+License:        LGPLv2+
 URL:            https://pypi.python.org/pypi/python-cjson
 Source0:        https://pypi.python.org/packages/source/p/python-cjson/python-cjson-1.1.0.tar.gz
 
