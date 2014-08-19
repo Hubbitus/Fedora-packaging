@@ -1,15 +1,13 @@
-%{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
-
 Name:           python-cjson
 Version:        1.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Fast JSON encoder/decoder for Python
 
 License:        LGPLv2+
 URL:            https://pypi.python.org/pypi/python-cjson
-Source0:        https://pypi.python.org/packages/source/p/python-cjson/python-cjson-1.1.0.tar.gz
+Source0:        https://pypi.python.org/packages/source/p/python-cjson/%{name}-%{version}.tar.gz
 
-BuildRequires:  python-devel
+BuildRequires:  python2-devel
 
 %description
 This module implements a very fast JSON encoder/decoder for Python.
@@ -46,5 +44,10 @@ CFLAGS="%{optflags}" %{__python} setup.py build
 
 
 %changelog
+* Tue Aug 19 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1.1.0-2
+- Start of Fedora review bz#1130097. Thanks to Christopher Meng.
+- Chang BR to python2-devel from just python-devel.
+- Drop python_sitearch declaration as it is not targeted to epel6 and early.
+
 * Thu Jul 17 2014 Pavel Alexeev (aka Pahan-Hubbitus) <Pahan@Hubbitus.info> - 1.1.0-1
 - Initial spec.
