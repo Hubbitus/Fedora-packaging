@@ -1,6 +1,6 @@
 Name:           python-cjson
 Version:        1.1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Fast JSON encoder/decoder for Python
 
 License:        LGPLv2+
@@ -37,6 +37,9 @@ CFLAGS="%{optflags}" %{__python} setup.py build
 %install
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
 
+%check
+PYTHONPATH=$(echo build/lib.linux-*) %{__python} jsontest.py
+
 %files
 %doc
 # For arch-specific packages: sitearch
@@ -44,6 +47,9 @@ CFLAGS="%{optflags}" %{__python} setup.py build
 
 
 %changelog
+* Mon Aug 25 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1.1.0-3
+- Add %%check section.
+
 * Tue Aug 19 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1.1.0-2
 - Start of Fedora review bz#1130097. Thanks to Christopher Meng.
 - Chang BR to python2-devel from just python-devel.
