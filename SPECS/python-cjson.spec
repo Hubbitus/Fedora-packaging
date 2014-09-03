@@ -1,6 +1,6 @@
 Name:           python-cjson
 Version:        1.1.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Fast JSON encoder/decoder for Python
 
 License:        LGPLv2+
@@ -41,12 +41,15 @@ CFLAGS="%{optflags}" %{__python} setup.py build
 PYTHONPATH=$(echo build/lib.linux-*) %{__python} jsontest.py
 
 %files
-%doc
+%doc README LICENSE ChangeLog
 # For arch-specific packages: sitearch
 %{python_sitearch}/*
 
 
 %changelog
+* Wed Sep 3 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1.1.0-4
+- Add %%doc README LICENSE ChangeLog
+
 * Mon Aug 25 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1.1.0-3
 - Add %%check section.
 
