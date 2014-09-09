@@ -2,7 +2,7 @@
 
 Name:           blink
 Version:        0.9.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Real-time communications client using SIP protocol
 
 License:        GPLv3
@@ -12,20 +12,7 @@ Source0:        http://download.ag-projects.com/BlinkQt/%{name}-%{version}.tar.g
 BuildRequires:  cdbs >= 0.4.47
 BuildRequires:  python2-devel >= 2.7
 BuildRequires:  libvncserver-devel
-BuildRequires:  Cython
 Requires:       PyQt4 >= 4.7
-Requires:       python-cjson
-Requires:       python-application
-Requires:       python-eventlet >= 0.8.11.4
-Requires:       python-eventlib
-Requires:       python-twisted-core >= 8.1.0
-Requires:       python-zope-interface4
-Requires:       python-sipsimple >= 0.18.1
-Requires:       python-gnutls
-Requires:       python-dns
-Requires:       python-xcaplib
-Requires:       python-msrplib
-Requires:       python-twisted-names
 
 
 %description
@@ -54,6 +41,13 @@ python setup.py install --root %{buildroot}
 
 
 %changelog
+* Tue Sep 9 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.9.1-3
+- Move most runtime dependencies into python-sipsimple package according to its
+    docs/Dependencies.txt: python-application, python-cjson, python-eventlib,
+    python-twisted-names, BR Cython, python-eventlet, python-twisted-core,
+    python-zope-interface4, python-sipsimple, python-gnutls, python-dns,
+    python-xcaplib, python-msrplib
+
 * Mon Sep 8 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.9.1-2
 - Turn BR python-qt4 into R PyQt4 by suggestions in review request (bz#1130103).
 - Remove requires: python-ejson, python-celery, python-redis, python-django as they are not necessary in that version (at least for start) (bz#1130103).
