@@ -12,6 +12,7 @@ Source0:        http://download.ag-projects.com/BlinkQt/%{name}-%{version}.tar.g
 BuildRequires:  cdbs >= 0.4.47
 BuildRequires:  python2-devel >= 2.7
 BuildRequires:  libvncserver-devel
+BuildRequires:  Cython
 Requires:       PyQt4 >= 4.7
 
 
@@ -44,7 +45,7 @@ python setup.py install --root %{buildroot}
 * Tue Sep 9 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.9.1-3
 - Move most runtime dependencies into python-sipsimple package according to its
     docs/Dependencies.txt: python-application, python-cjson, python-eventlib,
-    python-twisted-names, BR Cython, python-eventlet, python-twisted-core,
+    python-twisted-names, python-eventlet, python-twisted-core,
     python-zope-interface4, python-sipsimple, python-gnutls, python-dns,
     python-xcaplib, python-msrplib
 
