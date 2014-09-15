@@ -1,6 +1,6 @@
 Name:		Hubbitus-config
 Version:		1
-Release:		15.2%{?dist}
+Release:		16%{?dist}
 Summary:		Hubbitus system configuration
 Summary(ru):	Настройки системы Hubbitus
 
@@ -21,9 +21,14 @@ Source51:		root.toprc
 
 BuildArch:	noarch
 Requires:		Hubbitus-release
-Requires:		screen, mc, bash-completion, colorize, subversion, git
-Requires:		moreutils, ferm, wireshark, grin, sshfs, atop, htop, iotop,
-Requires:		strace, bmon, sysstat, dstat
+Requires:		screen, mc, bash-completion, colorize, subversion, git, colorize
+Requires:		wireshark, iotop, moreutils, grin, ferm, sshfs, htop, darkstat
+Requires:		strace, sysstat, dstat
+# Disable as it is not awailable for epel7:
+# https://bugzilla.redhat.com/show_bug.cgi?id=1141182
+#Requires:	bmon
+# https://bugzilla.redhat.com/show_bug.cgi?id=1141199
+#Requires:	atop
 Requires(pre):	/usr/sbin/useradd
 Requires(post):subversion
 
@@ -123,6 +128,14 @@ git_up 'https://github.com/Hubbitus/shell.scripts.git' '/root/bin'
 %files gui
 
 %changelog
+* Fri Sep 12 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1-16
+- Disable as it is not awailable for epel7:
+# https://bugzilla.redhat.com/show_bug.cgi?id=1141182
+#Requires:	bmon
+# https://bugzilla.redhat.com/show_bug.cgi?id=1141199
+#Requires:	atop
+- Add R darkstat.
+
 * Wed Apr 16 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1-15.2
 - Add -C option in git, add --strategy=recursive option.
 
