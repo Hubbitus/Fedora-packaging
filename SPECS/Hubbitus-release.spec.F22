@@ -1,6 +1,6 @@
 Name:		Hubbitus-release
 Version:		22
-Release:		1
+Release:		2
 Summary:		Hubbitus Repository Configuration
 Summary(ru):	Конфигурация репозитория Hubbitus
 
@@ -50,6 +50,9 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/yum.repos.d/*
 
 %changelog
+* Fri Oct 24 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 22-2
+- Fix repo file.
+
 * Fri Oct 24 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 22-1
 - Build for Fedora 22 - rawhide
 
