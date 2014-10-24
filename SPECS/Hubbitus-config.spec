@@ -1,6 +1,6 @@
 Name:		Hubbitus-config
 Version:		1
-Release:		16%{?dist}
+Release:		17%{?dist}
 Summary:		Hubbitus system configuration
 Summary(ru):	Настройки системы Hubbitus
 
@@ -23,7 +23,7 @@ BuildArch:	noarch
 Requires:		Hubbitus-release
 Requires:		screen, mc, bash-completion, colorize, subversion, git, colorize
 Requires:		wireshark, iotop, moreutils, grin, ferm, sshfs, htop, darkstat
-Requires:		strace, sysstat, dstat
+Requires:		strace, sysstat, dstat, psmisc
 # Disable as it is not awailable for epel7:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1141182
 #Requires:	bmon
@@ -57,7 +57,7 @@ Requires:		wireshark-gnome, mplayer, glances
 My initially settings of new system with GUI.
 Mostly it contain Requires of useful packages and some settings.
 THIS PACKAGE DOES NOT INTENDED FOR FOREIGN USE, but may be good idea to start
-customize it fo own needs.
+customize it for own needs.
 
 %description -l ru gui
 Мои основные настройки новой системы c ГРАФИКОЙ.
@@ -128,6 +128,9 @@ git_up 'https://github.com/Hubbitus/shell.scripts.git' '/root/bin'
 %files gui
 
 %changelog
+* Fri Oct 24 2014 Pavel Alexeev <Pahan@Hubbitus.info>- 1-17
+- Add R psmisc
+
 * Fri Sep 12 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1-16
 - Disable as it is not awailable for epel7:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1141182
