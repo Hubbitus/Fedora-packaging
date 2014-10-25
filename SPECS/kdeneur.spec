@@ -4,7 +4,7 @@ Summary:       KDE frontend for X Neural Switcher (xneur)
 Summary(ru):   KDE интерфейс для X Neural Switcher (xneur)
 Name:          kdeneur
 Version:       0.17.0
-Release:       1%{?HGrev:.hg%{HGrev}}%{?dist}
+Release:       2%{?HGrev:.hg%{HGrev}}%{?dist}
 
 Group:         User Interface/Desktops
 License:       GPLv2+
@@ -25,7 +25,7 @@ BuildRequires: libtool
 
 # Require explicit full versione because not only labriry used. This is only GUI to xneur config daemon and relies on
 # concrete xneur futures, including concrete revision fixes if that SCM build.
-Requires:      xneur = %{version}-%{release}
+Requires:      xneur = %{version}
 
 %description
 KDE front-end for X Neural Switcher (xneur).
@@ -84,5 +84,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Sat Oct 25 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.17.0-2
+- Require versioned xneur but without release part to do not account any rebuilds.
+
 * Mon Dec 2 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.17.0-1
 - Initial attempt package new frontend for xneur
