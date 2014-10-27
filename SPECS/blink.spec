@@ -2,7 +2,7 @@
 
 Name:           blink
 Version:        0.9.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Real-time communications client using SIP protocol
 
 License:        GPLv3
@@ -14,6 +14,7 @@ BuildRequires:  python2-devel >= 2.7
 BuildRequires:  libvncserver-devel
 BuildRequires:  Cython
 Requires:       PyQt4 >= 4.7
+Requires:       python-sipsimple
 
 
 %description
@@ -42,6 +43,9 @@ python setup.py install --root %{buildroot}
 
 
 %changelog
+* Mon Oct 27 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.9.1-4
+Add Requires: python-sipsimple
+
 * Tue Sep 9 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.9.1-3
 - Move most runtime dependencies into python-sipsimple package according to its
     docs/Dependencies.txt: python-application, python-cjson, python-eventlib,
