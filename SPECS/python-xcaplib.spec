@@ -2,17 +2,17 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 %{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 
-Name:           python-msrplib
-Version:        1.0.17
-Release:        1%{?dist}
-Summary:        Client for managing full or partial XML documents on XCAP servers (RFC 4825)
+Name:          python-xcaplib
+Version:       1.0.17
+Release:       2%{?dist}
+Summary:       Client for managing full or partial XML documents on XCAP servers (RFC 4825)
 
-License:        LGPLv2+
-URL:            http://sipsimpleclient.org/
-Source0:        http://download.ag-projects.com/SipClient/python-msrplib-0.15.0.tar.gz
+License:       LGPLv2+
+URL:           http://sipsimpleclient.org/
+Source0:       http://download.ag-projects.com/SipClient/python-xcaplib-1.0.17.tar.gz
 
-BuildArch:      noarch
-BuildRequires:  python-devel
+BuildArch:     noarch
+BuildRequires: python-devel
 
 %description
 XCAP protocol, defined in RFC 4825, allows a client to read, write, and
@@ -45,5 +45,8 @@ CFLAGS="%{optflags}" %{__python} setup.py build
 %{python_sitelib}/*
 
 %changelog
-* Thu Jul 17 2014 Pavel Alexeev (aka Pahan-Hubbitus) <Pahan@Hubbitus.info> - 1.0.17-1
+* Wed Oct 29 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1.0.17-2
+- Fix accidentally mix spec with python-msrplib content.
+
+* Thu Jul 17 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1.0.17-1
 - Initial version
