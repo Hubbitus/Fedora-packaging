@@ -27,11 +27,7 @@ zram compresses swap partitions into RAM for performance.
 %build
 
 %install
-mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
-mkdir -p %{buildroot}%{_unitdir}
-mkdir -p %{buildroot}%{_sbindir}
 %make_install DESTDIR=%{buildroot}
-
 
 %post
 %systemd_post %{name}.service
