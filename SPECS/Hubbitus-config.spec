@@ -1,6 +1,6 @@
 Name:		Hubbitus-config
 Version:		1
-Release:		17%{?dist}
+Release:		18%{?dist}
 Summary:		Hubbitus system configuration
 Summary(ru):	Настройки системы Hubbitus
 
@@ -23,7 +23,7 @@ BuildArch:	noarch
 Requires:		Hubbitus-release
 Requires:		screen, mc, bash-completion, colorize, subversion, git, colorize
 Requires:		wireshark, iotop, moreutils, grin, ferm, sshfs, htop, darkstat
-Requires:		strace, sysstat, dstat, psmisc
+Requires:		strace, sysstat, dstat, psmisc, nethogs
 # Disable as it is not awailable for epel7:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1141182
 #Requires:	bmon
@@ -128,8 +128,11 @@ git_up 'https://github.com/Hubbitus/shell.scripts.git' '/root/bin'
 %files gui
 
 %changelog
-* Fri Oct 24 2014 Pavel Alexeev <Pahan@Hubbitus.info>- 1-17
-- Add R psmisc
+* Tue Dec 16 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1-18
+- Add R nethogs.
+
+* Fri Oct 24 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1-17
+- Add R psmisc.
 
 * Fri Sep 12 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1-16
 - Disable as it is not awailable for epel7:

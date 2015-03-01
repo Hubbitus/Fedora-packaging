@@ -5,5 +5,6 @@
 name=Hubbitus F$releasever
 baseurl=
 	http://hubbitus.info/rpm/EL$releasever/
+	http://hubbitus.info/rpm/epel$releasever/
 enabled = 1
 gpgcheck = 0
