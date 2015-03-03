@@ -1,8 +1,8 @@
 #% global GITrev ec8d48f
 
 Name:             pgmodeler
-Version:          0.7.1
-Release:          2%{?GITrev:.git.%{GITrev}}%{?dist}
+Version:          0.8.0
+Release:          1%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -19,6 +19,9 @@ BuildRequires:    desktop-file-utils, gettext
 
 Requires(postun): /sbin/ldconfig
 Requires(post):   /sbin/ldconfig
+
+# https://github.com/pgmodeler/pgmodeler/issues/618
+Patch0:           pgmodeler-0.8.0-fixConfDumpInPri.patch
 
 %description
 PostgreSQL Database Modeler, or simply, pgModeler is an
@@ -40,82 +43,32 @@ developing applications that use %{name}.
 %prep
 %setup -q
 
-%build
-%_qt5_qmake %{name}.pro
+%patch0 -p1 -b .priConfDump
 
-# HACK
-ls -1 */*.pro */*/*.pro | xargs -r -I{} sh -c 'F={}; echo =$F=; sed -i "s/QT += core gui uitools/QT += core gui/g" $F; cd $(dirname $F); %_qt5_qmake ${F/*\//}'
-for item in libutils libobjrenderer libparsers libpgmodeler libdbconnect libpgmodeler_ui; do
-	sed -i.sed "s# /${item}.so# ../${item}/${item}.so#g" */Makefile
-done
+%build
+# @TODO Due to the bug (https://github.com/pgmodeler/pgmodeler/issues/559) CONFDIR, LANGDIR, SAMPLESDIR, SCHEMASDIR seems ignored?
+#	SHAREDIR=%%{_sharedstatedir}/%%{name} \
+#	CONFDIR=%%{_sysconfdir}/%%{name} \
+#	LANGDIR=%%{_datadir}/locale \
+#	SCHEMASDIR=%%{_sysconfdir}/%%{name} \
+%_qt5_qmake -recursive \
+	PREFIX=%{_prefix} \
+	BINDIR=%{_bindir} \
+	PRIVATEBINDIR=%{_libexecdir} \
+	PLUGINSDIR=%{_libdir}/%{name}/plugins \
+	SHAREDIR=%{_datarootdir}/%{name} \
+	DOCDIR=%{_docdir}/%{name} \
+	PRIVATELIBDIR=%{_libdir}/%{name} \
+		%{name}.pro
 
 # May be used instead of providing CXX to make
 #sed -i 's#CXX           = g++#CXX           = g++ -std=c++11#g' */Makefile */*/Makefile
-
 make %{?_smp_mflags} CXX="g++ -std=c++11"
 
 %install
-# Official install target do almost nothing
-#% make_install
+%make_install INSTALL_ROOT=%{buildroot}
 
-mkdir -p %{buildroot}%{_bindir}
-install -m755 -D build/%{name} %{buildroot}%{_bindir}/%{name}-bin
-install -m755 -D build/%{name}-cli %{buildroot}%{_bindir}/%{name}-cli-bin
-install -m755 -D build/%{name}-ch %{buildroot}%{_libexecdir}/%{name}-ch
-
-mkdir -p %{buildroot}%{_sysconfdir}
-cp -rp conf %{buildroot}/%{_sysconfdir}/%{name}
-cp -rp schemas %{buildroot}/%{_sysconfdir}/%{name}/
-
-mkdir -p %{buildroot}%{_datarootdir}/%{name}
-cp -rp lang %{buildroot}%{_datarootdir}/%{name}/
-
-mkdir -p %{buildroot}%{_sysconfdir}/profile.d
-#Based on pgmodeler.vars from distr:
-cat <<EOF > %{buildroot}%{_sysconfdir}/profile.d/%{name}.bash
-# Specify here the full path to the pgmodeler's root directory
-export PGMODELER_ROOT="%{_datarootdir}/%{name}"
-
-	if [ ! -e ~/.config/%{name}/%{name}.conf ]; then
-		cp -pr %{_sysconfdir}/%{name} ~/.config/
-	fi
-
-export PGMODELER_CONF_DIR="\$HOME/.config/%{name}"
-export PGMODELER_TMP_DIR="/tmp"
-export PGMODELER_SCHEMAS_DIR="%{_sysconfdir}/%{name}/schemas"
-export PGMODELER_LANG_DIR="%{_sysconfdir}/%{name}/lang"
-export PGMODELER_PLUGINS_DIR="%{_libdir}/%{name}/plugins"
-export PGMODELER_CHANDLER_PATH="%{_libexecdir}/%{name}-ch"
-export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:%{_libdir}/%{name}
-EOF
-
-# Wrappers to include enviroment-file on first run
-cat <<EOF > %{buildroot}%{_bindir}/%{name}
-#!/bin/bash
-. %{_sysconfdir}/profile.d/%{name}.bash
-%{_bindir}/%{name}-bin
-EOF
-cat <<EOF > %{buildroot}%{_bindir}/%{name}-cli
-#!/bin/bash
-. %{_sysconfdir}/profile.d/%{name}.bash
-%{_bindir}/%{name}-cli-bin
-EOF
-
-chmod 0755 %{buildroot}%{_bindir}/%{name} %{buildroot}%{_bindir}/%{name}-cli
-
-mkdir -p %{buildroot}%{_libdir}/%{name}/
-cp -dp build/*.so* %{buildroot}%{_libdir}/%{name}/
-
-mkdir -p %{buildroot}%{_includedir}/%{name}
-cp -dp lib*/src/*.h %{buildroot}%{_includedir}/%{name}/
-
-mkdir -p %{buildroot}%{_libdir}/%{name}/plugins
-cp -p plugins/*/build/*.so %{buildroot}%{_libdir}/%{name}/plugins/
-
-desktop-file-install --mode 644 \
-    --dir %{buildroot}%{_datadir}/applications/ \
-        %{SOURCE2}
-
+desktop-file-install --mode 644 --dir %{buildroot}%{_datadir}/applications/ %{SOURCE2}
 # icon and menu-entry
 install -p -dm 755 %{buildroot}%{_datadir}/pixmaps
 install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/pixmaps
@@ -125,24 +78,29 @@ install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/pixmaps
 %postun -p /sbin/ldconfig
 
 %files
-%doc CHANGELOG.md LICENSE README.md
+%doc CHANGELOG.md README.md RELEASENOTES.md
+%license LICENSE
 %{_bindir}/%{name}
-%{_bindir}/%{name}-bin
 %{_bindir}/%{name}-cli
-%{_bindir}/%{name}-cli-bin
 %{_libexecdir}/%{name}-ch
 %{_libdir}/%{name}
-%config(noreplace) %{_sysconfdir}/%{name}
-%config(noreplace) %{_sysconfdir}/profile.d/%{name}.bash
 %{_datarootdir}/%{name}
 %{_datadir}/pixmaps
 %{_datadir}/applications/%{name}.desktop
 
 %files devel
 %{_libdir}/%{name}/lib*.so
-%{_includedir}/%{name}
+#? % {_includedir}/%{name}
 
 %changelog
+* Mon Mar 02 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.0-1
+- Updaate to 0.8.0 by request Edson Ferreira (https://github.com/Hubbitus/Fedora-packaging/issues/1)
+- Changed files layout. Big job has been donee in https://github.com/pgmodeler/pgmodeler/issues/559 so use qmake project files parameters and makefile variables instead of manual installation and various hacks.
+- Spec cleanup.
+- Fix mixed tab/space rpmlint warn.
+- Move LICENSE into %%license from %%doc
+- Include RELEASENOTES.md.
+
 * Tue Apr 22 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.7.1-2
 - Adjust also LD_LIBRARY_PATH
 
