@@ -1,5 +1,7 @@
 Version: 2.7.0
 
+# review request: https://bugzilla.redhat.com/show_bug.cgi?id=954108
+
 %global GITrev e75bd46
 
 %global gapmajorver %(echo %version | sed 's|\\..*||g')
@@ -8,9 +10,9 @@ Version: 2.7.0
 %global gimplibdir %(pkg-config gimp-2.0 --variable=gimplibdir)
 %global gimpdatadir %(pkg-config gimp-2.0 --variable=gimpdatadir)
 
-Summary:		The GIMP Animation Package
-Name:		gimp-gap
-Release:		8%{?GITrev:.GIT%{GITrev}}%{?dist}
+Summary:		The GIMP Animation Package for freeworld with AVI support
+Name:		gimp-gap-freeworld
+Release:		9%{?GITrev:.GIT%{GITrev}}%{?dist}
 Group:		Applications/Multimedia
 License:		GPLv2+
 URL:			https://github.com/GNOME/gimp-gap
@@ -20,34 +22,43 @@ Source0:		gimp-gap-%{GITrev}.tar.xz
 Source1:		gimp-gap.get.tarball
 
 BuildRequires:	autoconf >= 2.54, automake >= 1.7, intltool >= 0.17
-# glib-gettextize >= 2.2.0
 BuildRequires:	pkgconfig(gimp-2.0), gimp-devel-tools >= 2.6.0
-BuildRequires:	bzip2-devel, glib2-devel >= 2.2.0, libjpeg-turbo-devel
+BuildRequires:	bzip2-devel, glib2-devel >= 2.2.0, libjpeg-turbo-devel, yasm
+BuildRequires:	SDL-devel
 
 Requires:		gimp >= 2.6.0
 
+Provides:		gimp-gap = %{version}-%{release}
+Obsoletes:	gimp-gap < %{version}-%{release}
+
 # Account new version 1.12: https://bugzilla.gnome.org/show_bug.cgi?id=699207
-Patch0:		gimp-gap-2.7-autogen.sh-automake-1.12.patch
-# Unbundle libs. Fedora-specific patch, borrowed from SUSE.
-Patch1:		gimp-gap-2.7-unbandle.patch
+Patch0:		gimp-gap-2.7-autogen.sh-automake-1.14.patch
 
 %description
 The GIMP-GAP (GIMP Animation Package) is a collection of Plug-Ins to
 extend GIMP with capabilities to edit and create animations as
 sequences of single frames.
 
-%prep
-%setup -q -n %{name}
+Gimp-gap package already in Fedora: https://apps.fedoraproject.org/packages/gimp-gap
+Unfortunately there was few issues like bundled ffmpeg and disabled libavformat
+support because of patents.
 
-%patch0 -p1 -b .automake-1.12
-%patch1 -p1 -b .unbundle
+For countries where law not permit software patents this package suggested as
+more reach by functionality.
+
+Please note, there no pirate or stolen parts!
+
+%prep
+%setup -q -n gimp-gap
+
+%patch0 -p0 -b .automake-1.14
 
 # Bundled libs (list from SUSE)
-rm -rf extern_libs vid_enc_avi vid_enc_ffmpeg gap/gap_mpege.c gap/gap_mpege.h \
-    libgapvidapi/gap_vid_api_ffmpeg.c libgapvidapi/gap_vid_api_mpeg3.c \
-    libgapvidapi/gap_vid_api_mpeg3toc.c
+#?rm -rf extern_libs vid_enc_avi vid_enc_ffmpeg gap/gap_mpege.c gap/gap_mpege.h \
+#?    libgapvidapi/gap_vid_api_ffmpeg.c libgapvidapi/gap_vid_api_mpeg3.c \
+#?    libgapvidapi/gap_vid_api_mpeg3toc.c
 
-# 1 symbol only not in UTF-8. iso8859-1 encoding my guess
+# 1 symbol only not in UTF-8. iso8859-1 encoding is my guess
 iconv -f iso8859-1 -t utf8 ChangeLog > ChangeLog.tmp
 touch -r ChangeLog ChangeLog.tmp
 mv -f ChangeLog.tmp ChangeLog
@@ -57,13 +68,16 @@ find \( -iname '*.c' -or -iname '*.h' \) -exec chmod -x {} \;
 find -type d -exec chmod 0755 {} \;
 
 %build
+
 # Disable call ./configure from autogen.sh because we want it with default configured parameters
 sed -i 's@$srcdir/configure@#$srcdir/configure@' autogen.sh
 ./autogen.sh
-%configure --disable-libavformat
+%configure
 
+#Hu HACK
+sed -is 's/#define restrict restrict/#define restrict __restrict__/' extern_libs/ffmpeg/config.h
 # Parralel build terminated with error
-make LIBS="$LIBS -lm"
+make LIBS="$LIBS -lm" CFLAGS="${CFLAGS//-Werror=format-security} -I%{_includedir}/SDL/ "
 
 %install
 %make_install
@@ -75,8 +89,17 @@ make LIBS="$LIBS -lm"
 %{gimplibdir}/plug-ins/*
 %{_libdir}/gimp-gap-%gapmajorver.%gapminorver
 %{gimpdatadir}/scripts/*
+%{gimpdatadir}/video_encoder_presets
 
 %changelog
+* Thu Mar 05 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-9.GITe75bd46
+- Introduce gimp-gap-freeworld (by Alex request https://github.com/Hubbitus/Fedora-packaging/issues/2), version with few changes:
+	o UNOFFICIAL build without --disable-libavformat option, add BR yasm, SDL-devel.
+	o Disable -Werror=format-security gcc option, hack restrict keyword for bundled ffmpeg compilation.
+	o Add %%{gimpdatadir}/video_encoder_presets
+- Adjust patch gimp-gap-2.7-autogen.sh-automake-1.12.patch to automake-1.14 version.
+- Add gimp-gap Provides/Obsoletes
+
 * Mon Nov 4 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 2.7.0-8.GITe75bd46
 - Review in progress (bz#954108), for comments thanks to Mario Blättermann.
 - Filled bug about incorrect FSF address - https://bugzilla.gnome.org/show_bug.cgi?id=711402

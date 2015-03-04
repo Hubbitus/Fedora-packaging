@@ -1,0 +1,46 @@
+--- autogen.sh.automake-1.14	2013-04-16 13:30:03.000000000 +0400
++++ autogen.sh	2015-03-05 00:19:17.719402217 +0300
+@@ -86,32 +86,10 @@
+     DIE=1
+ fi
+ 
++AUTOMAKE=automake
++ACLOCAL=aclocal
+ 
+ echo -n "checking for automake >= $AUTOMAKE_REQUIRED_VERSION ... "
+-if (automake-1.11 --version) < /dev/null > /dev/null 2>&1; then
+-   AUTOMAKE=automake-1.11
+-   ACLOCAL=aclocal-1.11
+-elif (automake-1.10 --version) < /dev/null > /dev/null 2>&1; then
+-   AUTOMAKE=automake-1.10
+-   ACLOCAL=aclocal-1.10
+-elif (automake-1.9 --version) < /dev/null > /dev/null 2>&1; then
+-   AUTOMAKE=automake-1.9
+-   ACLOCAL=aclocal-1.9
+-elif (automake-1.8 --version) < /dev/null > /dev/null 2>&1; then
+-   AUTOMAKE=automake-1.8
+-   ACLOCAL=aclocal-1.8
+-elif (automake-1.7 --version) < /dev/null > /dev/null 2>&1; then
+-   AUTOMAKE=automake-1.7
+-   ACLOCAL=aclocal-1.7
+-else
+-    echo
+-    echo "  You must have automake 1.7 or newer installed to compile $PROJECT."
+-    echo "  Download the appropriate package for your distribution,"
+-    echo "  or get the source tarball at ftp://ftp.gnu.org/pub/gnu/automake/"
+-    echo
+-    DIE=1
+-fi
+-
+ if test x$AUTOMAKE != x; then
+     VER=`$AUTOMAKE --version \
+          | grep automake | sed "s/.* \([0-9.]*\)[-a-z0-9]*$/\1/"`
+@@ -216,7 +194,7 @@
+ 
+ cd $ORIGDIR
+ 
+-$srcdir/configure --enable-maintainer-mode $AUTOGEN_CONFIGURE_ARGS "$@"
++##$srcdir/configure --enable-maintainer-mode $AUTOGEN_CONFIGURE_ARGS "$@"
+ RC=$?
+ if test $RC -ne 0; then
+   echo
