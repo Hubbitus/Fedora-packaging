@@ -1,12 +1,12 @@
 Name:		Hubbitus-release
 Version:		22
-Release:		2
+Release:		3
 Summary:		Hubbitus Repository Configuration
 Summary(ru):	Конфигурация репозитория Hubbitus
 
 Group:		System Environment/Base
 License:		GPLv2+
-URL:			http://hubbitus.info/rpm
+URL:			http://hubbitus.info/wiki/Repository
 Source0:		Hubbitus.repo
 
 Requires:		fedora-release >= 22
@@ -50,6 +50,10 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/yum.repos.d/*
 
 %changelog
+* Fri Mar 06 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 22-3
+- OVH block hosting account. Add http://rpm-mirror.hubbitus.info mirror for repo on digitalocean.com
+- Change URL to http://hubbitus.info/wiki/Repository
+
 * Fri Oct 24 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 22-2
 - Fix repo file.
 
