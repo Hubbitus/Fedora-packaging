@@ -1,6 +1,6 @@
 Name:		Hubbitus-config
 Version:		1
-Release:		18%{?dist}
+Release:		21%{?dist}
 Summary:		Hubbitus system configuration
 Summary(ru):	Настройки системы Hubbitus
 
@@ -23,7 +23,7 @@ BuildArch:	noarch
 Requires:		Hubbitus-release
 Requires:		screen, mc, bash-completion, colorize, subversion, git, colorize
 Requires:		wireshark, iotop, moreutils, grin, ferm, sshfs, htop, darkstat
-Requires:		strace, sysstat, dstat, psmisc, nethogs
+Requires:		strace, sysstat, dstat, psmisc, nethogs, telnet, elmon
 # Disable as it is not awailable for epel7:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1141182
 #Requires:	bmon
@@ -99,8 +99,12 @@ rm -rf %{buildroot}
 
 %post
 function git_up(){
-	svn info "$2" &>/dev/null && rm -rf "$2" # migration from SVN
-	git -C "$2" pull --strategy=recursive || git clone "$1" "$2"
+	[ -e "$2/.svn" ] && rm -rf "$2" # migration from SVN
+	# git -C "$2" pull --strategy=recursive || git clone "$1" "$2"
+	# Unfortunately git 1.8 (on epel7) does not known -C option, workaround
+	mkdir -p "$2" ; pushd "$2"
+	git pull --strategy=recursive 2>/dev/null || git clone "$1" .
+	popd
 }
 
 # Checkout ~/bin
@@ -128,6 +132,15 @@ git_up 'https://github.com/Hubbitus/shell.scripts.git' '/root/bin'
 %files gui
 
 %changelog
+* Fri Mar 06 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-21
+- Change check of svn to just dir .svn presence, to do not play with its versions and upgrades
+
+* Fri Mar 06 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-20
+- Update git-up function with workaround to handle old 1.8 git on epel, which has not known -C option.
+
+* Fri Mar 06 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-19
+- Add R telnet, elmon
+
 * Tue Dec 16 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 1-18
 - Add R nethogs.
 
