@@ -2,7 +2,7 @@
 
 Name:             pgmodeler
 Version:          0.8.0
-Release:          1%{?GITrev:.git.%{GITrev}}%{?dist}
+Release:          2%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -12,13 +12,15 @@ Group:            Applications/Databases
 Source1:          %{name}.get.tarball
 Source0:          https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
 Source2:          %{name}.desktop
+Source3:          pgmodeler-mime-dbm.xml
 
+
+Requires:         hicolor-icon-theme
 BuildRequires:    qt5-qtbase-devel, libxml2-devel, postgresql-devel
 BuildRequires:    desktop-file-utils, gettext
+# for convert 300x300 logo file to 256x256
+BuildRequires:    ImageMagick, moreutils
 #Requires:
-
-Requires(postun): /sbin/ldconfig
-Requires(post):   /sbin/ldconfig
 
 # https://github.com/pgmodeler/pgmodeler/issues/618
 Patch0:           pgmodeler-0.8.0-fixConfDumpInPri.patch
@@ -69,13 +71,30 @@ make %{?_smp_mflags} CXX="g++ -std=c++11"
 %make_install INSTALL_ROOT=%{buildroot}
 
 desktop-file-install --mode 644 --dir %{buildroot}%{_datadir}/applications/ %{SOURCE2}
-# icon and menu-entry
-install -p -dm 755 %{buildroot}%{_datadir}/pixmaps
-install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/pixmaps
+# icon, mime and menu-entry
+convert -resize 256x256 pgmodeler_logo.png - | sponge pgmodeler_logo.png
+install -p -dm 755 %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/ %{buildroot}%{_datadir}/mime/packages/
+install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/
+install -p -m 644 %{SOURCE3} %{buildroot}%{_datadir}/mime/packages/%{name}.xml
 
-%post -p /sbin/ldconfig
+# http://fedoraproject.org/wiki/Packaging:ScriptletSnippets#desktop-database
+%post
+touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
+touch --no-create %{_datadir}/mime/packages &>/dev/null || :
+update-desktop-database &> /dev/null || :
 
-%postun -p /sbin/ldconfig
+%postun
+if [ $1 -eq 0 ] ; then
+  gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+  update-mime-database %{_datadir}/mime &> /dev/null || :
+  touch --no-create %{_datadir}/icons/hicolor &>/dev/null
+fi
+update-desktop-database &> /dev/null || :
+
+%posttrans
+gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
+
 
 %files
 %doc CHANGELOG.md README.md RELEASENOTES.md
@@ -85,7 +104,8 @@ install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/pixmaps
 %{_libexecdir}/%{name}-ch
 %{_libdir}/%{name}
 %{_datarootdir}/%{name}
-%{_datadir}/pixmaps
+%{_datadir}/icons/hicolor
+%{_datadir}/mime/packages/%{name}.xml
 %{_datadir}/applications/%{name}.desktop
 
 %files devel
@@ -93,6 +113,11 @@ install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/pixmaps
 #? % {_includedir}/%{name}
 
 %changelog
+* Sun Mar 08 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.0-2
+- Install new mime application/dbm ( https://github.com/Hubbitus/Fedora-packaging/issues/1, upstream: https://github.com/pgmodeler/pgmodeler/issues/633 )
+- Move icon from %%{_datadir}/pixmaps to %%{_datadir}/icons/hicolor (Add Requires: hicolor-icon-theme)
+- Delete ldconfig call - only private libs installed.
+
 * Mon Mar 02 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.0-1
 - Updaate to 0.8.0 by request Edson Ferreira (https://github.com/Hubbitus/Fedora-packaging/issues/1)
 - Changed files layout. Big job has been donee in https://github.com/pgmodeler/pgmodeler/issues/559 so use qmake project files parameters and makefile variables instead of manual installation and various hacks.

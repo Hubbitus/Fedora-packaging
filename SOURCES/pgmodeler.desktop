@@ -7,3 +7,4 @@ Icon=pgmodeler_logo
 Terminal=false
 Type=Application
 Categories=KDE;Qt;Database;Development;
+MimeType=application/dbm;
