@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=pgmodeler
+GenericName=Firmware, extractor, searcher and installer for Blackberry 10
+Comment=Sachesi allows you to extract, search for and (un)install Blackberry firmware. It also allows you to backup, restore, wipe, reboot and nuke.
+Exec=sachesi
+Icon=sachesi
+Terminal=false
+Type=Application
+Categories=KDE;Qt;Database;Development;
