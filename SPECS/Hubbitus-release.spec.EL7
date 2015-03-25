@@ -1,6 +1,6 @@
 Name:		Hubbitus-release
 Version:		7
-Release:		2
+Release:		3
 Summary:		Hubbitus Repository Configuration
 Summary(ru):	Конфигурация репозитория Hubbitus
 
@@ -9,7 +9,7 @@ License:		GPLv2+
 URL:			http://hubbitus.info/wiki/Repository
 Source0:		Hubbitus.repo
 
-Requires:		centos-release >= 7
+Requires:		epel-release >= 7
 
 BuildArch:	noarch
 
@@ -50,6 +50,9 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/yum.repos.d/*
 
 %changelog
+* Wed Mar 25 2015 Pavel Alexeev <Pahan@Hubbitus.info>- 7-3
+- Require epel-release instead of centos-release to work also on RHEL.
+
 * Fri Mar 06 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 7-2
 - OVH block hosting account. Add http://rpm-mirror.hubbitus.info mirror for repo on digitalocean.com
 - Change URL to http://hubbitus.info/wiki/Repository
