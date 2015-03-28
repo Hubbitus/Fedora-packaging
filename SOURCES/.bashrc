@@ -170,3 +170,5 @@ export CLASSPATH=$CLASSPATH:.
 # Do not auto update screen titles!
 #export PROMPT_COMMAND='if [ ! "screen" = "${TERM:0:6}" ]; then printf "\033k%s@%s:%s\033\\" "${USER}" "${HOSTNAME%%.*}" "${PWD/#$HOME/~}"; else echo ""; fi'
 export PROMPT_COMMAND=''
+
+export ELMON=cmMvtanld
