@@ -1,6 +1,6 @@
 Name:		Hubbitus-config
 Version:		1
-Release:		22%{?dist}
+Release:		25%{?dist}
 Summary:		Hubbitus system configuration
 Summary(ru):	Настройки системы Hubbitus
 
@@ -18,17 +18,18 @@ Source7:		.rsync_shared_options
 
 Source50:		root.screenrc
 Source51:		root.toprc
+Source52:		root.bashrc
 
 BuildArch:	noarch
 Requires:		Hubbitus-release
-Requires:		screen, mc, bash-completion, colorize, subversion, git, colorize
-Requires:		wireshark, iotop, moreutils, grin, ferm, sshfs, htop, darkstat
-Requires:		strace, sysstat, dstat, psmisc, nethogs, telnet, elmon
-# Disable as it is not awailable for epel7:
-# https://bugzilla.redhat.com/show_bug.cgi?id=1141182
-#Requires:	bmon
-# https://bugzilla.redhat.com/show_bug.cgi?id=1141199
-#Requires:	atop
+Requires:		screen, mc, bash-completion, colorize, git, colorize, php, ferm
+Requires:		wireshark, iotop, moreutils, grin, sshfs, htop, darkstat, glances
+Requires:		strace, sysstat, dstat, psmisc, nethogs, telnet, elmon, trafshow
+Requires:		the_silver_searcher
+# Request for epel7 was: https://bugzilla.redhat.com/show_bug.cgi?id=1141182
+Requires:		bmon
+# Request for epel7 was: https://bugzilla.redhat.com/show_bug.cgi?id=1141199
+Requires:		atop
 Requires(pre):	/usr/sbin/useradd
 Requires(post):subversion
 
@@ -47,14 +48,14 @@ to host by ssh without password (authorized_keys)! Use it on you own risk only.
 ПАКЕТ НЕ ПРЕДНАЗНАЧЕН ДЛЯ ВНЕШНЕГО ИСПОЛЬЗОВАНИЯ, но может стать хорошим стартом
 для создания подобного для своих нужд. Пожалуйста учтите что ИНСТАЛЛИРУЮТСЯ МОИ
 ОТКРЫТЕ КЛЮЧИ ДЛЯ БЕСПАРОЛЬНОГО ДОСТУПА К СЕРВЕРУ (authorized_keys).
-Исползуйте только на свой страх риск.
+Используйте только на свой страх риск.
 
 %package gui
 Group:		System Environment/Base
 Summary:		Hubbitus system configuration
 Requires:		%{name} = %{version}-%{release}
 Requires:		firefox, thunderbird, gajim, meld, java-1.7.0-openjdk
-Requires:		wireshark-gnome, mplayer, glances
+Requires:		wireshark-gnome, mplayer
 
 %description gui
 My initially settings of new system with GUI.
@@ -91,6 +92,7 @@ install -pm 644 %{SOURCE7} %{buildroot}/home/pasha/
 install -pm 600 %{SOURCE4} %{buildroot}/root/.ssh/
 install -pm 644 %{SOURCE50} %{buildroot}/root/.screenrc
 install -pm 644 %{SOURCE51} %{buildroot}/root/.toprc
+install -pm 644 %{SOURCE52} %{buildroot}/root/.bashrc.hubbitus
 
 
 %clean
@@ -115,8 +117,10 @@ git_up 'https://github.com/Hubbitus/HuPHP.git' '/home/_SHARED_'
 git_up 'https://github.com/Hubbitus/shell.scripts.git' '/home/pasha/bin'
 git_up 'https://github.com/Hubbitus/shell.scripts.git' '/root/bin'
 
+# Add once addon root .bashrc
+grep -q hubbitus /root/.bashrc || echo '[ -f /root/.bashrc.hubbitus ] && . /root/.bashrc.hubbitus' >> /root/.bashrc
+
 %files
-%defattr(-,root,root,-)
 %attr(-,pasha,pasha) %config(noreplace) /home/pasha/.screenrc
 %attr(-,pasha,pasha) %config(noreplace) /home/pasha/.screenrc-remote
 %attr(-,pasha,pasha) %config(noreplace) /home/pasha/.toprc
@@ -127,7 +131,9 @@ git_up 'https://github.com/Hubbitus/shell.scripts.git' '/root/bin'
 %attr(-,pasha,pasha) %config(noreplace) /home/pasha/bin
 %config(noreplace) /root/.screenrc
 %config(noreplace) /root/.toprc
+%config(noreplace) /root/.bashrc.hubbitus
 %config(noreplace) /root/bin
+%dir %attr(0700,pasha,pasha) %config(noreplace) /home/pasha/.ssh
 %attr(0600,pasha,pasha) %config(noreplace) /home/pasha/.ssh/authorized_keys
 %attr(0600,root,root) %config(noreplace) /root/.ssh/authorized_keys
 /home/_SHARED_
@@ -135,8 +141,21 @@ git_up 'https://github.com/Hubbitus/shell.scripts.git' '/root/bin'
 %files gui
 
 %changelog
+* Sat Mar 28 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1.25
+- Cleanup root.bashrc file.
+
+* Sat Mar 28 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1.24
+- /root/.bashrc present in rootfiles package, so, deploy addon instead of conflict
+
+* Sat Mar 28 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-23
+- Include root.bashrc.
+- Add R trafshow, the_silver_searcher(ag) and php.
+- Remove R subversion (but leave in Requires(post))
+- Move glances R from -gui sub-package to main.
+- Update authorized_keys to mention more my servers (ansible will come to replacee it).
+
 * Thu Mar 26 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-22
-- In .bashrc conditionaly inlude /opt/grails/grails_autocomplete only if it exists.
+- In .bashrc conditionaly include /opt/grails/grails_autocomplete only if it exists.
 
 * Fri Mar 06 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-21
 - Change check of svn to just dir .svn presence, to do not play with its versions and upgrades
