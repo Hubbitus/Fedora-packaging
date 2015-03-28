@@ -150,7 +150,7 @@ export IMUS_HOME='/home/pasha/imus'
 #export JAVA_HOME=/usr/lib/jvm/jre-1.7.0-openjdk.x86_64/
 export JAVA_HOME=/usr/java/latest/
 export GRAILS_HOME=/opt/grails/
-. /opt/grails/grails_autocomplete
+[ -f /opt/grails/grails_autocomplete ] && . /opt/grails/grails_autocomplete
 
 
 # http://openite.com/ru/Development/2013/01/08/ispravlenie-otobrazheniya-shriftov-v-produktah-jetbrains.html

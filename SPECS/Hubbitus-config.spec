@@ -1,6 +1,6 @@
 Name:		Hubbitus-config
 Version:		1
-Release:		21%{?dist}
+Release:		22%{?dist}
 Summary:		Hubbitus system configuration
 Summary(ru):	Настройки системы Hubbitus
 
@@ -37,14 +37,17 @@ My initially settings of new system.
 Mostly it contain Requires of useful packages and some settings.
 Also creates pasha user without password but with access by keys.
 THIS PACKAGE DOES NOT INTENDED FOR FOREIGN USE, but may be good idea to start
-customize it for you own needs.
+customize it for you own needs. Please note INSTALLS MY PUBLIC KEYS FOR access
+to host by ssh without password (authorized_keys)! Use it on you own risk only.
 
 %description -l ru
 Мои основные настройки новой системы.
 Прежде всего пакет содержит зависимости к другим пакетам, которые я считаю
 необходимыми, но также ещё некоторые настройки и скрипты.
 ПАКЕТ НЕ ПРЕДНАЗНАЧЕН ДЛЯ ВНЕШНЕГО ИСПОЛЬЗОВАНИЯ, но может стать хорошим стартом
-для создания подобного для своих нужд.
+для создания подобного для своих нужд. Пожалуйста учтите что ИНСТАЛЛИРУЮТСЯ МОИ
+ОТКРЫТЕ КЛЮЧИ ДЛЯ БЕСПАРОЛЬНОГО ДОСТУПА К СЕРВЕРУ (authorized_keys).
+Исползуйте только на свой страх риск.
 
 %package gui
 Group:		System Environment/Base
@@ -132,6 +135,9 @@ git_up 'https://github.com/Hubbitus/shell.scripts.git' '/root/bin'
 %files gui
 
 %changelog
+* Thu Mar 26 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-22
+- In .bashrc conditionaly inlude /opt/grails/grails_autocomplete only if it exists.
+
 * Fri Mar 06 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-21
 - Change check of svn to just dir .svn presence, to do not play with its versions and upgrades
 
