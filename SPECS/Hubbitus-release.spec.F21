@@ -1,13 +1,13 @@
 Name:		Hubbitus-release
 Version:		21
-Release:		2
+Release:		3
 Summary:		Hubbitus Repository Configuration
 Summary(ru):	Конфигурация репозитория Hubbitus
 
 Group:		System Environment/Base
 License:		GPLv2+
 URL:			http://hubbitus.info/wiki/Repository
-Source0:		Hubbitus.repo
+Source0:		Hubbitus.repo.Fedora
 
 Requires:		fedora-release >= 21
 
@@ -41,15 +41,19 @@ rm -rf %{buildroot}
 
 # yum
 install -dm 755 %{buildroot}%{_sysconfdir}/yum.repos.d
-install -pm 644 %{SOURCE0} %{buildroot}%{_sysconfdir}/yum.repos.d/
+install -pm 644 %{SOURCE0} %{buildroot}%{_sysconfdir}/yum.repos.d/Hubbitus.repo
 
 %clean
 rm -rf %{buildroot}
 
 %files
-%config(noreplace) %{_sysconfdir}/yum.repos.d/*
+%config(noreplace) %{_sysconfdir}/yum.repos.d/Hubbitus.repo
 
 %changelog
+* Sun Mar 29 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 21-3
+- Fix build with correct repofile (instead of EL variant).
+- Remove symlink in sources, provide explicit repo names.
+
 * Fri Mar 06 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 21-2
 - OVH block hosting account. Add http://rpm-mirror.hubbitus.info mirror for repo on digitalocean.com
 - Change URL to http://hubbitus.info/wiki/Repository
