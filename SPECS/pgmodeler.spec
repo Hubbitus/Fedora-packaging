@@ -1,8 +1,8 @@
 #% global GITrev ec8d48f
 
 Name:             pgmodeler
-Version:          0.8.0
-Release:          2%{?GITrev:.git.%{GITrev}}%{?dist}
+Version:          0.8.1
+Release:          0.alpha.1%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -10,20 +10,18 @@ URL:              http://www.pgmodeler.com.br/
 Group:            Applications/Databases
 # Script to generate main source0 for git based builds
 Source1:          %{name}.get.tarball
-Source0:          https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
+Source0:          https://github.com/%{name}/%{name}/archive/v%{version}-alpha.tar.gz
 Source2:          %{name}.desktop
 Source3:          pgmodeler-mime-dbm.xml
-
 
 Requires:         hicolor-icon-theme
 BuildRequires:    qt5-qtbase-devel, libxml2-devel, postgresql-devel
 BuildRequires:    desktop-file-utils, gettext
 # for convert 300x300 logo file to 256x256
 BuildRequires:    ImageMagick, moreutils
-#Requires:
 
-# https://github.com/pgmodeler/pgmodeler/issues/618
-Patch0:           pgmodeler-0.8.0-fixConfDumpInPri.patch
+# https://fedoraproject.org/wiki/Packaging:AppData
+BuildRequires:    libappstream-glib
 
 %description
 PostgreSQL Database Modeler, or simply, pgModeler is an
@@ -43,25 +41,23 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q
-
-%patch0 -p1 -b .priConfDump
+%setup -q -n %{name}-%{version}-alpha
 
 %build
 # @TODO Due to the bug (https://github.com/pgmodeler/pgmodeler/issues/559) CONFDIR, LANGDIR, SAMPLESDIR, SCHEMASDIR seems ignored?
-#	SHAREDIR=%%{_sharedstatedir}/%%{name} \
-#	CONFDIR=%%{_sysconfdir}/%%{name} \
-#	LANGDIR=%%{_datadir}/locale \
-#	SCHEMASDIR=%%{_sysconfdir}/%%{name} \
+# SHAREDIR=%%{_sharedstatedir}/%%{name} \
+# CONFDIR=%%{_sysconfdir}/%%{name} \
+# LANGDIR=%%{_datadir}/locale \
+# SCHEMASDIR=%%{_sysconfdir}/%%{name} \
 %_qt5_qmake -recursive \
-	PREFIX=%{_prefix} \
-	BINDIR=%{_bindir} \
-	PRIVATEBINDIR=%{_libexecdir} \
-	PLUGINSDIR=%{_libdir}/%{name}/plugins \
-	SHAREDIR=%{_datarootdir}/%{name} \
-	DOCDIR=%{_docdir}/%{name} \
-	PRIVATELIBDIR=%{_libdir}/%{name} \
-		%{name}.pro
+ PREFIX=%{_prefix} \
+ BINDIR=%{_bindir} \
+ PRIVATEBINDIR=%{_libexecdir} \
+ PLUGINSDIR=%{_libdir}/%{name}/plugins \
+ SHAREDIR=%{_datarootdir}/%{name} \
+ DOCDIR=%{_docdir}/%{name} \
+ PRIVATELIBDIR=%{_libdir}/%{name} \
+  %{name}.pro
 
 # May be used instead of providing CXX to make
 #sed -i 's#CXX           = g++#CXX           = g++ -std=c++11#g' */Makefile */*/Makefile
@@ -76,6 +72,9 @@ convert -resize 256x256 pgmodeler_logo.png - | sponge pgmodeler_logo.png
 install -p -dm 755 %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/ %{buildroot}%{_datadir}/mime/packages/
 install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/
 install -p -m 644 %{SOURCE3} %{buildroot}%{_datadir}/mime/packages/%{name}.xml
+
+install -Dp -m 644 %{name}.appdata.xml %{buildroot}/%{_datadir}/appdata/%{name}.appdata.xml
+appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/appdata/%{name}.appdata.xml
 
 # http://fedoraproject.org/wiki/Packaging:ScriptletSnippets#desktop-database
 %post
@@ -107,12 +106,16 @@ update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 %{_datadir}/icons/hicolor
 %{_datadir}/mime/packages/%{name}.xml
 %{_datadir}/applications/%{name}.desktop
+%{_datadir}/appdata/%{name}.appdata.xml
 
 %files devel
 %{_libdir}/%{name}/lib*.so
-#? % {_includedir}/%{name}
 
 %changelog
+* Sun Apr 05 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.1-0.alpha.1
+- 0.8.1-alpha. My app-data included (https://github.com/pgmodeler/pgmodeler/issues/622). Add App-Data handling.
+- Remove Patch0: pgmodeler-0.8.0-fixConfDumpInPri.patch (https://github.com/pgmodeler/pgmodeler/issues/618) which already in source.
+
 * Sun Mar 08 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.0-2
 - Install new mime application/dbm ( https://github.com/Hubbitus/Fedora-packaging/issues/1, upstream: https://github.com/pgmodeler/pgmodeler/issues/633 )
 - Move icon from %%{_datadir}/pixmaps to %%{_datadir}/icons/hicolor (Add Requires: hicolor-icon-theme)
