@@ -1,0 +1,30 @@
+#!/bin/bash
+
+PKG=bbcp
+GITURL=http://www.slac.stanford.edu/~abh/bbcp/bbcp.git
+
+set -x
+
+: ${1?"Not enough arguments: `basename $0` <SHA1-of-interest-commit>"}
+
+rm -rf "$PKG.${1:0:7}"
+
+mkdir "$PKG.${1:0:7}"
+
+# http://stackoverflow.com/questions/1911109/git-clone-a-specific-branch
+git clone $GITURL "$PKG.${1:0:7}"
+
+pushd "$PKG.${1:0:7}"
+
+git checkout $1
+
+git submodule update --init --recursive
+
+rm -rf .git
+
+popd
+
+tar -cJf "$PKG.git.${1:0:7}.tar.xz" "$PKG.${1:0:7}"
+
+# Cleanup
+rm -rf "$PKG.${1:0:7}"
