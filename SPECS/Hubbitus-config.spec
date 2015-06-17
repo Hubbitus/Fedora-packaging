@@ -1,6 +1,6 @@
 Name:		Hubbitus-config
 Version:		1
-Release:		26%{?dist}
+Release:		28%{?dist}
 Summary:		Hubbitus system configuration
 Summary(ru):	Настройки системы Hubbitus
 
@@ -25,11 +25,13 @@ Requires:		Hubbitus-release
 Requires:		screen, mc, bash-completion, colorize, git, colorize, php, ferm
 Requires:		wireshark, iotop, moreutils, grin, sshfs, htop, darkstat, glances
 Requires:		strace, sysstat, dstat, psmisc, nethogs, telnet, elmon, trafshow
-Requires:		the_silver_searcher, bind-utils
+Requires:		the_silver_searcher, bind-utils, ncdu
 # Request for epel7 was: https://bugzilla.redhat.com/show_bug.cgi?id=1141182
 Requires:		bmon
 # Request for epel7 was: https://bugzilla.redhat.com/show_bug.cgi?id=1141199
 Requires:		atop
+# Request for epel7 https://bugzilla.redhat.com/show_bug.cgi?id=1228747
+Requires:		afuse
 Requires(pre):	/usr/sbin/useradd
 Requires(post):subversion
 
@@ -115,6 +117,7 @@ function git_up(){
 # Checkout ~/bin
 git_up 'https://github.com/Hubbitus/HuPHP.git' '/home/_SHARED_'
 git_up 'https://github.com/Hubbitus/shell.scripts.git' '/home/pasha/bin'
+chown pasha -R /home/pasha/bin
 git_up 'https://github.com/Hubbitus/shell.scripts.git' '/root/bin'
 
 # Add once addon root .bashrc
@@ -141,6 +144,12 @@ grep -q hubbitus /root/.bashrc || echo '[ -f /root/.bashrc.hubbitus ] && . /root
 %files gui
 
 %changelog
+* Wed Jun 17 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1.28
+- Add "chown pasha -R /home/pasha/bin"
+
+* Fri Jun 05 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1.27
+- Add R ncdu, afuse
+
 * Sun Mar 29 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1.26
 - Add R bind-utils (host command)
 
