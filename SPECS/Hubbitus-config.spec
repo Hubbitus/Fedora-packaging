@@ -1,12 +1,12 @@
 Name:		Hubbitus-config
 Version:		1
-Release:		28%{?dist}
+Release:		31%{?dist}
 Summary:		Hubbitus system configuration
 Summary(ru):	Настройки системы Hubbitus
 
 Group:		System Environment/Base
 License:		GPLv2+
-URL:			http://hubbitus.info/rpm
+URL:			http://rpm.hubbitus.info/
 Source0:		.screenrc
 Source1:		.screenrc-remote
 Source2:		.toprc
@@ -15,6 +15,7 @@ Source4:		authorized_keys
 Source5:		.bash_profile
 Source6:		.bashrc
 Source7:		.rsync_shared_options
+Source8:		.gitconfig
 
 Source50:		root.screenrc
 Source51:		root.toprc
@@ -25,7 +26,8 @@ Requires:		Hubbitus-release
 Requires:		screen, mc, bash-completion, colorize, git, colorize, php, ferm
 Requires:		wireshark, iotop, moreutils, grin, sshfs, htop, darkstat, glances
 Requires:		strace, sysstat, dstat, psmisc, nethogs, telnet, elmon, trafshow
-Requires:		the_silver_searcher, bind-utils, ncdu
+Requires:		the_silver_searcher, bind-utils, ncdu, vcsh, kde-dev-scripts
+Requires:		java-1.8.0-openjdk-headless
 # Request for epel7 was: https://bugzilla.redhat.com/show_bug.cgi?id=1141182
 Requires:		bmon
 # Request for epel7 was: https://bugzilla.redhat.com/show_bug.cgi?id=1141199
@@ -56,7 +58,7 @@ to host by ssh without password (authorized_keys)! Use it on you own risk only.
 Group:		System Environment/Base
 Summary:		Hubbitus system configuration
 Requires:		%{name} = %{version}-%{release}
-Requires:		firefox, thunderbird, gajim, meld, java-1.7.0-openjdk
+Requires:		firefox, thunderbird, gajim, meld, yakuake, kdeneur, terminator
 Requires:		wireshark-gnome, mplayer
 
 %description gui
@@ -90,7 +92,9 @@ install -pm 600 %{SOURCE4} %{buildroot}/home/pasha/.ssh/
 install -pm 644 %{SOURCE5} %{buildroot}/home/pasha/
 install -pm 644 %{SOURCE6} %{buildroot}/home/pasha/
 install -pm 644 %{SOURCE7} %{buildroot}/home/pasha/
+install -pm 644 %{SOURCE8} %{buildroot}/home/pasha/
 
+install -pm 644 %{SOURCE8} %{buildroot}/root/
 install -pm 600 %{SOURCE4} %{buildroot}/root/.ssh/
 install -pm 644 %{SOURCE50} %{buildroot}/root/.screenrc
 install -pm 644 %{SOURCE51} %{buildroot}/root/.toprc
@@ -131,7 +135,9 @@ grep -q hubbitus /root/.bashrc || echo '[ -f /root/.bashrc.hubbitus ] && . /root
 %attr(-,pasha,pasha) %config(noreplace) /home/pasha/.bash_profile
 %attr(-,pasha,pasha) %config(noreplace) /home/pasha/.bashrc
 %attr(-,pasha,pasha) %config(noreplace) /home/pasha/.rsync_shared_options
+%attr(-,pasha,pasha) %config(noreplace) /home/pasha/.gitconfig
 %attr(-,pasha,pasha) %config(noreplace) /home/pasha/bin
+%config(noreplace) /root/.gitconfig
 %config(noreplace) /root/.screenrc
 %config(noreplace) /root/.toprc
 %config(noreplace) /root/.bashrc.hubbitus
@@ -144,19 +150,30 @@ grep -q hubbitus /root/.bashrc || echo '[ -f /root/.bashrc.hubbitus ] && . /root
 %files gui
 
 %changelog
-* Wed Jun 17 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1.28
+* Mon Jun 29 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-31
+- Add R kdeneur, yakuake, terminator to gui sub package
+
+* Mon Jun 29 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-30
+- Add /pasha/.gitconfig and /root/.gitconfig
+
+* Mon Jun 29 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-29
+- Add R vcsh, kde-dev-scripts (colorsvn)
+- Add R java-1.8.0-openjdk-headless, java-1.8.0-openjdk-devel
+- Remove R java-1.7.0-openjdk from gui sub package
+
+* Wed Jun 17 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-28
 - Add "chown pasha -R /home/pasha/bin"
 
-* Fri Jun 05 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1.27
+* Fri Jun 05 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-27
 - Add R ncdu, afuse
 
-* Sun Mar 29 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1.26
+* Sun Mar 29 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-26
 - Add R bind-utils (host command)
 
-* Sat Mar 28 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1.25
+* Sat Mar 28 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-25
 - Cleanup root.bashrc file.
 
-* Sat Mar 28 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1.24
+* Sat Mar 28 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-24
 - /root/.bashrc present in rootfiles package, so, deploy addon instead of conflict
 
 * Sat Mar 28 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-23
