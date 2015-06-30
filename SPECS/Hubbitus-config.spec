@@ -1,6 +1,6 @@
 Name:		Hubbitus-config
 Version:		1
-Release:		31%{?dist}
+Release:		32%{?dist}
 Summary:		Hubbitus system configuration
 Summary(ru):	Настройки системы Hubbitus
 
@@ -27,7 +27,7 @@ Requires:		screen, mc, bash-completion, colorize, git, colorize, php, ferm
 Requires:		wireshark, iotop, moreutils, grin, sshfs, htop, darkstat, glances
 Requires:		strace, sysstat, dstat, psmisc, nethogs, telnet, elmon, trafshow
 Requires:		the_silver_searcher, bind-utils, ncdu, vcsh, kde-dev-scripts
-Requires:		java-1.8.0-openjdk-headless
+Requires:		java-1.8.0-openjdk-headless, multitail
 # Request for epel7 was: https://bugzilla.redhat.com/show_bug.cgi?id=1141182
 Requires:		bmon
 # Request for epel7 was: https://bugzilla.redhat.com/show_bug.cgi?id=1141199
@@ -150,6 +150,9 @@ grep -q hubbitus /root/.bashrc || echo '[ -f /root/.bashrc.hubbitus ] && . /root
 %files gui
 
 %changelog
+* Tue Jun 30 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-32
+- Add R multitail
+
 * Mon Jun 29 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-31
 - Add R kdeneur, yakuake, terminator to gui sub package
 
