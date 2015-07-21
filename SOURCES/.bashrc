@@ -26,6 +26,10 @@ alias ll='ls -l --color=auto'
 # Allow user aliases in sudo http://askubuntu.com/questions/22037/aliases-not-available-when-using-sudo
 alias sudo='sudo '
 
+alias ap=ansible-playbook
+
+alias sc=systemctl
+
 alias yum='nice -n19 yum'
 #alias rpmbuild='nice -n18 rpmbuild --target=athlon | egrep "Записан:|Wrote:" | cut -d" " -f2 | xargs -r rpmlint'
 rpmbuild (){

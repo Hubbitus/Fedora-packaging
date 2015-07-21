@@ -1,6 +1,6 @@
 Name:		Hubbitus-config
 Version:		1
-Release:		32%{?dist}
+Release:		34%{?dist}
 Summary:		Hubbitus system configuration
 Summary(ru):	Настройки системы Hubbitus
 
@@ -27,7 +27,7 @@ Requires:		screen, mc, bash-completion, colorize, git, colorize, php, ferm
 Requires:		wireshark, iotop, moreutils, grin, sshfs, htop, darkstat, glances
 Requires:		strace, sysstat, dstat, psmisc, nethogs, telnet, elmon, trafshow
 Requires:		the_silver_searcher, bind-utils, ncdu, vcsh, kde-dev-scripts
-Requires:		java-1.8.0-openjdk-headless, multitail
+Requires:		java-1.8.0-openjdk-headless, multitail, rsync, mutt
 # Request for epel7 was: https://bugzilla.redhat.com/show_bug.cgi?id=1141182
 Requires:		bmon
 # Request for epel7 was: https://bugzilla.redhat.com/show_bug.cgi?id=1141199
@@ -125,7 +125,7 @@ chown pasha -R /home/pasha/bin
 git_up 'https://github.com/Hubbitus/shell.scripts.git' '/root/bin'
 
 # Add once addon root .bashrc
-grep -q hubbitus /root/.bashrc || echo '[ -f /root/.bashrc.hubbitus ] && . /root/.bashrc.hubbitus' >> /root/.bashrc
+grep -q hubbitus /root/.bashrc || echo -e '\n[ -f /root/.bashrc.hubbitus ] && . /root/.bashrc.hubbitus' >> /root/.bashrc
 
 %files
 %attr(-,pasha,pasha) %config(noreplace) /home/pasha/.screenrc
@@ -150,6 +150,13 @@ grep -q hubbitus /root/.bashrc || echo '[ -f /root/.bashrc.hubbitus ] && . /root
 %files gui
 
 %changelog
+* Wed Jul 15 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-34
+- Add R mutt, fix root bashrc addition
+- Update root .bashrc to handle missing mc modarin256root-defbg theme and fallback on gotar
+
+* Wed Jul 08 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-32
+- Add R rsync
+
 * Tue Jun 30 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 1-32
 - Add R multitail
 
