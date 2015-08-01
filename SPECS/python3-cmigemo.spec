@@ -19,8 +19,7 @@ A C/Migemo binding for python written in pure python using ctypes.
 %setup -q -n cmigemo-%{version}
 
 %build
-# Remove CFLAGS=... for noarch packages (unneeded)
-CFLAGS="%{optflags}" %{__python3} setup.py build
+%{__python3} setup.py build
 
 %install
 %{__python3} setup.py install -O1 --skip-build --root %{buildroot}
