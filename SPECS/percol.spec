@@ -1,12 +1,13 @@
+# Review https://bugzilla.redhat.com/show_bug.cgi?id=1249329
 %global commit0 b567f41830f3ac814e71688f9d2e13ea337f618d
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 Name:          percol
 Version:       0.1.1
-Release:       0.1%{?shortcommit0:.git.%{shortcommit0}}%{?dist}
+Release:       0.2%{?shortcommit0:.git.%{shortcommit0}}%{?dist}
 Summary:       Interactive selection to the traditional pipe concept on UNIX
 
-License:       GPLv2+
+License:       MIT
 URL:           https://github.com/mooz/percol
 %if 0%{?commit0:1}
 Source0:       https://github.com/mooz/%{name}/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
@@ -17,7 +18,7 @@ Source0:       https://github.com/mooz/%{name}/archive/v%{version}.tar.gz#/%{nam
 BuildArch:     noarch
 BuildRequires: python3-devel
 BuildRequires: python3-cmigemo
-Requires:      python3-six
+Requires:      python3-six python3-cmigemo
 
 %description
 percol is an interactive grep tool in your terminal. percol
@@ -51,6 +52,12 @@ used in command-chains with | in your shell (UNIX philosophy!).
 %{python3_sitelib}/*
 
 %changelog
+* Sat Nov 28 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.1.1-0.2.git.b567f41
+- Review in progress - https://bugzilla.redhat.com/show_bug.cgi?id=1249329. Thanks to Julien Enselme.
+- Change License to MIT (GPL statements removed: https://github.com/mooz/percol/commit/d0bc902555fff5abef85012af3cbc323b915843b).
+- Requested license text inclusion: https://github.com/mooz/percol/issues/87
+- Add requires python3-cmigemo
+
 * Sun Jul 26 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.1.1-0.1.git.b567f41
 - Master build, two problems reported by me addressed now:
     o FSF address: https://github.com/mooz/percol/issues/77
