@@ -1,7 +1,9 @@
 #% global GITrev ec8d48f
 
+%global prever alpha1
+
 Name:             pgmodeler
-Version:          0.8.1
+Version:          0.8.2
 Release:          0.alpha.1%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
@@ -10,7 +12,7 @@ URL:              http://www.pgmodeler.com.br/
 Group:            Applications/Databases
 # Script to generate main source0 for git based builds
 Source1:          %{name}.get.tarball
-Source0:          https://github.com/%{name}/%{name}/archive/v%{version}-alpha.tar.gz
+Source0:          https://github.com/%{name}/%{name}/archive/v%{version}%{?prever:-%{prever}}.tar.gz#/%{name}-%{version}%{?prever:-%{prever}}.tar.gz
 Source2:          %{name}.desktop
 Source3:          pgmodeler-mime-dbm.xml
 
@@ -41,7 +43,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q -n %{name}-%{version}-alpha
+%setup -q -n %{name}-%{version}%{?prever:-%{prever}}
 
 %build
 # @TODO Due to the bug (https://github.com/pgmodeler/pgmodeler/issues/559) CONFDIR, LANGDIR, SAMPLESDIR, SCHEMASDIR seems ignored?
@@ -75,6 +77,9 @@ install -p -m 644 %{SOURCE3} %{buildroot}%{_datadir}/mime/packages/%{name}.xml
 
 install -Dp -m 644 %{name}.appdata.xml %{buildroot}/%{_datadir}/appdata/%{name}.appdata.xml
 appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/appdata/%{name}.appdata.xml
+
+# License installed separately
+rm -f %{buildroot}/%{_docdir}/%{name}/LICENSE
 
 # http://fedoraproject.org/wiki/Packaging:ScriptletSnippets#desktop-database
 %post
@@ -112,6 +117,10 @@ update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 %{_libdir}/%{name}/lib*.so
 
 %changelog
+* Thu Nov 26 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-0.alpha.1
+- New upstream version - 0.8.2-alpha1.
+- New segfault issue: https://github.com/pgmodeler/pgmodeler/issues/777
+
 * Sun Apr 05 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.1-0.alpha.1
 - 0.8.1-alpha. My app-data included (https://github.com/pgmodeler/pgmodeler/issues/622). Add App-Data handling.
 - Remove Patch0: pgmodeler-0.8.0-fixConfDumpInPri.patch (https://github.com/pgmodeler/pgmodeler/issues/618) which already in source.
