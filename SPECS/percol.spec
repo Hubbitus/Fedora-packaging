@@ -4,7 +4,7 @@
 
 Name:          percol
 Version:       0.1.1
-Release:       0.2%{?shortcommit0:.git.%{shortcommit0}}%{?dist}
+Release:       0.3%{?shortcommit0:.git.%{shortcommit0}}%{?dist}
 Summary:       Interactive selection to the traditional pipe concept on UNIX
 
 License:       MIT
@@ -38,10 +38,10 @@ used in command-chains with | in your shell (UNIX philosophy!).
 %endif
 
 %build
-%{__python3} setup.py build
+%{py3_build}
 
 %install
-%{__python3} setup.py install -O1 --skip-build --root %{buildroot}
+%{py3_install}
 
 %check
 %{__python3} setup.py test
@@ -52,6 +52,10 @@ used in command-chains with | in your shell (UNIX philosophy!).
 %{python3_sitelib}/*
 
 %changelog
+* Sun Nov 29 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.1.1-0.3.git.b567f41
+- Review done.
+- Use new python pacroses %%py3_build and %%py3_install.
+
 * Sat Nov 28 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.1.1-0.2.git.b567f41
 - Review in progress - https://bugzilla.redhat.com/show_bug.cgi?id=1249329. Thanks to Julien Enselme.
 - Change License to MIT (GPL statements removed: https://github.com/mooz/percol/commit/d0bc902555fff5abef85012af3cbc323b915843b).
