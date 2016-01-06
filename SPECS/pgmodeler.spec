@@ -4,7 +4,7 @@
 
 Name:             pgmodeler
 Version:          0.8.2
-Release:          0.beta.1%{?GITrev:.git.%{GITrev}}%{?dist}
+Release:          0.2.beta%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -74,6 +74,8 @@ convert -resize 256x256 pgmodeler_logo.png - | sponge pgmodeler_logo.png
 install -p -dm 755 %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/ %{buildroot}%{_datadir}/mime/packages/
 install -p -m 644 conf/%{name}_logo.png %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/
 install -p -m 644 %{SOURCE3} %{buildroot}%{_datadir}/mime/packages/%{name}.xml
+# https://github.com/pgmodeler/pgmodeler/issues/783
+mkdir -p %{buildroot}%{_libdir}/%{name}/plugins
 
 install -Dp -m 644 %{name}.appdata.xml %{buildroot}/%{_datadir}/appdata/%{name}.appdata.xml
 appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/appdata/%{name}.appdata.xml
@@ -117,7 +119,10 @@ update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 %{_libdir}/%{name}/lib*.so
 
 %changelog
-* Sat Jan 02 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-0.beta.1
+* Tue Jan 05 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-0.2.beta
+- Create plugins directory to do not complain on start: https://github.com/pgmodeler/pgmodeler/issues/783
+
+* Sat Jan 02 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-0.1.beta
 - Try build 0.8.2-beta1 by suggestion in (https://github.com/pgmodeler/pgmodeler/issues/777)
 
 * Thu Nov 26 2015 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-0.alpha.1
