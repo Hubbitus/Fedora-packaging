@@ -1,13 +1,14 @@
+%global commit0 e776a806407a85bd7ea2ba3fb05a47b86f2f5b54
+%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
+
 Name:           caelum
-Version:        0.6.1
-Release:        4%{?dist}
+Version:        0.6.2
+Release:        0.1%{?shortcommit0:.git.%{shortcommit0}}%{?dist}
 Summary:        Add-on for the 3D graphics rendering engine OGRE
 
 License:        LGPLv3+
-URL:            http://code.google.com/p/caelum/
-# RPM does not uderstand that full URL: http://code.google.com/p/caelum/downloads/detail?name=caelum-0.6.1.tar.gz&can=2&q=
-Source0:        %{name}-%{version}.tar.gz
-Patch0:         caelum-0.6.1-ogre-1.8.1.patch
+URL:            https://bitbucket.org/ogreaddons/caelum/overview
+Source0:        https://github.com/RigsOfRods/%{name}/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
 BuildRequires:  ogre-devel, cmake, ois-devel
 
 %description
@@ -25,9 +26,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q
-%patch0 -p1 -b .ogre.1.8.1
-
+%setup -qn %{name}-%{commit0}
 
 %build
 %cmake .
@@ -36,6 +35,10 @@ make %{?_smp_mflags}
 
 %install
 %make_install
+
+# It just OGRE plugin (http://www.rigsofrods.com/wiki/pages/Compiling_Sources_under_Linux#Caelum_.28dynamic_sky_-_optional.29)
+mkdir -p %{buildroot}/%{_libdir}/OGRE/
+mv %{buildroot}/%{_libdir}/libCaelum.so %{buildroot}/%{_libdir}/OGRE/libCaelum.so
 
 rm -rf %{buildroot}/usr/doc
 
@@ -46,8 +49,8 @@ rm -rf %{buildroot}/usr/doc
 
 
 %files
-%doc Contributors.txt ReadMe.txt lgpl.txt
-%{_libdir}/libCaelum.so
+%doc Contributors.txt ReadMe.txt lgpl.txt gpl.txt
+%{_libdir}/OGRE/libCaelum.so
 
 %files devel
 %{_includedir}/Caelum
@@ -55,6 +58,13 @@ rm -rf %{buildroot}/usr/doc
 
 
 %changelog
+* Wed Jan 06 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.6.2-0.1.git.e776a80
+- Change upstream to https://github.com/RigsOfRods/caelum
+- Update to unreleased version 0.6.2 (change versioning).
+- Update spec to use upstream VCS.
+- Move so file in OGRE dir as it is just plugin.
+- Drop old patch.
+
 * Sat Feb 9 2013 Pavel Alexeev <Pahan@Hubbitus.info> - 0.6.1-4
 - Add BR ois-devel
 - Exclude gpl.txt.
