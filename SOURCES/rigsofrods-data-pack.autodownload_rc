@@ -1,0 +1,27 @@
+[MESSAGE]
+	[TITLE]Click 'Accept' to start download high quality pack[/TITLE]
+	[TEXT]RigsOfRods basically may start without additional resources, but there will be available only 2 demo terrain.
+
+To play with pleasure you need download one or more data files with music, sound, various models (car, track, helicopters, airplanes etc).
+
+You may found many of such things in official repository by URL: http://www.rigsofrods.com/repository/
+Instructions how to install - http://www.rigsofrods.com/wiki/pages/Installing_Files_from_the_Repository_post_0.36
+
+That content licensed separately as authors want. In most cases it free for download and use, but require permissions for modification! So, if you plan modify it - please contact their authors first if you do not see explicitly granted permission on add-on page.
+
+There also possibility download it by PACKS (http://www.rigsofrods.com/wiki/pages/Starting_RoR_under_Linux).
+If you click 'Accept' button it will be downloaded automatically into home user directory.
+Please note its size about 1Gb.
+[/TEXT]
+[/MESSAGE]
+
+[FILELIST]
+[FILE]
+	[FILENAME]pack_highquality04.zip[/FILENAME]
+	[MD5]374ecf0323f9002f351f6fda38548379[/MD5]
+	[PATH]$HOME/.rigsofrods/packs[/PATH]
+	[MIRRORS]
+		[URL]http://www.rigsofrods.com/repository/downloadCDN/pack_highquality04.zip[/URL]
+	[/MIRRORS]
+[/FILE]
+[/FILELIST]

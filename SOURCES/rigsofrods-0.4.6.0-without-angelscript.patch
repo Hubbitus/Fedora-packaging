@@ -1,0 +1,15 @@
+diff -NurEbBH '--exclude=nbproject' '--exclude=Progress' '--exclude=*.fresh-angelscript' '--exclude=*.log' '--exclude=*.includecache' '--exclude=*.internal' '--exclude=*.o' '--exclude=depend.make' rigs-of-rods-23c619a9010e375ea7357ef190ff683f2beac5d4.orig/bin/resources/particles/water.particle rigs-of-rods-23c619a9010e375ea7357ef190ff683f2beac5d4/bin/resources/particles/water.particle
+--- rigs-of-rods-23c619a9010e375ea7357ef190ff683f2beac5d4.orig/bin/resources/particles/water.particle	2016-01-07 23:27:32.000000000 +0300
++++ rigs-of-rods-23c619a9010e375ea7357ef190ff683f2beac5d4/bin/resources/particles/water.particle	2016-01-16 20:13:13.346580283 +0300
+@@ -46,11 +46,6 @@
+ 			rotation_speed_range_end    	1
+ 	}
+ 
+-	affector FireExtinguisher
+-	{
+-		effectiveness 	1
+-	}
+-
+ }
+ 
+ particle_system tracks/particles/waterRed
