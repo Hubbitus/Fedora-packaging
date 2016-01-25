@@ -1,9 +1,9 @@
-%global commit0 23c619a9010e375ea7357ef190ff683f2beac5d4
+%global commit0 3e56c073e42dd64c6d15272f9312b58f76a7fd1b
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 Name:          rigsofrods
 Version:       0.4.6.0
-Release:       0.5%{?shortcommit0:.git.%{shortcommit0}}%{?dist}
+Release:       0.6%{?shortcommit0:.git.%{shortcommit0}}%{?dist}
 Summary:       Vehicle simulator based on soft-body physics
 
 License:       GPLv3
@@ -27,11 +27,6 @@ Requires:      unzip, autodownloader
 # Update to 23c619a9010e375ea7357ef190ff683f2beac5d4 - https://github.com/RigsOfRods/rigs-of-rods/issues/534 closed. Build without angelscript until https://github.com/RigsOfRods/rigs-of-rods/issues/530 resolved.
 # patch as sugested in https://github.com/RigsOfRods/rigs-of-rods/commit/23c619a9010e375ea7357ef190ff683f2beac5d4.
 Patch1:        rigsofrods-0.4.6.0-without-angelscript.patch
-# https://github.com/RigsOfRods/rigs-of-rods/issues/156
-Patch2:        rigsofrods-0.4.6.0-mygui-gt-2.2.1.patch
-
-# It did not compiled on arm: https://github.com/RigsOfRods/rigs-of-rods/issues/608
-ExcludeArch:   %{arm}
 
 %description
 Rigs of Rods is an open source vehicle simulator licensed under the GNU General
@@ -56,7 +51,6 @@ Features
 %prep
 %setup -qn rigs-of-rods-%{commit0}
 %patch1 -p1 -b .without-angelscript
-%patch2 -p1 -b .mygui-gt-2.2.1
 
 # Convert lineendings
 dos2unix --keepdate README.md COPYING
@@ -148,6 +142,10 @@ EOF
 %{_datarootdir}/%{name}
 
 %changelog
+* Sun Jan 24 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.4.6.0-0.6.git.3e56c07
+- Issue with compilation on ARM resolved (https://github.com/RigsOfRods/rigs-of-rods/issues/608).
+- Drop rigsofrods-0.4.6.0-mygui-gt-2.2.1.patch as it incorporated (https://github.com/RigsOfRods/rigs-of-rods/issues/156 -> https://github.com/RigsOfRods/rigs-of-rods/pull/547)
+
 * Sun Jan 17 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.4.6.0-0.5.git.23c619a
 - Does not compiled on ARM - https://github.com/RigsOfRods/rigs-of-rods/issues/608. Excluded.
 
