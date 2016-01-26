@@ -1,14 +1,14 @@
-%global commit0 e776a806407a85bd7ea2ba3fb05a47b86f2f5b54
+%global commit0 b33ce46e289e158e0ca2beae1265bec4cfcd7d1e
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 Name:           caelum
-Version:        0.6.2
+Version:        0.6.3
 Release:        0.1%{?shortcommit0:.git.%{shortcommit0}}%{?dist}
 Summary:        Add-on for the 3D graphics rendering engine OGRE
 
 License:        LGPLv3+
-URL:            https://bitbucket.org/ogreaddons/caelum/overview
-Source0:        https://github.com/RigsOfRods/%{name}/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
+URL:            https://github.com/RigsOfRods/ogre-caelum
+Source0:        https://github.com/RigsOfRods/ogre-caelum/archive/%{commit0}.tar.gz#/%{name}-%{shortcommit0}.tar.gz
 BuildRequires:  ogre-devel, cmake, ois-devel
 
 %description
@@ -26,7 +26,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -qn %{name}-%{commit0}
+%setup -qn ogre-%{name}-%{commit0}
 
 %build
 %cmake .
@@ -58,6 +58,10 @@ rm -rf %{buildroot}/usr/doc
 
 
 %changelog
+* Sun Jan 10 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.6.3-0.1.git.b33ce46
+- Change repo to https://github.com/RigsOfRods/ogre-caelum from https://github.com/RigsOfRods/caelum which are deprecated (https://github.com/RigsOfRods/rigs-of-rods/issues/550#issuecomment-170330973)!
+- Report https://github.com/RigsOfRods/ogre-caelum/issues/1.
+
 * Wed Jan 06 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.6.2-0.1.git.e776a80
 - Change upstream to https://github.com/RigsOfRods/caelum
 - Update to unreleased version 0.6.2 (change versioning).
