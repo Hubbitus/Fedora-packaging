@@ -1,7 +1,8 @@
+# Review request: https://bugzilla.redhat.com/show_bug.cgi?id=1302053
 Summary:            Top-like PostgreSQL statistics viewer
 Name:               pgcenter
 Version:            0.2.0
-Release:            1%{?dist}
+Release:            2%{?dist}
 License:            BSD
 Group:              Development/Tools
 URL:                https://github.com/lesovsky/pgcenter
@@ -17,7 +18,7 @@ Moreover, statistics has detailed information about connections, current
 queries and database operations (INSERT/DELETE/UPDATE). But most of this
 statistics are provided as permanently incremented counters. The pgcenter
 provides convenient interface to this statistics and allow viewing statistics
-changes in time interval, eg. per second. The pgcenter provides fast access
+changes in time interval, e.g. per second. The pgcenter provides fast access
 for database management task, such as editing configuration files, reloading
 services, viewing log files and canceling or terminating database backends
 (by pid or using state mask). However if need execute some specific
@@ -27,16 +28,21 @@ operations, pgcenter can start psql session for this purposes.
 %setup -qn %{name}-%{version}
 
 %build
-make %{?_smp_mflags}
+make %{?_smp_mflags} NCONFIG='%(ls %{_bindir}/ncurses[56]-config)'
 
 %install
 %{make_install}
 
 %files
-%doc COPYRIGHT README.md
+%license COPYRIGHT
+%doc README.md
 %{_bindir}/%{name}
 
 %changelog
+* Fri Jan 29 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.2.0-2
+- In rawhide ncurses 6 landed. Account both 5 and 6.
+- Use %%license for COPYRIGHT file.
+
 * Mon Jan 25 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.2.0-1
 - Import http://testing.yum.kaos.io/SRPMS/repoview/pgcenter.html
 - Change BR postgresql94-devel -> postgresql-devel
