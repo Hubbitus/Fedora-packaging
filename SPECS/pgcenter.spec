@@ -2,7 +2,7 @@
 Summary:            Top-like PostgreSQL statistics viewer
 Name:               pgcenter
 Version:            0.2.0
-Release:            2%{?dist}
+Release:            3%{?dist}
 License:            BSD
 Group:              Development/Tools
 URL:                https://github.com/lesovsky/pgcenter
@@ -32,13 +32,19 @@ make %{?_smp_mflags} NCONFIG='%(ls %{_bindir}/ncurses[56]-config)'
 
 %install
 %{make_install}
+install -Dpm 644 doc/%{name}.1.gz %{buildroot}/%{_mandir}/man1/%{name}.1.gz
 
 %files
 %license COPYRIGHT
-%doc README.md
+%doc README.md doc/Changelog
+%{_mandir}/man1/%{name}.1.gz
 %{_bindir}/%{name}
 
 %changelog
+* Sat Feb 06 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.2.0-3
+- Package approved to Fedora.
+- Add doc/Changelog and man page as suggested.
+
 * Fri Jan 29 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.2.0-2
 - In rawhide ncurses 6 landed. Account both 5 and 6.
 - Use %%license for COPYRIGHT file.
