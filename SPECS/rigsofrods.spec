@@ -1,9 +1,9 @@
-%global commit0 3e56c073e42dd64c6d15272f9312b58f76a7fd1b
+%global commit0 64ad6f6a2de8dc7e0ce3ee8c29cb8f0956197548
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 Name:          rigsofrods
 Version:       0.4.6.0
-Release:       0.6%{?shortcommit0:.git.%{shortcommit0}}%{?dist}
+Release:       0.7%{?shortcommit0:.git.%{shortcommit0}}%{?dist}
 Summary:       Vehicle simulator based on soft-body physics
 
 License:       GPLv3
@@ -142,6 +142,10 @@ EOF
 %{_datarootdir}/%{name}
 
 %changelog
+* Sat Aug 06 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.4.6.0-0.7.git.64ad6f6
+- Update to 64ad6f6.
+- Update high quality pack URL (by https://github.com/RigsOfRods/rigs-of-rods/issues/602#issuecomment-224537716)
+
 * Sun Jan 24 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.4.6.0-0.6.git.3e56c07
 - Issue with compilation on ARM resolved (https://github.com/RigsOfRods/rigs-of-rods/issues/608).
 - Drop rigsofrods-0.4.6.0-mygui-gt-2.2.1.patch as it incorporated (https://github.com/RigsOfRods/rigs-of-rods/issues/156 -> https://github.com/RigsOfRods/rigs-of-rods/pull/547)
