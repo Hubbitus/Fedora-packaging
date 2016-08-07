@@ -1,10 +1,9 @@
-%global GITrev 8d1e180
-
-%global prever beta
+#global GITrev 8d1e180
+#global prever beta
 
 Name:             pgmodeler
 Version:          0.8.2
-Release:          0.2.beta%{?GITrev:.git.%{GITrev}}%{?dist}
+Release:          1%{?prever:.%{prever}}%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -18,7 +17,7 @@ Source3:          pgmodeler-mime-dbm.xml
 
 Requires:         hicolor-icon-theme
 BuildRequires:    qt5-qtbase-devel, libxml2-devel, postgresql-devel
-BuildRequires:    desktop-file-utils, gettext
+BuildRequires:    desktop-file-utils, gettext, qt5-qtsvg-devel
 # for convert 300x300 logo file to 256x256
 BuildRequires:    ImageMagick, moreutils
 
@@ -51,7 +50,7 @@ developing applications that use %{name}.
 # CONFDIR=%%{_sysconfdir}/%%{name} \
 # LANGDIR=%%{_datadir}/locale \
 # SCHEMASDIR=%%{_sysconfdir}/%%{name} \
-%_qt5_qmake -recursive \
+%_qt5_qmake %{_qt5_qmake_flags} \
  PREFIX=%{_prefix} \
  BINDIR=%{_bindir} \
  PRIVATEBINDIR=%{_libexecdir} \
@@ -62,8 +61,8 @@ developing applications that use %{name}.
   %{name}.pro
 
 # May be used instead of providing CXX to make
-#sed -i 's#CXX           = g++#CXX           = g++ -std=c++11#g' */Makefile */*/Makefile
-make %{?_smp_mflags} CXX="g++ -std=c++11"
+#?make %{?_smp_mflags} CXX="g++ -std=c++11"
+make %{?_smp_mflags}
 
 %install
 %make_install INSTALL_ROOT=%{buildroot}
@@ -82,6 +81,8 @@ appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/appdata/%{name}.a
 
 # License installed separately
 rm -f %{buildroot}/%{_docdir}/%{name}/LICENSE
+
+%find_lang %{name} --with-qt --all-name
 
 # http://fedoraproject.org/wiki/Packaging:ScriptletSnippets#desktop-database
 %post
@@ -102,7 +103,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 
 
-%files
+%files -f %{name}.lang
 %doc CHANGELOG.md README.md RELEASENOTES.md
 %license LICENSE
 %{_bindir}/%{name}
@@ -110,6 +111,7 @@ update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 %{_libexecdir}/%{name}-ch
 %{_libdir}/%{name}
 %{_datarootdir}/%{name}
+%exclude %{_datarootdir}/%{name}/lang/*
 %{_datadir}/icons/hicolor
 %{_datadir}/mime/packages/%{name}.xml
 %{_datadir}/applications/%{name}.desktop
@@ -119,6 +121,13 @@ update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 %{_libdir}/%{name}/lib*.so
 
 %changelog
+* Sun Aug 07 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-1
+- Update version to release 0.8.2.
+- Fix prerev var usage.
+- Add BR qt5-qtsvg-devel.
+- Use _qt5_qmake_flags macros to honor Fedora build flags, drop old hacks.
+- Step to use find_lang macro for localizations.
+
 * Tue Jan 05 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-0.2.beta
 - Create plugins directory to do not complain on start: https://github.com/pgmodeler/pgmodeler/issues/783
 
