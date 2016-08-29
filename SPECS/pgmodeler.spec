@@ -1,9 +1,11 @@
+# ReviewRequest: https://bugzilla.redhat.com/show_bug.cgi?id=977116
+
 #global GITrev 8d1e180
 #global prever beta
 
 Name:             pgmodeler
 Version:          0.8.2
-Release:          1%{?prever:.%{prever}}%{?GITrev:.git.%{GITrev}}%{?dist}
+Release:          2%{?prever:.%{prever}}%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -50,7 +52,7 @@ developing applications that use %{name}.
 # CONFDIR=%%{_sysconfdir}/%%{name} \
 # LANGDIR=%%{_datadir}/locale \
 # SCHEMASDIR=%%{_sysconfdir}/%%{name} \
-%_qt5_qmake %{_qt5_qmake_flags} \
+%qmake_qt5 \
  PREFIX=%{_prefix} \
  BINDIR=%{_bindir} \
  PRIVATEBINDIR=%{_libexecdir} \
@@ -60,9 +62,7 @@ developing applications that use %{name}.
  PRIVATELIBDIR=%{_libdir}/%{name} \
   %{name}.pro
 
-# May be used instead of providing CXX to make
-#?make %{?_smp_mflags} CXX="g++ -std=c++11"
-make %{?_smp_mflags}
+%make_build
 
 %install
 %make_install INSTALL_ROOT=%{buildroot}
@@ -121,6 +121,10 @@ update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 %{_libdir}/%{name}/lib*.so
 
 %changelog
+* Mon Aug 29 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-2
+- Review request in progress - bz#977116. Thanks to Igor Gnatenko. Changes by comments https://github.com/Hubbitus/Fedora-packaging/commit/d0716a3d152c8d085988944bce7140b8e56f2e64#commitcomment-18686601
+- Use macroses %%qmake_qt5 and %%make_build.
+
 * Sun Aug 07 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-1
 - Update version to release 0.8.2.
 - Fix prerev var usage.
