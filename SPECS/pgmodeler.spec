@@ -5,7 +5,7 @@
 
 Name:             pgmodeler
 Version:          0.8.2
-Release:          2%{?prever:.%{prever}}%{?GITrev:.git.%{GITrev}}%{?dist}
+Release:          3%{?prever:.%{prever}}%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -33,15 +33,6 @@ concepts of entity-relationship diagrams with specific features that
 only PostgreSQL implements. The pgModeler translates the models created
 by the user to SQL code and apply them onto database clusters (Version
 9.x).
-
-%package devel
-Summary:        Development files for %{name}
-Group:          Development/Libraries
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description devel
-The %{name}-devel package contains libraries and header files for
-developing applications that use %{name}.
 
 %prep
 %setup -q -n %{name}-%{version}%{?prever:_%{prever}}
@@ -116,11 +107,14 @@ update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 %{_datadir}/mime/packages/%{name}.xml
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/appdata/%{name}.appdata.xml
-
-%files devel
+# That is not devel files! All in subdirectory and needs to load plugins only
 %{_libdir}/%{name}/lib*.so
 
 %changelog
+* Sun Sep 11 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-3
+- Review taken by Sandro Mani.
+- Drop devel sub-package because it almost empty.
+
 * Mon Aug 29 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-2
 - Review request in progress - bz#977116. Thanks to Igor Gnatenko. Changes by comments https://github.com/Hubbitus/Fedora-packaging/commit/d0716a3d152c8d085988944bce7140b8e56f2e64#commitcomment-18686601
 - Use macroses %%qmake_qt5 and %%make_build.
