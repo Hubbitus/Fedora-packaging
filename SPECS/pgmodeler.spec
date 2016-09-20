@@ -3,9 +3,13 @@
 #global GITrev 8d1e180
 #global prever beta
 
+%global _privatelibs lib(objrenderer|parsers|pgconnector|pgmodeler|pgmodeler_ui|utils)\\.so
+%global __provides_exclude (%{_privatelibs})
+%global __requires_exclude (%{_privatelibs})
+
 Name:             pgmodeler
 Version:          0.8.2
-Release:          3%{?prever:.%{prever}}%{?GITrev:.git.%{GITrev}}%{?dist}
+Release:          4%{?prever:.%{prever}}%{?GITrev:.git.%{GITrev}}%{?dist}
 Summary:          PostgreSQL Database Modeler
 
 License:          GPLv3
@@ -17,7 +21,7 @@ Source0:          https://github.com/%{name}/%{name}/archive/v%{version}%{?preve
 Source2:          %{name}.desktop
 Source3:          pgmodeler-mime-dbm.xml
 
-Requires:         hicolor-icon-theme
+Requires:         hicolor-icon-theme, shared-mime-info
 BuildRequires:    qt5-qtbase-devel, libxml2-devel, postgresql-devel
 BuildRequires:    desktop-file-utils, gettext, qt5-qtsvg-devel
 # for convert 300x300 logo file to 256x256
@@ -100,17 +104,23 @@ update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 %{_bindir}/%{name}
 %{_bindir}/%{name}-cli
 %{_libexecdir}/%{name}-ch
+# %%{_libdir}/%%{name}/lib*.so are not devel files! All in subdirectory and needs to load plugins only
 %{_libdir}/%{name}
 %{_datarootdir}/%{name}
 %exclude %{_datarootdir}/%{name}/lang/*
-%{_datadir}/icons/hicolor
+%{_datadir}/icons/hicolor/256x256/apps/pgmodeler_logo.png
 %{_datadir}/mime/packages/%{name}.xml
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/appdata/%{name}.appdata.xml
-# That is not devel files! All in subdirectory and needs to load plugins only
-%{_libdir}/%{name}/lib*.so
 
 %changelog
+* Tue Sep 20 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-4
+- Review in progress. Thanks to Sandro Mani.
+- Add Requires shared-mime-info
+- Explicit require single logo file.
+- Drop listing %%{_libdir}/%%{name}/lib*.so twice.
+- Filter out private requires anf provides from '%%{_libdir}/%%{name}/lib*.so*'
+
 * Sun Sep 11 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.8.2-3
 - Review taken by Sandro Mani.
 - Drop devel sub-package because it almost empty.
