@@ -1,1 +1,0 @@
-Hubbitus-release.spec.F23
