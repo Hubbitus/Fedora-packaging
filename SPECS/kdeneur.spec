@@ -3,8 +3,8 @@
 Summary:       KDE frontend for X Neural Switcher (xneur)
 Summary(ru):   KDE интерфейс для X Neural Switcher (xneur)
 Name:          kdeneur
-Version:       0.17.0
-Release:       2%{?HGrev:.hg%{HGrev}}%{?dist}
+Version:       0.19.0
+Release:       1%{?HGrev:.hg%{HGrev}}%{?dist}
 
 Group:         User Interface/Desktops
 License:       GPLv2+
@@ -17,7 +17,7 @@ Source:        https://launchpad.net/~andrew-crew-kuznetsov/+archive/xneur-stabl
 %endif
 Source1:       kdeneur.desktop
 
-BuildRequires: desktop-file-utils, pcre-devel, qt-devel, kdelibs-devel
+BuildRequires: desktop-file-utils, pcre-devel, qt5-qtbase-devel, kdelibs-devel
 BuildRequires: xneur-devel = %{version}
 %if 0%{?HGrev}
 BuildRequires: libtool
@@ -74,7 +74,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
 %files -f %{name}.lang
-%doc AUTHORS ABOUT-NLS COPYING ChangeLog NEWS
+%doc AUTHORS ABOUT-NLS COPYING ChangeLog
 %{_bindir}/%{name}
 %{_datadir}/%{name}
 # To do not list files twice it must be listed by find_lang helper
@@ -84,6 +84,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Mon Oct 10 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 0.19.0-1
+- Update to version 0.19.0.
+
 * Sat Oct 25 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.17.0-2
 - Require versioned xneur but without release part to do not account any rebuilds.
 
