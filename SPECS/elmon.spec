@@ -2,7 +2,7 @@
 
 Name:           elmon
 Version:        13b1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Performance monitoring tool
 
 License:        GPLv3
@@ -10,7 +10,6 @@ URL:            http://elmon.sourceforge.net/
 Source0:        http://sourceforge.net/projects/%{name}/files/%{name}_%{version}.tar
 
 BuildRequires:  ncurses-devel
-BuildRequires:  gcc
 
 %description
 elmon is a performance monitoring tool for Linux. It provides an ncurses
@@ -52,6 +51,9 @@ install elmon_x86_rhel52 %{buildroot}/%{_bindir}/%{name}
 
 
 %changelog
+* Wed Oct 26 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 13b1-3
+- Drop BR gcc
+
 * Tue Sep 13 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 13b1-2
 - Shorter description.
 - Cleanup.
