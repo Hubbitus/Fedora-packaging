@@ -1,13 +1,15 @@
+# Review request: https://bugzilla.redhat.com/show_bug.cgi?id=1028743
+
 Name:             hans
-Version:          0.4.3
-Release:          3%{?dist}
+Version:          1.0
+Release:          1%{?dist}
 Summary:          IP over ICMP tunneling solution
 Group:            System Environment/Daemons
 
 License:          GPLv3+
 URL:              http://code.gerade.org/hans/
-Source0:          https://github.com/friedrich/%{name}/archive/v%{version}.tar.gz
-# My systemd, sysvinit and preconfiguration stuff
+Source0:          https://github.com/friedrich/%{name}/archive/v%{version}.tar.gz#/hans-%{version}.tar.gz
+# My systemd and preconfiguration stuff
 Source1:          %{name}-client.service
 Source2:          %{name}-server.service
 Source3:          %{name}-client.sysconfig
@@ -34,7 +36,7 @@ BuildRequires:    systemd
 Requires:         %{name}
 
 %description client
-This is the client part of %{name} sulution.
+This is the client part of %{name} solution.
 
 %package server
 Summary:          Server part of solution to tunnel IPv4 data through a ICMP
@@ -91,7 +93,8 @@ exit 0
 %systemd_postun_with_restart %{name}.service
 
 %files
-%doc CHANGES LICENSE README.md
+%doc CHANGES README.md
+%license LICENSE
 %{_sbindir}/%{name}
 
 %files client
@@ -103,6 +106,12 @@ exit 0
 %{_unitdir}/%{name}-server.service
 
 %changelog
+* Sun Nov 27 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 1.0-1
+- Thanks to Michal Ambroz for taking review.
+- Update to version 1.0.
+- Add tarball name into source url.
+- Mark license with appropriate macros.
+
 * Tue Mar 11 2014 Pavel Alexeev <Pahan@Hubbitus.info> - 0.4.3-3
 - Drop all sysvinit support because it now MUST NOT be present in new packages (https://fedoraproject.org/wiki/Packaging:SysVInitScript?rd=Packaging/SysVInitScript#Initscripts_in_addition_to_systemd_unit_files).
 - Change user creation procedure, move in base package.
