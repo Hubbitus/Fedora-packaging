@@ -2,7 +2,7 @@
 
 Name:             hans
 Version:          1.0
-Release:          1%{?dist}
+Release:          2%{?dist}
 Summary:          IP over ICMP tunneling solution
 Group:            System Environment/Daemons
 
@@ -33,7 +33,7 @@ Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
 BuildRequires:    systemd
-Requires:         %{name}
+Requires:         %{name}%{?_isa} = %{version}-%{release}
 
 %description client
 This is the client part of %{name} solution.
@@ -45,7 +45,7 @@ Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
 BuildRequires:    systemd
-Requires:         %{name}
+Requires:         %{name}%{?_isa} = %{version}-%{release}
 
 %description server
 This is the server part of %{name} solution.
@@ -54,8 +54,8 @@ This is the server part of %{name} solution.
 %setup -q
 
 %build
-#%% configure
-make %{?_smp_mflags}
+# no configure scripts
+make %{?_smp_mflags} FLAGS="%{optflags}"
 
 %install
 install -pD %{name} %{buildroot}/%{_sbindir}/%{name}
@@ -68,11 +68,6 @@ install -Dp -m 0644 %{SOURCE4} %{buildroot}/%{_sysconfdir}/sysconfig/%{name}-ser
 
 %pre
 getent passwd %{name} >/dev/null || useradd -r -s /sbin/nologin -c "IP over ICMP tunneling user" %{name}
-exit 0
-
-%pre server
-# Add the "hans" user
-/usr/sbin/useradd -c "IP over ICMP" -s /sbin/nologin -r %{name} 2> /dev/null || :
 
 %post client
 %systemd_post %{name}.service
@@ -106,6 +101,12 @@ exit 0
 %{_unitdir}/%{name}-server.service
 
 %changelog
+* Sat Jan 21 2017 Pavel Alexeev <Pahan@Hubbitus.info> - 1.0-2
+- Add %%{optflags}
+- Single %%pre for user creation
+- Make requires fully versioned
+- Place <PASSWORD> to force user set it
+
 * Sun Nov 27 2016 Pavel Alexeev <Pahan@Hubbitus.info> - 1.0-1
 - Thanks to Michal Ambroz for taking review.
 - Update to version 1.0.
